@@ -43,7 +43,9 @@
     "eslint": "catalog:",
     "jiti": "^1.21.6",
     "prettier": "catalog:",
+    "prettier-plugin-tailwindcss": "^0.6.5",
     "tailwindcss": "^3.4.4",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "catalog:"
   },
   "prettier": "@acme/prettier-config"
