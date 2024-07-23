@@ -90,3 +90,35 @@ export const Session = pgTable("session", {
 export const SessionRelations = relations(Session, ({ one }) => ({
   user: one(User, { fields: [Session.userId], references: [User.id] }),
 }));
+
+// My schema below
+
+export const Article = pgTable("article", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content").notNull(),
+  draft_content: text("draft_content"),
+  previewImage: varchar("preview_image", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", {
+    mode: "date",
+    withTimezone: true,
+  }).$onUpdateFn(() => sql`now()`),
+});
+
+export const CreditedPeople = pgTable("credited_people", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+});
+
+export const CreateArticleSchema = createInsertSchema(Article, {
+  title: z.string().max(255),
+  content: z.string().max(255),
+  draft_content: z.string().max(255),
+  previewImage: z.string().max(255),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
