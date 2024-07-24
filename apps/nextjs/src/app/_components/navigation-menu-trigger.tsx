@@ -7,7 +7,7 @@ import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cn } from "@acme/ui";
 import { navigationMenuTriggerStyle } from "@acme/ui/navigation-menu";
 
-import useForwardedRef from "~/hooks/use-forwarded-ref";
+import useForwardedRef from "~/app/_hooks/use-forwarded-ref";
 
 export const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
