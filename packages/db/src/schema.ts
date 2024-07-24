@@ -12,7 +12,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const Post = pgTable("post", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  id: uuid("id").notNull().primaryKey(),
   title: varchar("name", { length: 256 }).notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -32,7 +32,7 @@ export const CreatePostSchema = createInsertSchema(Post, {
 });
 
 export const User = pgTable("user", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  id: uuid("id").notNull().primaryKey(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("emailVerified", {
@@ -94,7 +94,7 @@ export const SessionRelations = relations(Session, ({ one }) => ({
 // My schema below
 
 export const Article = pgTable("article", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  id: uuid("id").notNull().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
   content: text("content").notNull(),
   draft_content: text("draft_content"),
@@ -107,12 +107,12 @@ export const Article = pgTable("article", {
 });
 
 export const CreditedPeople = pgTable("credited_people", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  id: uuid("id").notNull().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
 });
 
-export const CreateArticleSchema = createInsertSchema(Article, {
+/* export const CreateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
   content: z.string().max(255),
   draft_content: z.string().max(255),
@@ -121,4 +121,4 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   id: true,
   createdAt: true,
   updatedAt: true,
-});
+}); */

@@ -6,6 +6,10 @@
     "rootDir": ".",
     "emitDeclarationOnly": true
   },
-  "include": ["*.ts", "src"],
+  "include": [
+    "*.ts",
+    "src",
+    "../../apps/nextjs/src/hooks/use-forwarded-ref.ts"
+  ],
   "exclude": ["node_modules"]
 }

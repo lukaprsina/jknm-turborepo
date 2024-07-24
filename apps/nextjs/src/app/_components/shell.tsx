@@ -1,6 +1,7 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 import { auth } from "@acme/auth";
 import { cn } from "@acme/ui";
@@ -11,12 +12,13 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@acme/ui/navigation-menu";
 import { ThemeToggle } from "@acme/ui/theme";
 
+import logo from "~/app/_content/logo.png";
 import { HydrateClient } from "~/trpc/server";
+import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 type ShellProps = {
   children: React.ReactNode;
@@ -30,10 +32,7 @@ export async function Shell({ editable, children }: ShellProps) {
         <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
           <Header />
         </header>
-        <main className="relative w-full">
-          {/* <main className="container h-screen py-16"> */}
-          {children}
-        </main>
+        <main className="relative w-full">{children}</main>
         <footer className="bottom-0 z-10">
           <Footer />
         </footer>
@@ -45,108 +44,87 @@ export async function Shell({ editable, children }: ShellProps) {
 async function Header() {
   return (
     <div className="container mx-auto flex items-center justify-between">
-      <Link href="/" className="text-2xl font-bold">
-        Jamarski klub Novo mesto
+      <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
+        <Image
+          src={logo}
+          alt="logo"
+          sizes="(max-width: 640px) 100vw, 640px" // TODO: Modify the sizes prop here
+          placeholder="empty"
+          className="h-auto w-14 object-contain"
+        />
+        <p>Jamarski klub Novo mesto</p>
       </Link>
       <DesktopHeader />
       <Button className="md:hidden">
-        <Menu />
+        <HamburgerMenuIcon />
       </Button>
     </div>
   );
 }
 
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Kataster jam",
-    href: "/docs/primitives/alert-dialog",
-    description:
-      "A modal dialog that interrupts the user with important content and expects a response.",
-  },
-  {
-    title: "Izobraževanje",
-    href: "/docs/primitives/hover-card",
-    description:
-      "For sighted users to preview content available behind a link.",
-  },
-  {
-    title: "Etični kodeks",
-    href: "/docs/primitives/progress",
-    description:
-      "Displays an indicator showing the completion progress of a task, typically displayed as a progress bar.",
-  },
-  {
-    title: "Društvo v javnem interesu",
-    href: "/docs/primitives/scroll-area",
-    description: "Visually or semantically separates content.",
-  },
-  {
-    title: "Jamarska reševalna služba",
-    href: "/docs/primitives/tabs",
-    description:
-      "A set of layered sections of content—known as tab panels—that are displayed one at a time.",
-  },
-];
+async function DesktopHeaderLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <NavigationMenuItem>
+      <Link href={href} legacyBehavior passHref>
+        <NavigationMenuLink
+          className={cn(
+            navigationMenuTriggerStyle(),
+            "bg-transparent dark:bg-primary/80 dark:text-primary-foreground",
+          )}
+        >
+          {children}
+        </NavigationMenuLink>
+      </Link>
+    </NavigationMenuItem>
+  );
+}
 
 async function DesktopHeader() {
   return (
     <div className="flex gap-6">
       <NavigationMenu>
         <NavigationMenuList>
+          <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
+          <DesktopHeaderLink href="/raziskovanje">
+            Raziskovanje
+          </DesktopHeaderLink>
+          <DesktopHeaderLink href="/publiciranje">
+            Publiciranje
+          </DesktopHeaderLink>
+          <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
           <NavigationMenuItem>
-            <Link href="/zgodovina" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Zgodovina
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/raziskovanje" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Raziskovanje
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/publiciranje" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Publiciranje
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/varstvo" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Varstvo jam
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger>Klub</NavigationMenuTrigger>
+            <NavigationMenuTrigger className="bg-transparent text-primary-foreground focus:bg-transparent focus:text-primary-foreground dark:bg-primary/80">
+              Klub
+            </NavigationMenuTrigger>
             <NavigationMenuContent className="relative">
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                {components.map((component) => (
-                  <ListItem
-                    key={component.title}
-                    title={component.title}
-                    href={component.href}
-                  >
-                    {component.description}
-                  </ListItem>
-                ))}
+                <ListItem title="Kataster jam" href=""></ListItem>
+                <ListItem title="Izobraževanje" href=""></ListItem>
+                <ListItem title="Etični kodeks" href=""></ListItem>
+                <ListItem title="Društvo v javnem interesu" href=""></ListItem>
+                <ListItem title="Jamarska reševalna služba" href=""></ListItem>
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/novice" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Novice
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+          <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
         </NavigationMenuList>
       </NavigationMenu>
-      <ThemeToggle />
+      <div className="flex gap-1">
+        <Button
+          className="dark:bg-primary/80 dark:text-primary-foreground"
+          variant="ghost"
+          size="icon"
+        >
+          <MagnifyingGlassIcon />
+        </Button>
+        <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+      </div>
     </div>
   );
 }
