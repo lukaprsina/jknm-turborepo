@@ -22,7 +22,7 @@ const initialValue = [
   },
 ];
 
-export async function PlateComponent() {
+export function PlateComponent() {
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>

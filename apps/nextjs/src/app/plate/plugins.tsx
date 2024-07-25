@@ -10,7 +10,6 @@ import {
   createSuperscriptPlugin,
   createUnderlinePlugin,
   MARK_BOLD,
-  MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_SUBSCRIPT,
@@ -26,12 +25,7 @@ import {
   createSoftBreakPlugin,
 } from "@udecode/plate-break";
 import { createCaptionPlugin } from "@udecode/plate-caption";
-import {
-  createCodeBlockPlugin,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_CODE_LINE,
-  ELEMENT_CODE_SYNTAX,
-} from "@udecode/plate-code-block";
+import { createCodeBlockPlugin } from "@udecode/plate-code-block";
 import { createCommentsPlugin, MARK_COMMENT } from "@udecode/plate-comments";
 import {
   createPlugins,
@@ -64,7 +58,6 @@ import {
 } from "@udecode/plate-horizontal-rule";
 import { createIndentPlugin } from "@udecode/plate-indent";
 import { createIndentListPlugin } from "@udecode/plate-indent-list";
-import { createJuicePlugin } from "@udecode/plate-juice";
 import { createKbdPlugin, MARK_KBD } from "@udecode/plate-kbd";
 import {
   createColumnPlugin,
@@ -256,7 +249,6 @@ const plugins = createPlugins(
       },
     }),
     createNodeIdPlugin(),
-    createNormalizeTypesPlugin(),
     createResetNodePlugin({
       options: {
         rules: [
