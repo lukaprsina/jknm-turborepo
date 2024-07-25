@@ -3,13 +3,14 @@ import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
 import { cn } from "@acme/ui";
-import { ThemeProvider, ThemeToggle } from "@acme/ui/theme";
+import { ThemeProvider } from "@acme/ui/theme";
 import { Toaster } from "@acme/ui/toast";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/globals.css";
 
+import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import { env } from "~/env";
 
 export const metadata: Metadata = {
@@ -18,13 +19,13 @@ export const metadata: Metadata = {
       ? "https://turbo.t3.gg"
       : "http://localhost:3000",
   ),
-  title: "Create T3 Turbo",
+  title: "Jamarski klub Novo mesto",
   description: "Simple monorepo with shared backend for web & mobile apps",
   openGraph: {
-    title: "Create T3 Turbo",
+    title: "Jamarski klub Novo mesto",
     description: "Simple monorepo with shared backend for web & mobile apps",
     url: "https://create-t3-turbo.vercel.app",
-    siteName: "Create T3 Turbo",
+    siteName: "Jamarski klub Novo mesto",
   },
   twitter: {
     card: "summary_large_image",
@@ -51,8 +52,14 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          <Toaster />
+          <TooltipProvider
+            disableHoverableContent
+            delayDuration={500}
+            skipDelayDuration={0}
+          >
+            <TRPCReactProvider>{props.children}</TRPCReactProvider>
+            <Toaster />
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
