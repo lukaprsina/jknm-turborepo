@@ -25,6 +25,13 @@ import {
   createSoftBreakPlugin,
 } from "@udecode/plate-break";
 import { createCaptionPlugin } from "@udecode/plate-caption";
+import {
+  createCloudAttachmentPlugin,
+  createCloudImagePlugin,
+  createCloudPlugin,
+  ELEMENT_CLOUD_ATTACHMENT,
+  ELEMENT_CLOUD_IMAGE,
+} from "@udecode/plate-cloud";
 import { createCodeBlockPlugin } from "@udecode/plate-code-block";
 import { createCommentsPlugin, MARK_COMMENT } from "@udecode/plate-comments";
 import {
@@ -102,6 +109,8 @@ import { createTogglePlugin, ELEMENT_TOGGLE } from "@udecode/plate-toggle";
 import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
 
 import { BlockquoteElement } from "~/components/plate-ui/blockquote-element";
+import { CloudAttachmentElement } from "~/components/plate-ui/cloud-attachment-element";
+import { CloudImageElement } from "~/components/plate-ui/cloud-image-element";
 import { ColumnElement } from "~/components/plate-ui/column-element";
 import { ColumnGroupElement } from "~/components/plate-ui/column-group-element";
 import { CommentLeaf } from "~/components/plate-ui/comment-leaf";
@@ -289,6 +298,27 @@ const plugins = createPlugins(
         rules: [{ path: [0], strictType: ELEMENT_H1 }],
       },
     }),
+    createCloudPlugin({
+      options: {
+        /**
+         * You can use either a Portive API Key `apiKey` or an Auth Token
+         * `authToken` generated from the API Key.
+         * https://www.portive.com/docs/auth/intro
+         */
+        // apiKey: 'PRTV_xxxx_xxxx'
+        authToken:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InB1UFoyZTdlN0tUVzh0MjQifQ.eyJpYXQiOjE2Njg0NTUxMDksImV4cCI6MTcwMDAxMjcwOX0.xEznN3Wl6GqN57wsDGq0Z6giI4TvU32gvmMJUzcg2No",
+      },
+    }),
+    createCloudAttachmentPlugin(),
+    createCloudImagePlugin({
+      options: {
+        maxInitialHeight: 320,
+        maxInitialWidth: 320,
+        maxResizeWidth: 720,
+        minResizeWidth: 100,
+      },
+    }),
   ],
   {
     components: withDraggables(
@@ -324,6 +354,9 @@ const plugins = createPlugins(
         [MARK_SUBSCRIPT]: withProps(PlateLeaf, { as: "sub" }),
         [MARK_SUPERSCRIPT]: withProps(PlateLeaf, { as: "sup" }),
         [MARK_UNDERLINE]: withProps(PlateLeaf, { as: "u" }),
+        // My stuff
+        [ELEMENT_CLOUD_ATTACHMENT]: CloudAttachmentElement,
+        [ELEMENT_CLOUD_IMAGE]: CloudImageElement,
       }),
     ),
   },
