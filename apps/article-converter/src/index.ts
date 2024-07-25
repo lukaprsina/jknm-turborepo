@@ -1,13 +1,62 @@
+import fs from "node:fs";
+import { finished } from "node:stream/promises";
+import { parse } from "csv-parse";
+
 import { db } from "@acme/db/client";
 
 export const name = "article-converter";
 
-async function main() {
-  const posts = await db.query.Post.findMany({
-    limit: 10,
-  });
+type CSVType = {
+  title: string;
+  content: string;
+  publishedAt: string;
+  updatedAt: string;
+};
 
-  console.log(posts);
+/*   [
+    '106',
+    '',
+    '1',
+    'SI',
+    'Brezno pod košenico',
+    '',
+    '<p>Dišalo je po novi stotici. Pa vendar ... Le streljaj stran\r\n' +
+   ...
+      'Vidic</strong>.</p>',
+    '',
+    '7/10/2009 00:00:00',
+    '',
+    '-1',
+    '',
+    '',
+    '',
+    '0',
+    '22/1/2010 12:08:10'
+  ], */
+
+async function main() {
+  const cwd = new URL(".", import.meta.url).pathname.slice(1);
+  console.log({ cwd });
+
+  let csvData: CSVType[] = [];
+
+  await finished(
+    fs
+      .createReadStream(`${cwd}../assets/Objave.txt`)
+      .pipe(parse({ delimiter: "," }))
+      .on("data", function (csvrow) {
+        if (csvrow[2] !== 1) return;
+
+        csvData.push({
+          title: csvrow[4],
+          content: csvrow[6],
+          publishedAt: csvrow[8],
+          updatedAt: csvrow[15],
+        });
+      }),
+  );
+
+  console.log(csvData.slice(0, 3));
 }
 
 main()

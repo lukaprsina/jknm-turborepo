@@ -9,7 +9,7 @@ export default function Component() {
   return (
     <div className="w-full">
       <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
-        <div className="container mx-auto flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <Link href="#" className="text-2xl font-bold" prefetch={false}>
             News Website
           </Link>
@@ -55,7 +55,7 @@ export default function Component() {
           </button>
         </div>
       </header>
-      <main className="container mx-auto grid grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
+      <main className="grid grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
         <div className="col-span-1 overflow-hidden rounded-lg bg-card shadow-lg md:col-span-2 lg:col-span-3">
           <Link href="#" className="grid gap-0 md:grid-cols-2" prefetch={false}>
             <img

@@ -16,8 +16,8 @@ import {
 } from "@acme/ui/navigation-menu";
 import { ThemeToggle } from "@acme/ui/theme";
 
-import logo from "~/app/_content/logo.png";
 import { HydrateClient } from "~/trpc/server";
+import logo from "../../../assets/logo.png";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 type ShellProps = {
@@ -43,7 +43,7 @@ export async function Shell({ editable, children }: ShellProps) {
 
 async function Header() {
   return (
-    <div className="container mx-auto flex items-center justify-between">
+    <div className="container flex items-center justify-between">
       <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
         <Image
           src={logo}

@@ -1,6 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   integer,
+  json,
   pgTable,
   primaryKey,
   text,
@@ -92,18 +94,40 @@ export const SessionRelations = relations(Session, ({ one }) => ({
 }));
 
 // My schema below
-
 export const Article = pgTable("article", {
   id: uuid("id").notNull().primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
-  content: text("content").notNull(),
-  draft_content: text("draft_content"),
+  published: boolean("published").default(false),
+  content: text("content"),
+  draftContent: text("draft_content"),
   previewImage: varchar("preview_image", { length: 255 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  publishedAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => sql`now()`),
+  imageSizes: json("image_sizes"),
+});
+
+export const CreateArticleSchema = createInsertSchema(Article, {
+  title: z.string().max(255),
+  content: z.string(),
+  draftContent: z.string(),
+  previewImage: z.string().max(255).url(),
+  imageSizes: z
+    .record(
+      z.string().url(),
+      z.object({
+        width: z.number(),
+        height: z.number(),
+      }),
+    )
+    .optional(),
+  published: z.boolean().optional(),
+  publishedAt: z.date().optional(),
+}).omit({
+  id: true,
+  updatedAt: true,
 });
 
 export const CreditedPeople = pgTable("credited_people", {
@@ -111,14 +135,3 @@ export const CreditedPeople = pgTable("credited_people", {
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
 });
-
-/* export const CreateArticleSchema = createInsertSchema(Article, {
-  title: z.string().max(255),
-  content: z.string().max(255),
-  draft_content: z.string().max(255),
-  previewImage: z.string().max(255),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-}); */
