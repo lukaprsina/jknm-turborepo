@@ -13,27 +13,6 @@ type CSVType = {
   updatedAt: string;
 };
 
-/*   [
-    '106',
-    '',
-    '1',
-    'SI',
-    'Brezno pod košenico',
-    '',
-    '<p>Dišalo je po novi stotici. Pa vendar ... Le streljaj stran\r\n' +
-   ...
-      'Vidic</strong>.</p>',
-    '',
-    '7/10/2009 00:00:00',
-    '',
-    '-1',
-    '',
-    '',
-    '',
-    '0',
-    '22/1/2010 12:08:10'
-  ], */
-
 async function main() {
   const cwd = new URL(".", import.meta.url).pathname.slice(1);
   console.log({ cwd });

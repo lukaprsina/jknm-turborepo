@@ -26,20 +26,17 @@ export function PlateComponent() {
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
-        <CommentsProvider users={{}} myUserId="1">
-          <Plate plugins={plugins} initialValue={initialValue}>
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
+        <Plate plugins={plugins} initialValue={initialValue}>
+          <FixedToolbar>
+            <FixedToolbarButtons />
+          </FixedToolbar>
 
-            <Editor />
+          <Editor />
 
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
-            <CommentsPopover />
-          </Plate>
-        </CommentsProvider>
+          <FloatingToolbar>
+            <FloatingToolbarButtons />
+          </FloatingToolbar>
+        </Plate>
       </DndProvider>
     </TooltipProvider>
   );

@@ -10,6 +10,7 @@ import {
   createSuperscriptPlugin,
   createUnderlinePlugin,
   MARK_BOLD,
+  MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_SUBSCRIPT,
@@ -32,12 +33,20 @@ import {
   ELEMENT_CLOUD_ATTACHMENT,
   ELEMENT_CLOUD_IMAGE,
 } from "@udecode/plate-cloud";
-import { createCodeBlockPlugin } from "@udecode/plate-code-block";
-import { createCommentsPlugin, MARK_COMMENT } from "@udecode/plate-comments";
+import {
+  createCodeBlockPlugin,
+  ELEMENT_CODE_BLOCK,
+  ELEMENT_CODE_LINE,
+  ELEMENT_CODE_SYNTAX,
+  unwrapCodeBlock,
+} from "@udecode/plate-code-block";
 import {
   createPlugins,
+  isSelectionAtBlockStart,
+  PlateElement,
   PlateLeaf,
   RenderAfterEditable,
+  someNode,
 } from "@udecode/plate-common";
 import { createDndPlugin } from "@udecode/plate-dnd";
 import { createEmojiPlugin } from "@udecode/plate-emoji";
@@ -64,7 +73,10 @@ import {
   ELEMENT_HR,
 } from "@udecode/plate-horizontal-rule";
 import { createIndentPlugin } from "@udecode/plate-indent";
-import { createIndentListPlugin } from "@udecode/plate-indent-list";
+import {
+  createIndentListPlugin,
+  KEY_LIST_STYLE_TYPE,
+} from "@udecode/plate-indent-list";
 import { createKbdPlugin, MARK_KBD } from "@udecode/plate-kbd";
 import {
   createColumnPlugin,
@@ -73,8 +85,13 @@ import {
 } from "@udecode/plate-layout";
 import { createLineHeightPlugin } from "@udecode/plate-line-height";
 import { createLinkPlugin, ELEMENT_LINK } from "@udecode/plate-link";
-import { createTodoListPlugin, ELEMENT_TODO_LI } from "@udecode/plate-list";
 import {
+  createTodoListPlugin,
+  ELEMENT_LI,
+  ELEMENT_TODO_LI,
+} from "@udecode/plate-list";
+import {
+  createFilePlugin,
   createImagePlugin,
   createMediaEmbedPlugin,
   ELEMENT_IMAGE,
@@ -111,9 +128,12 @@ import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
 import { BlockquoteElement } from "~/components/plate-ui/blockquote-element";
 import { CloudAttachmentElement } from "~/components/plate-ui/cloud-attachment-element";
 import { CloudImageElement } from "~/components/plate-ui/cloud-image-element";
+import { CodeBlockElement } from "~/components/plate-ui/code-block-element";
+import { CodeLeaf } from "~/components/plate-ui/code-leaf";
+import { CodeLineElement } from "~/components/plate-ui/code-line-element";
+import { CodeSyntaxLeaf } from "~/components/plate-ui/code-syntax-leaf";
 import { ColumnElement } from "~/components/plate-ui/column-element";
 import { ColumnGroupElement } from "~/components/plate-ui/column-group-element";
-import { CommentLeaf } from "~/components/plate-ui/comment-leaf";
 import { HeadingElement } from "~/components/plate-ui/heading-element";
 import { HighlightLeaf } from "~/components/plate-ui/highlight-leaf";
 import { HrElement } from "~/components/plate-ui/hr-element";
@@ -135,6 +155,20 @@ import { TableRowElement } from "~/components/plate-ui/table-row-element";
 import { TodoListElement } from "~/components/plate-ui/todo-list-element";
 import { ToggleElement } from "~/components/plate-ui/toggle-element";
 import { withDraggables } from "~/components/plate-ui/with-draggables";
+import { autoformatPlugin } from "./autoformat/autoformatPlugin";
+import { createSavePlugin } from "./save-plugin/save-plugin";
+import { TabbableElement } from "./tabbable-element";
+
+const resetBlockTypesCommonRule = {
+  types: [ELEMENT_BLOCKQUOTE, ELEMENT_TODO_LI],
+  defaultType: ELEMENT_PARAGRAPH,
+};
+
+const resetBlockTypesCodeBlockRule = {
+  types: [ELEMENT_CODE_BLOCK],
+  defaultType: ELEMENT_PARAGRAPH,
+  onReset: unwrapCodeBlock,
+};
 
 const plugins = createPlugins(
   [
@@ -152,9 +186,7 @@ const plugins = createPlugins(
     createMediaEmbedPlugin(),
     createCaptionPlugin({
       options: {
-        pluginKeys: [
-          // ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED
-        ],
+        pluginKeys: [ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED],
       },
     }),
     createMentionPlugin(),
@@ -175,10 +207,7 @@ const plugins = createPlugins(
     createAlignPlugin({
       inject: {
         props: {
-          validTypes: [
-            ELEMENT_PARAGRAPH,
-            // ELEMENT_H1, ELEMENT_H2, ELEMENT_H3
-          ],
+          validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
         },
       },
     }),
@@ -187,7 +216,10 @@ const plugins = createPlugins(
         props: {
           validTypes: [
             ELEMENT_PARAGRAPH,
-            // ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_BLOCKQUOTE, ELEMENT_CODE_BLOCK
+            ELEMENT_H1,
+            ELEMENT_H2,
+            ELEMENT_H3,
+            ELEMENT_BLOCKQUOTE /* ELEMENT_CODE_BLOCK */,
           ],
         },
       },
@@ -197,7 +229,10 @@ const plugins = createPlugins(
         props: {
           validTypes: [
             ELEMENT_PARAGRAPH,
-            // ELEMENT_H1, ELEMENT_H2, ELEMENT_H3, ELEMENT_BLOCKQUOTE, ELEMENT_CODE_BLOCK
+            ELEMENT_H1,
+            ELEMENT_H2,
+            ELEMENT_H3,
+            ELEMENT_BLOCKQUOTE /* ELEMENT_CODE_BLOCK */,
           ],
         },
       },
@@ -207,21 +242,11 @@ const plugins = createPlugins(
         props: {
           defaultNodeValue: 1.5,
           validNodeValues: [1, 1.2, 1.5, 2, 3],
-          validTypes: [
-            ELEMENT_PARAGRAPH,
-            // ELEMENT_H1, ELEMENT_H2, ELEMENT_H3
-          ],
+          validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
         },
       },
     }),
-    createAutoformatPlugin({
-      options: {
-        rules: [
-          // Usage: https://platejs.org/docs/autoformat
-        ],
-        enableUndoOnDelete: true,
-      },
-    }),
+    createAutoformatPlugin(autoformatPlugin),
     createBlockSelectionPlugin({
       options: {
         sizes: {
@@ -281,11 +306,9 @@ const plugins = createPlugins(
         ],
       },
     }),
-    createTabbablePlugin(),
     createTrailingBlockPlugin({
       options: { type: ELEMENT_PARAGRAPH },
     }),
-    createCommentsPlugin(),
     createDeserializeDocxPlugin(),
     createDeserializeCsvPlugin(),
     createDeserializeMdPlugin(),
@@ -298,13 +321,8 @@ const plugins = createPlugins(
         rules: [{ path: [0], strictType: ELEMENT_H1 }],
       },
     }),
-    createCloudPlugin({
+    /* createCloudPlugin({
       options: {
-        /**
-         * You can use either a Portive API Key `apiKey` or an Auth Token
-         * `authToken` generated from the API Key.
-         * https://www.portive.com/docs/auth/intro
-         */
         // apiKey: 'PRTV_xxxx_xxxx'
         authToken:
           "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InB1UFoyZTdlN0tUVzh0MjQifQ.eyJpYXQiOjE2Njg0NTUxMDksImV4cCI6MTcwMDAxMjcwOX0.xEznN3Wl6GqN57wsDGq0Z6giI4TvU32gvmMJUzcg2No",
@@ -318,6 +336,40 @@ const plugins = createPlugins(
         maxResizeWidth: 720,
         minResizeWidth: 100,
       },
+    }), */
+    createSavePlugin({
+      options: {
+        hotkey: ["ctrl+m", "ctrl+s"],
+        save_callback: (value) => {
+          console.log("Saving...");
+        },
+        autosave_after_inactive: true,
+      },
+    }),
+    createTabbablePlugin({
+      options: {
+        query: (editor) => {
+          if (isSelectionAtBlockStart(editor)) return false;
+
+          return !someNode(editor, {
+            match: (n) => {
+              return !!(
+                n.type &&
+                ([ELEMENT_TABLE, ELEMENT_LI].includes(n.type as string) ||
+                  n[KEY_LIST_STYLE_TYPE])
+              );
+            },
+          });
+        },
+      },
+      plugins: [
+        {
+          key: "tabbable_element",
+          isElement: true,
+          isVoid: true,
+          component: TabbableElement,
+        },
+      ],
     }),
   ],
   {
@@ -346,7 +398,6 @@ const plugins = createPlugins(
         [ELEMENT_TH]: TableCellHeaderElement,
         [ELEMENT_TODO_LI]: TodoListElement,
         [MARK_BOLD]: withProps(PlateLeaf, { as: "strong" }),
-        [MARK_COMMENT]: CommentLeaf,
         [MARK_HIGHLIGHT]: HighlightLeaf,
         [MARK_ITALIC]: withProps(PlateLeaf, { as: "em" }),
         [MARK_KBD]: KbdLeaf,
@@ -357,6 +408,15 @@ const plugins = createPlugins(
         // My stuff
         [ELEMENT_CLOUD_ATTACHMENT]: CloudAttachmentElement,
         [ELEMENT_CLOUD_IMAGE]: CloudImageElement,
+        // lol
+        [ELEMENT_CODE_BLOCK]: CodeBlockElement,
+        [ELEMENT_CODE_LINE]: CodeLineElement,
+        [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
+        /* [ELEMENT_LI]: withProps(PlateElement, { as: "li" }),
+        [ELEMENT_UL]: withProps(ListElement, { variant: "ul" }),
+        [ELEMENT_OL]: withProps(ListElement, { variant: "ol" }), */
+        [MARK_CODE]: CodeLeaf,
+        // [MARK_COMMENT]: CommentLeaf,
       }),
     ),
   },

@@ -4,7 +4,9 @@ import { PlateComponent } from "./editor";
 export default function PlatePage() {
   return (
     <Shell>
-      <PlateComponent />
+      <div className="container mt-4 min-h-screen">
+        <PlateComponent />
+      </div>
     </Shell>
   );
 }

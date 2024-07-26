@@ -2,6 +2,7 @@
 
 import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { MinusIcon } from "@radix-ui/react-icons";
 import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
 import {
   focusEditor,
@@ -9,7 +10,12 @@ import {
   useEditorRef,
 } from "@udecode/plate-common";
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from "@udecode/plate-heading";
+import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
+import { ELEMENT_LINK } from "@udecode/plate-link";
+import { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
+import { ELEMENT_TABLE } from "@udecode/plate-table";
+import { FilmIcon } from "lucide-react";
 
 import { Icons } from "~/components/icons";
 import {
@@ -56,73 +62,73 @@ const items = [
         label: "Quote",
         value: ELEMENT_BLOCKQUOTE,
       },
-      // {
-      //   value: ELEMENT_TABLE,
-      //   label: 'Table',
-      //   description: 'Table',
-      //   icon: Icons.table,
-      // },
-      // {
-      //   value: 'ul',
-      //   label: 'Bulleted list',
-      //   description: 'Bulleted list',
-      //   icon: Icons.ul,
-      // },
-      // {
-      //   value: 'ol',
-      //   label: 'Numbered list',
-      //   description: 'Numbered list',
-      //   icon: Icons.ol,
-      // },
-      // {
-      //   value: ELEMENT_HR,
-      //   label: 'Divider',
-      //   description: 'Divider (---)',
-      //   icon: Icons.hr,
-      // },
+      {
+        value: ELEMENT_TABLE,
+        label: "Table",
+        description: "Table",
+        icon: Icons.table,
+      },
+      {
+        value: "ul",
+        label: "Bulleted list",
+        description: "Bulleted list",
+        icon: Icons.ul,
+      },
+      {
+        value: "ol",
+        label: "Numbered list",
+        description: "Numbered list",
+        icon: Icons.ol,
+      },
+      {
+        value: ELEMENT_HR,
+        label: "Divider",
+        description: "Divider (---)",
+        icon: MinusIcon,
+      },
     ],
     label: "Basic blocks",
   },
-  // {
-  //   label: 'Media',
-  //   items: [
-  //     {
-  //       value: ELEMENT_CODE_BLOCK,
-  //       label: 'Code',
-  //       description: 'Code (```)',
-  //       icon: Icons.codeblock,
-  //     },
-  //     {
-  //       value: ELEMENT_IMAGE,
-  //       label: 'Image',
-  //       description: 'Image',
-  //       icon: Icons.image,
-  //     },
-  //     {
-  //       value: ELEMENT_MEDIA_EMBED,
-  //       label: 'Embed',
-  //       description: 'Embed',
-  //       icon: Icons.embed,
-  //     },
-  //     {
-  //       value: ELEMENT_EXCALIDRAW,
-  //       label: 'Excalidraw',
-  //       description: 'Excalidraw',
-  //       icon: Icons.excalidraw,
-  //     },
-  //   ],
-  // },
-  // {
-  //   label: 'Inline',
-  //   items: [
-  //     {
-  //       value: ELEMENT_LINK,
-  //       label: 'Link',
-  //       description: 'Link',
-  //       icon: Icons.link,
-  //     },
-  //   ],
-  // },
+  {
+    label: "Media",
+    items: [
+      // {
+      //   value: ELEMENT_CODE_BLOCK,
+      //   label: 'Code',
+      //   description: 'Code (```)',
+      //   icon: Icons.codeblock,
+      // },
+      {
+        value: ELEMENT_IMAGE,
+        label: "Image",
+        description: "Image",
+        icon: Icons.image,
+      },
+      {
+        value: ELEMENT_MEDIA_EMBED,
+        label: "Embed",
+        description: "Embed",
+        icon: FilmIcon,
+      },
+      // {
+      //   value: ELEMENT_EXCALIDRAW,
+      //   label: 'Excalidraw',
+      //   description: 'Excalidraw',
+      //   icon: Icons.excalidraw,
+      // },
+    ],
+  },
+  {
+    label: "Inline",
+    items: [
+      {
+        value: ELEMENT_LINK,
+        label: "Link",
+        description: "Link",
+        icon: Icons.link,
+      },
+    ],
+  },
 ];
 
 export function InsertDropdownMenu(props: DropdownMenuProps) {
