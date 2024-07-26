@@ -1,7 +1,8 @@
 import type { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
 import React from "react";
 import { withRef } from "@udecode/cn";
-import { useMediaToolbarButton } from "@udecode/plate-media";
+import { useEditorRef, useEditorState } from "@udecode/plate-common";
+import { insertMedia, useMediaToolbarButton } from "@udecode/plate-media";
 
 import { Icons } from "~/components/icons";
 import { ToolbarButton } from "./toolbar";
@@ -13,9 +14,20 @@ export const MediaToolbarButton = withRef<
   }
 >(({ nodeType, ...rest }, ref) => {
   const { props } = useMediaToolbarButton({ nodeType });
+  const editor = useEditorRef();
 
   return (
-    <ToolbarButton ref={ref} {...props} {...rest}>
+    <ToolbarButton
+      ref={ref}
+      {...props}
+      {...rest}
+      onClick={async () =>
+        await insertMedia(editor, {
+          type: nodeType,
+          getUrl: async () => "https://picsum.photos/200/300",
+        })
+      }
+    >
       <Icons.image />
     </ToolbarButton>
   );

@@ -4,6 +4,7 @@ import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
 import { MinusIcon } from "@radix-ui/react-icons";
 import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
+import { ELEMENT_CODE_BLOCK } from "@udecode/plate-code-block";
 import {
   focusEditor,
   insertEmptyElement,
@@ -92,12 +93,12 @@ const items = [
   {
     label: "Media",
     items: [
-      // {
-      //   value: ELEMENT_CODE_BLOCK,
-      //   label: 'Code',
-      //   description: 'Code (```)',
-      //   icon: Icons.codeblock,
-      // },
+      {
+        value: ELEMENT_CODE_BLOCK,
+        label: "Code",
+        description: "Code (```)",
+        icon: Icons.codeblock,
+      },
       {
         value: ELEMENT_IMAGE,
         label: "Image",

@@ -27,9 +27,6 @@ import {
 } from "@udecode/plate-break";
 import { createCaptionPlugin } from "@udecode/plate-caption";
 import {
-  createCloudAttachmentPlugin,
-  createCloudImagePlugin,
-  createCloudPlugin,
   ELEMENT_CLOUD_ATTACHMENT,
   ELEMENT_CLOUD_IMAGE,
 } from "@udecode/plate-cloud";
@@ -43,7 +40,6 @@ import {
 import {
   createPlugins,
   isSelectionAtBlockStart,
-  PlateElement,
   PlateLeaf,
   RenderAfterEditable,
   someNode,
@@ -156,6 +152,11 @@ import { TodoListElement } from "~/components/plate-ui/todo-list-element";
 import { ToggleElement } from "~/components/plate-ui/toggle-element";
 import { withDraggables } from "~/components/plate-ui/with-draggables";
 import { autoformatPlugin } from "./autoformat/autoformatPlugin";
+import {
+  createCloudAttachmentPlugin,
+  createCloudImagePlugin,
+  createCloudPlugin,
+} from "./cloud";
 import { createSavePlugin } from "./save-plugin/save-plugin";
 import { TabbableElement } from "./tabbable-element";
 
@@ -321,7 +322,7 @@ const plugins = createPlugins(
         rules: [{ path: [0], strictType: ELEMENT_H1 }],
       },
     }),
-    /* createCloudPlugin({
+    createCloudPlugin({
       options: {
         // apiKey: 'PRTV_xxxx_xxxx'
         authToken:
@@ -336,7 +337,7 @@ const plugins = createPlugins(
         maxResizeWidth: 720,
         minResizeWidth: 100,
       },
-    }), */
+    }),
     createSavePlugin({
       options: {
         hotkey: ["ctrl+m", "ctrl+s"],
