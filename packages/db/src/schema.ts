@@ -14,7 +14,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const Post = pgTable("post", {
-  id: uuid("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: varchar("name", { length: 256 }).notNull(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -34,7 +34,7 @@ export const CreatePostSchema = createInsertSchema(Post, {
 });
 
 export const User = pgTable("user", {
-  id: uuid("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),
   emailVerified: timestamp("emailVerified", {
@@ -95,7 +95,7 @@ export const SessionRelations = relations(Session, ({ one }) => ({
 
 // My schema below
 export const Article = pgTable("article", {
-  id: uuid("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }).notNull(),
   published: boolean("published").default(false),
   content: text("content"),
