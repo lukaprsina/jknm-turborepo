@@ -3,9 +3,12 @@ import type {
   PlateEditor,
   WithPlatePlugin,
 } from "@udecode/plate-common/server";
+import { useEffect } from "react";
 import { getPluginOptions, Value } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
+
+import { useSaving } from "./save-context";
 
 export const KEY_SAVE = "save";
 
@@ -45,6 +48,14 @@ let dirty = false;
 
 export const createSavePlugin = createPluginFactory<SavePlugin>({
   key: KEY_SAVE,
+  useHooks: () => {
+    const saving = useSaving();
+    useEffect(() => {
+      console.log("SavePlugin useHooks setting saving to true");
+      saving?.setSaving(true);
+    }, [saving]);
+  },
+
   handlers: {
     onKeyDown: onKeyDownSave,
     onChange: (editor) => (value) => {
