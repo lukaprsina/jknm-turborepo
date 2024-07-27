@@ -1,9 +1,10 @@
 import type { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
-import React from "react";
+import React, { useState } from "react";
 import { withRef } from "@udecode/cn";
 import { useEditorRef } from "@udecode/plate-common";
 import { insertMedia, useMediaToolbarButton } from "@udecode/plate-media";
 
+import { uploadFile } from "~/app/plate/cloud";
 import { Icons } from "~/components/icons";
 import { ToolbarButton } from "./toolbar";
 
@@ -13,22 +14,47 @@ export const MediaToolbarButton = withRef<
     nodeType?: typeof ELEMENT_IMAGE | typeof ELEMENT_MEDIA_EMBED;
   }
 >(({ nodeType, ...rest }, ref) => {
-  const { props } = useMediaToolbarButton({ nodeType });
   const editor = useEditorRef();
+  const [uploading, setUploading] = useState(false);
+  const file_input_ref = React.useRef<HTMLInputElement>(null);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+
+    if (!file) {
+      alert("Please select a file to upload.");
+      return;
+    }
+
+    setUploading(true);
+    await uploadFile(editor, file);
+    setUploading(false);
+  };
 
   return (
-    <ToolbarButton
-      ref={ref}
-      {...props}
-      {...rest}
-      /* onClick={async () =>
-        await insertMedia(editor, {
-          type: nodeType,
-          getUrl: async () => "https://picsum.photos/200/300",
-        })
-      } */
-    >
-      <Icons.image />
-    </ToolbarButton>
+    <form>
+      <input
+        id="file"
+        hidden
+        type="file"
+        onChange={handleChange}
+        ref={file_input_ref}
+        accept="image/png, image/jpeg"
+      />
+      <ToolbarButton
+        ref={ref}
+        disabled={uploading}
+        tooltip="Image"
+        onClick={() => {
+          file_input_ref.current?.click();
+        }}
+        onMouseDown={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.preventDefault();
+        }}
+        {...rest}
+      >
+        <Icons.image />
+      </ToolbarButton>
+    </form>
   );
 });

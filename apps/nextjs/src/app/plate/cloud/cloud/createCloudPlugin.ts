@@ -1,11 +1,11 @@
-import { type Value, createPluginFactory } from '@udecode/plate-common/server';
+import type { Value } from "@udecode/plate-common/server";
+import { createPluginFactory } from "@udecode/plate-common/server";
 
-import type { CloudPlugin, PlateCloudEditor } from './types';
+import type { CloudPlugin, PlateCloudEditor } from "./types";
+import { onDropCloud, onPasteCloud } from "./handlers";
+import { withCloud } from "./withCloud";
 
-import { onDropCloud, onPasteCloud } from './handlers';
-import { withCloud } from './withCloud';
-
-export const KEY_CLOUD = 'cloud';
+export const KEY_CLOUD = "cloud";
 
 export const createCloudPlugin = createPluginFactory<
   CloudPlugin,
@@ -17,5 +17,5 @@ export const createCloudPlugin = createPluginFactory<
     onPaste: (editor) => (e) => onPasteCloud(editor, e),
   },
   key: KEY_CLOUD,
-  withOverrides: withCloud,
+  // withOverrides: withCloud,
 });

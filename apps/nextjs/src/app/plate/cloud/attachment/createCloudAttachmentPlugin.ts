@@ -1,11 +1,11 @@
-import { type Value, createPluginFactory } from '@udecode/plate-common/server';
+import type { Value } from "@udecode/plate-common/server";
+import { createPluginFactory } from "@udecode/plate-common/server";
 
-import type { PlateCloudEditor } from '../cloud/types';
-import type { CloudAttachmentPlugin } from './types';
+import type { PlateCloudEditor } from "../cloud/types";
+import type { CloudAttachmentPlugin } from "./types";
+import { withCloudAttachment } from "./withCloudAttachment";
 
-import { withCloudAttachment } from './withCloudAttachment';
-
-export const ELEMENT_CLOUD_ATTACHMENT = 'cloud_attachment';
+export const ELEMENT_CLOUD_ATTACHMENT = "cloud_attachment";
 
 export const createCloudAttachmentPlugin = createPluginFactory<
   CloudAttachmentPlugin,
@@ -15,5 +15,5 @@ export const createCloudAttachmentPlugin = createPluginFactory<
   isElement: true,
   isVoid: true,
   key: ELEMENT_CLOUD_ATTACHMENT,
-  withOverrides: withCloudAttachment,
+  // withOverrides: withCloudAttachment,
 });

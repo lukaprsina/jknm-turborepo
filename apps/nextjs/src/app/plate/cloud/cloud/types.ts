@@ -1,13 +1,16 @@
-import type * as portiveClient from '@portive/client';
-import type { PlateEditor, Value } from '@udecode/plate-common/server';
+import type * as portiveClient from "@portive/client";
+import type { PlateEditor, Value } from "@udecode/plate-common/server";
 
-import type { Upload } from '../upload';
-import type { createUploadStore } from '../upload/createUploadStore';
+import type { Upload } from "../upload";
+import type { createUploadStore } from "../upload/createUploadStore";
 
 /** Specifies just the `options` part of the CloudPlugin */
 export type CloudPlugin = {
-  uploadStoreInitialValue?: Record<string, Upload>;
-} & portiveClient.ClientOptions;
+  upload_file_callback?: <V extends Value = Value>(
+    editor: PlateEditor<V>,
+    file: File,
+  ) => Promise<void>;
+};
 
 export type PlateCloudEditor<V extends Value = Value> = CloudEditorProps<V> &
   PlateEditor<V>;
@@ -49,13 +52,13 @@ export type FileEventBase = {
 
 /** FileEvent for files that are not images */
 export type GenericFileEvent = {
-  type: 'generic';
+  type: "generic";
 } & FileEventBase;
 
 /** FileEvent for files that are images */
 export type ImageFileEvent = {
   height: number;
-  type: 'image';
+  type: "image";
   width: number;
 } & FileEventBase;
 

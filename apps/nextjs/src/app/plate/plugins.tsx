@@ -160,6 +160,7 @@ import {
   createCloudAttachmentPlugin,
   createCloudImagePlugin,
   createCloudPlugin,
+  uploadFile,
 } from "./cloud";
 import { createSavePlugin } from "./save-plugin/save-plugin";
 import { TabbableElement } from "./tabbable-element";
@@ -347,9 +348,7 @@ const plugins = createPlugins(
     }),
     createCloudPlugin({
       options: {
-        // apiKey: 'PRTV_xxxx_xxxx'
-        authToken:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InB1UFoyZTdlN0tUVzh0MjQifQ.eyJpYXQiOjE2Njg0NTUxMDksImV4cCI6MTcwMDAxMjcwOX0.xEznN3Wl6GqN57wsDGq0Z6giI4TvU32gvmMJUzcg2No",
+        upload_file_callback: uploadFile,
       },
     }),
     createCloudAttachmentPlugin(),
@@ -395,6 +394,7 @@ const plugins = createPlugins(
         },
       ],
     }),
+    createFilePlugin(),
   ],
   {
     components: withDraggables(
