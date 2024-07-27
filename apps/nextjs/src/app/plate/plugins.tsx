@@ -35,10 +35,13 @@ import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
   ELEMENT_CODE_SYNTAX,
+  isCodeBlockEmpty,
+  isSelectionAtCodeBlockStart,
   unwrapCodeBlock,
 } from "@udecode/plate-code-block";
 import {
   createPlugins,
+  isBlockAboveEmpty,
   isSelectionAtBlockStart,
   PlateLeaf,
   RenderAfterEditable,
@@ -59,6 +62,7 @@ import {
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
+  KEYS_HEADING,
 } from "@udecode/plate-heading";
 import {
   createHighlightPlugin,
@@ -220,7 +224,8 @@ const plugins = createPlugins(
             ELEMENT_H1,
             ELEMENT_H2,
             ELEMENT_H3,
-            ELEMENT_BLOCKQUOTE /* ELEMENT_CODE_BLOCK */,
+            ELEMENT_BLOCKQUOTE,
+            ELEMENT_CODE_BLOCK,
           ],
         },
       },
@@ -233,7 +238,8 @@ const plugins = createPlugins(
             ELEMENT_H1,
             ELEMENT_H2,
             ELEMENT_H3,
-            ELEMENT_BLOCKQUOTE /* ELEMENT_CODE_BLOCK */,
+            ELEMENT_BLOCKQUOTE,
+            ELEMENT_CODE_BLOCK,
           ],
         },
       },
@@ -275,7 +281,7 @@ const plugins = createPlugins(
             query: {
               start: true,
               end: true,
-              // allow: KEYS_HEADING,
+              allow: KEYS_HEADING,
             },
             relative: true,
             level: 1,
@@ -287,7 +293,26 @@ const plugins = createPlugins(
     createResetNodePlugin({
       options: {
         rules: [
-          // Usage: https://platejs.org/docs/reset-node
+          {
+            ...resetBlockTypesCommonRule,
+            hotkey: "Enter",
+            predicate: isBlockAboveEmpty,
+          },
+          {
+            ...resetBlockTypesCommonRule,
+            hotkey: "Backspace",
+            predicate: isSelectionAtBlockStart,
+          },
+          {
+            ...resetBlockTypesCodeBlockRule,
+            hotkey: "Enter",
+            predicate: isCodeBlockEmpty,
+          },
+          {
+            ...resetBlockTypesCodeBlockRule,
+            hotkey: "Backspace",
+            predicate: isSelectionAtCodeBlockStart,
+          },
         ],
       },
     }),
@@ -299,9 +324,7 @@ const plugins = createPlugins(
           {
             hotkey: "enter",
             query: {
-              allow: [
-                // ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD
-              ],
+              allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD],
             },
           },
         ],

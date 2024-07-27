@@ -33,6 +33,9 @@ export const onKeyDownSave =
       event.preventDefault();
       event.stopPropagation();
       options.save_callback(editor.children);
+
+      clearTimeout(save_timeout_id);
+      clearTimeout(save_max_time_timeout_id);
     }
   };
 

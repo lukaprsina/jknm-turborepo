@@ -1,42 +1,22 @@
-import * as portiveClient from '@portive/client';
-import { type Value, nanoid } from '@udecode/plate-common/server';
+import type { Value } from "@udecode/plate-common/server";
+import {
+  ELEMENT_IMAGE,
+  insertImage,
+  insertMedia,
+  insertMediaEmbed,
+} from "@udecode/plate-media";
+import mime from "mime/lite";
 
-import type { FileEvent, PlateCloudEditor, ProgressEvent } from './types';
-
-const createFileEvent = (
-  id: string,
-  clientFile: portiveClient.ClientFile
-): FileEvent => {
-  if (clientFile.type === 'image') {
-    return {
-      file: clientFile.file,
-      height: clientFile.height,
-      id,
-      type: 'image',
-      url: clientFile.objectUrl,
-      width: clientFile.width,
-    };
-  }
-
-  return {
-    file: clientFile.file,
-    id,
-    type: 'generic',
-    url: clientFile.objectUrl,
-  };
-};
+import type { PlateCloudEditor } from "./types";
 
 export const uploadFile = async <V extends Value = Value>(
   editor: PlateCloudEditor<V>,
-  file: File
+  file: File,
 ) => {
-  const id = `#${nanoid()}`;
-  const { client } = editor.cloud;
-
-  const response = await fetch('/s3/api', {
-    method: 'POST',
+  const response = await fetch("/api/upload", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ filename: file.name, content_type: file.type }),
   });
@@ -48,33 +28,40 @@ export const uploadFile = async <V extends Value = Value>(
     Object.entries(fields).forEach(([key, value]) => {
       formData.append(key, value as string);
     });
-    formData.append('file', file);
+    formData.append("file", file);
 
     const uploadResponse = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       body: formData,
     });
 
     if (uploadResponse.ok) {
-      // setImageURL(`${url}${fields.key}`);
-      console.log('Image URL:', `${url}${fields.key}`);
-
-      /* await insertMedia(editor, {
-        type: nodeType,
-        getUrl: async () => `${url}${fields.key}`,
-      }); */
+      const file_mime = mime.getType(file.name);
+      // is image
+      if (file_mime?.includes("image")) {
+        console.log("Uploaded image to S3:", file.name);
+        insertImage(editor, `${url}${fields.key}`);
+      } else {
+        console.log("Uploaded file to S3:", file.name);
+        insertMediaEmbed(editor, {
+          url: `${url}${fields.key}`,
+          name: file.name,
+        });
+      }
     } else {
-      console.error('S3 Upload Error:', uploadResponse);
-      alert('Upload failed.');
+      console.error("S3 Upload Error:", uploadResponse);
+      alert("Upload failed.");
     }
   } else {
-    alert('Failed to get pre-signed URL.');
+    alert("Failed to get pre-signed URL.");
   }
 };
 
 export const uploadFiles = <V extends Value = Value>(
   editor: PlateCloudEditor<V>,
-  files: Iterable<File>
+  files: Iterable<File>,
 ) => {
-  void Promise.allSettled(files);
+  for (const file of files) {
+    void uploadFile(editor, file);
+  }
 };
