@@ -5,7 +5,7 @@ import SignIn from "./signin";
 
 import "./google.css";
 
-import { Shell } from "../_components/shell";
+import { Shell } from "../../components/shell";
 
 // import ResponsiveShell from "../../components/responsive_shell";
 {

@@ -4,7 +4,7 @@ import { withRef } from "@udecode/cn";
 import { useEditorRef } from "@udecode/plate-common";
 import { insertMedia, useMediaToolbarButton } from "@udecode/plate-media";
 
-import { uploadFile } from "~/app/plate/cloud";
+import { uploadFile } from "~/app/uredi/[novica_ime]/cloud";
 import { Icons } from "~/components/icons";
 import { ToolbarButton } from "./toolbar";
 

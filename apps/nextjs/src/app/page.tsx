@@ -1,5 +1,5 @@
-import { ArticleCard, FeaturedArticleCard } from "./_components/article-card";
-import { Shell } from "./_components/shell";
+import { ArticleCard, FeaturedArticleCard } from "../components/article-card";
+import { Shell } from "../components/shell";
 
 export default function HomePage() {
   return (

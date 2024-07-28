@@ -16,8 +16,8 @@ import {
 } from "@acme/ui/navigation-menu";
 import { ThemeToggle } from "@acme/ui/theme";
 
+import logo from "~/../assets/logo.png";
 import { HydrateClient } from "~/trpc/server";
-import logo from "../../../assets/logo.png";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {

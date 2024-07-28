@@ -9,10 +9,10 @@ import {
 import { useEditorReadOnly } from "@udecode/plate-common";
 import { MARK_BG_COLOR, MARK_COLOR } from "@udecode/plate-font";
 import { ListStyleType } from "@udecode/plate-indent-list";
-import { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
+import { ELEMENT_IMAGE } from "@udecode/plate-media";
 
-import { SaveToolbarButton } from "~/app/plate/save-plugin/save-toolbar-button";
-import { SettingsToolbarButton } from "~/app/plate/settings-plugins/settings-toolbar-button";
+import { SaveToolbarButton } from "~/app/uredi/[novica_ime]/save-plugin/save-toolbar-button";
+import { SettingsToolbarButton } from "~/app/uredi/[novica_ime]/settings-plugins/settings-toolbar-button";
 import { Icons, iconVariants } from "~/components/icons";
 import { AlignDropdownMenu } from "~/components/plate-ui/align-dropdown-menu";
 import { ColorDropdownMenu } from "~/components/plate-ui/color-dropdown-menu";
