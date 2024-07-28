@@ -1,10 +1,10 @@
-import React from "react";
-import { cn } from "@udecode/cn";
-import {
+import type {
   EmojiCategoryList,
   IEmojiFloatingLibrary,
   UseEmojiPickerType,
 } from "@udecode/plate-emoji";
+import React from "react";
+import { cn } from "@udecode/cn";
 
 export type EmojiPickerNavigationProps = Pick<
   UseEmojiPickerType,

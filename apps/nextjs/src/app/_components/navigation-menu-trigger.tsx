@@ -37,7 +37,7 @@ export const NavigationMenuTrigger = React.forwardRef<
         if (
           mutation.type === "attributes" &&
           mutation.attributeName === "data-state" &&
-          mutation.target?.dataset?.state === "open"
+          mutation.target.dataset?.state === "open"
         ) {
           setDisable(true);
           const timeout = setTimeout(() => {
@@ -52,7 +52,7 @@ export const NavigationMenuTrigger = React.forwardRef<
     const observer = new MutationObserver(observerCallback);
 
     // Add ref nodes to observer watch
-    if (forwarded_ref?.current) {
+    if (forwarded_ref.current) {
       observer.observe(forwarded_ref.current, {
         attributes: true,
       });

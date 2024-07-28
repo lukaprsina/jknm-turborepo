@@ -6,18 +6,18 @@ import { db } from "@acme/db/client";
 
 export const name = "article-converter";
 
-type CSVType = {
+interface CSVType {
   title: string;
   content: string;
   publishedAt: string;
   updatedAt: string;
-};
+}
 
 async function main() {
   const cwd = new URL(".", import.meta.url).pathname.slice(1);
   console.log({ cwd });
 
-  let csvData: CSVType[] = [];
+  const csvData: CSVType[] = [];
 
   await finished(
     fs

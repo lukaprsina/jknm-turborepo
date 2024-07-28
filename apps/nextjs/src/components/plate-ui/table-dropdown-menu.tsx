@@ -1,5 +1,5 @@
+import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
-import { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import {
   focusEditor,
   someNode,

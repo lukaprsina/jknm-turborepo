@@ -3,11 +3,11 @@ import type { Descendant } from "slate";
 import type { Upload, UploadProgress } from "../upload/types";
 import { isStoreRef } from "./getSaveValue";
 
-type MaybeUploadNode = {
+interface MaybeUploadNode {
   [key: string]: unknown;
   children?: MaybeUploadNode[];
   url?: unknown;
-};
+}
 
 /** Recursive part of `normalizeOrigins` function with correct types. */
 const _getInProgressUploads = (

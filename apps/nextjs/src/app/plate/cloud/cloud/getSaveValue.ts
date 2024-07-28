@@ -8,11 +8,11 @@ import type { Upload } from "../upload/types";
  * don't put this in a `types.ts` file because it really only has use in this
  * one method.
  */
-type MaybeUploadNode = {
+interface MaybeUploadNode {
   [key: string]: unknown;
   children?: MaybeUploadNode[];
   url?: unknown;
-};
+}
 
 /**
  * Returns `true` only if the `url` passed in looks like it's not a real URL but

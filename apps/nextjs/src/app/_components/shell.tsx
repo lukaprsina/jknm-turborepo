@@ -20,10 +20,10 @@ import { HydrateClient } from "~/trpc/server";
 import logo from "../../../assets/logo.png";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
-type ShellProps = {
+interface ShellProps {
   children: React.ReactNode;
   editable?: boolean;
-};
+}
 
 export async function Shell({ editable, children }: ShellProps) {
   return (

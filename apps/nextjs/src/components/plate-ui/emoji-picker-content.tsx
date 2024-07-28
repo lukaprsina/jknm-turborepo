@@ -1,11 +1,7 @@
+import type { Emoji, GridRow, UseEmojiPickerType } from "@udecode/plate-emoji";
 import React, { memo, useCallback } from "react";
 import { cn } from "@udecode/cn";
-import {
-  Emoji,
-  EmojiSettings,
-  GridRow,
-  UseEmojiPickerType,
-} from "@udecode/plate-emoji";
+import { EmojiSettings } from "@udecode/plate-emoji";
 
 export type EmojiPickerContentProps = Pick<
   UseEmojiPickerType,
@@ -20,12 +16,12 @@ export type EmojiPickerContentProps = Pick<
   | "settings"
 >;
 
-export type EmojiButtonProps = {
+export interface EmojiButtonProps {
   index: number;
   emoji: Emoji;
   onSelect: (emoji: Emoji) => void;
   onMouseOver: (emoji?: Emoji) => void;
-};
+}
 
 export type RowOfButtonsProps = Pick<
   UseEmojiPickerType,

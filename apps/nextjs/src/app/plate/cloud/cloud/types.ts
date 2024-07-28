@@ -5,19 +5,21 @@ import type { Upload } from "../upload";
 import type { createUploadStore } from "../upload/createUploadStore";
 
 /** Specifies just the `options` part of the CloudPlugin */
-export type CloudPlugin = {
+export interface CloudPlugin {
   upload_file_callback?: <V extends Value = Value>(
     editor: PlateEditor<V>,
     file: File,
   ) => Promise<void>;
-};
+}
 
 export type PlateCloudEditor<V extends Value = Value> = CloudEditorProps<V> &
   PlateEditor<V>;
 
-export type FinishUploadsOptions = { maxTimeoutInMs?: number };
+export interface FinishUploadsOptions {
+  maxTimeoutInMs?: number;
+}
 
-export type CloudEditorProps<V extends Value = Value> = {
+export interface CloudEditorProps<V extends Value = Value> {
   cloud: {
     client: portiveClient.Client;
     finishUploads: (options?: FinishUploadsOptions) => Promise<void>;
@@ -38,17 +40,17 @@ export type CloudEditorProps<V extends Value = Value> = {
     uploadStore: ReturnType<typeof createUploadStore>;
     // save: (options: { maxTimeoutInMs?: number }) => Promise<V>;
   };
-};
+}
 
 /**
  * The part of the FileEvent shared between the GenericFileEvent and the
  * ImageFileEvent.
  */
-export type FileEventBase = {
+export interface FileEventBase {
   file: File;
   id: string;
   url: string;
-};
+}
 
 /** FileEvent for files that are not images */
 export type GenericFileEvent = {
@@ -66,17 +68,17 @@ export type ImageFileEvent = {
 export type FileEvent = GenericFileEvent | ImageFileEvent;
 
 /** Indicates upload in progress */
-export type ProgressEvent = {
+export interface ProgressEvent {
   sentBytes: number;
   totalBytes: number;
-};
+}
 
 /** Indicates an error during upload */
-export type ErrorEvent = {
+export interface ErrorEvent {
   message: string;
-};
+}
 
 /** Indicates a successful upload */
-export type SuccessEvent = {
+export interface SuccessEvent {
   url: string;
-};
+}

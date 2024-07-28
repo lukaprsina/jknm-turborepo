@@ -85,7 +85,7 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
+        const type: string = (node.type as string) || ELEMENT_PARAGRAPH;
 
         return type === initialNodeType;
       });

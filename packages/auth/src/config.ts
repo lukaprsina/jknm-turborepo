@@ -3,9 +3,10 @@ import type {
   NextAuthConfig,
   Session as NextAuthSession,
 } from "next-auth";
+import type { GoogleProfile } from "next-auth/providers/google";
 import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import Google, { GoogleProfile } from "next-auth/providers/google";
+import Google from "next-auth/providers/google";
 
 import { db } from "@acme/db/client";
 import { Account, Session, User } from "@acme/db/schema";
@@ -54,7 +55,7 @@ export const authConfig = {
     },
     signIn: async ({ account, profile }) => {
       if (account?.provider != "google") return false;
-      if (!(profile as GoogleProfile)?.email_verified) return false;
+      if (!(profile as GoogleProfile).email_verified) return false;
 
       // TODO: info@jknm.si
       if (!profile?.email?.endsWith("@jknm.si")) return false;

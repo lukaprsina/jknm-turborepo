@@ -1,6 +1,6 @@
 import { getPluginOptions, useEditorRef } from "@udecode/plate-common";
 
-import { MyImageElement } from "../plate-types";
+import type { MyImageElement } from "../plate-types";
 import { KEY_SETTINGS, SettingsPlugin } from "./settings-plugin";
 
 export const useSettingsButton = () => {
@@ -18,7 +18,7 @@ export const useSettingsButton = () => {
         const image_urls = editor.children
           .filter((child) => child.type === "img")
           .map((child) => {
-            return child.url as unknown as MyImageElement;
+            return child.url as MyImageElement;
           });
 
         console.log(image_urls);

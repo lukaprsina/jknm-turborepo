@@ -12,7 +12,7 @@ export async function GET() {
     const response = await client.send(
       new ListObjectsCommand({ Bucket: env.AWS_BUCKET_NAME }),
     );
-    return NextResponse.json(response?.Contents ?? []);
+    return NextResponse.json(response.Contents ?? []);
   } catch (error: unknown) {
     return NextResponse.json({ error });
   }

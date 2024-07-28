@@ -10,7 +10,10 @@ import React, { useCallback, useRef, useState } from "react";
 import { resizeInWidth } from "@portive/client";
 import { findNodePath, setNodes, useEditorRef } from "@udecode/plate-common";
 
-type ImageSize = { height: number; width: number };
+interface ImageSize {
+  height: number;
+  width: number;
+}
 
 type SetImageSize = Dispatch<SetStateAction<ImageSize>>;
 
@@ -103,7 +106,7 @@ export function ResizeControls({
   setSize: SetImageSize;
   size: ImageSize;
 }) {
-  const editor = useEditorRef() as PlateCloudEditor & PlateCloudImageEditor;
+  const editor = useEditorRef();
   const [isResizing, setIsResizing] = useState(false);
 
   const { maxResizeWidth, minResizeWidth } = editor.cloudImage;

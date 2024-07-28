@@ -5,10 +5,10 @@ import { Button } from "@acme/ui/button";
 
 import { HydrateClient } from "~/trpc/server";
 
-type ShellProps = {
+interface ShellProps {
   children: React.ReactNode;
   editable?: boolean;
-};
+}
 
 export async function Shell({ editable, children }: ShellProps) {
   return (

@@ -8,7 +8,7 @@ import type { Upload } from "./types";
  * object from it.
  */
 export const useUpload = (id: string): Upload => {
-  const editor = useEditorRef() as PlateCloudEditor;
+  const editor = useEditorRef();
 
   /**
    * We call this even if it's not always required because it calls `useStore`

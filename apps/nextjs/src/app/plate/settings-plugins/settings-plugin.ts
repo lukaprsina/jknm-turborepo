@@ -7,9 +7,9 @@ import { getPluginOptions, Value } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
 
-export type SettingsPlugin = {
+export interface SettingsPlugin {
   hotkey?: string | string[];
-};
+}
 
 export const KEY_SETTINGS = "settings";
 

@@ -1,20 +1,20 @@
 import type { PlateEditor, TElement, Value } from "@udecode/plate-common";
 
-export type CloudImagePlugin = {
+export interface CloudImagePlugin {
   maxInitialHeight?: number;
   maxInitialWidth?: number;
   maxResizeWidth?: number;
   minResizeWidth?: number;
-};
+}
 
-export type CloudImageEditorProps = {
+export interface CloudImageEditorProps {
   cloudImage: {
     maxInitialHeight: number;
     maxInitialWidth: number;
     maxResizeWidth: number;
     minResizeWidth: number;
   };
-};
+}
 
 export type PlateCloudImageEditor<V extends Value = Value> =
   CloudImageEditorProps & PlateEditor<V>;

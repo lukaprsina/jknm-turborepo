@@ -16,9 +16,9 @@ import { CommentItem } from "./comment-item";
 import { CommentReplyItems } from "./comment-reply-items";
 import { popoverVariants } from "./popover";
 
-export type FloatingCommentsContentProps = {
+export interface FloatingCommentsContentProps {
   disableForm?: boolean;
-};
+}
 
 export function CommentsPopoverContent(props: FloatingCommentsContentProps) {
   const { disableForm } = props;

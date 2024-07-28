@@ -1,14 +1,10 @@
-import { AutoformatBlockRule } from "@udecode/plate-autoformat";
+import type { AutoformatBlockRule } from "@udecode/plate-autoformat";
+import type { PlateEditor } from "@udecode/plate-common";
 import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
 } from "@udecode/plate-code-block";
-import {
-  getParentNode,
-  isElement,
-  isType,
-  PlateEditor,
-} from "@udecode/plate-common";
+import { getParentNode, isElement, isType } from "@udecode/plate-common";
 import { toggleList, unwrapList } from "@udecode/plate-list";
 
 export const preFormat: AutoformatBlockRule["preFormat"] = (editor) =>

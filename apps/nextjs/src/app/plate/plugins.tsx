@@ -1,3 +1,4 @@
+import type { RenderAfterEditable } from "@udecode/plate-common";
 import { withProps } from "@udecode/cn";
 import { createAlignPlugin } from "@udecode/plate-alignment";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
@@ -44,7 +45,6 @@ import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
   PlateLeaf,
-  RenderAfterEditable,
   someNode,
 } from "@udecode/plate-common";
 import { createDndPlugin } from "@udecode/plate-dnd";

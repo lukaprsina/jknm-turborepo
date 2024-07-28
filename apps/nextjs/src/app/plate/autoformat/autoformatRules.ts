@@ -7,7 +7,7 @@ import {
   autoformatSmartQuotes,
 } from "@udecode/plate-autoformat";
 
-import { MyAutoformatRule } from "../plate-types";
+import type { MyAutoformatRule } from "../plate-types";
 import { autoformatBlocks } from "./autoformatBlocks";
 import { autoformatIndentLists } from "./autoformatIndentLists";
 import { autoformatMarks } from "./autoformatMarks";

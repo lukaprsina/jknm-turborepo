@@ -1,6 +1,7 @@
 import { getPluginOptions, useEditorRef } from "@udecode/plate-common";
 
-import { KEY_SAVE, SavePlugin } from "./save-plugin";
+import type { SavePlugin } from "./save-plugin";
+import { KEY_SAVE } from "./save-plugin";
 
 export const useSaveButton = () => {
   const editor = useEditorRef();

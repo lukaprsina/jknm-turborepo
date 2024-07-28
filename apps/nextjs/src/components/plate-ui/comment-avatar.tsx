@@ -13,7 +13,7 @@ export function CommentAvatar({ userId }: { userId: null | string }) {
   return (
     <Avatar className="size-5">
       <AvatarImage alt={user.name} src={user.avatarUrl} />
-      <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+      <AvatarFallback>{user.name[0]}</AvatarFallback>
     </Avatar>
   );
 }

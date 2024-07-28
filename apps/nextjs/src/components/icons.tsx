@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { LucideIcon, LucideProps } from "lucide-react";
 import React from "react";
 import { cva } from "class-variance-authority";
 import {
@@ -33,7 +33,6 @@ import {
   Link2Off,
   List,
   ListOrdered,
-  LucideProps,
   MessageSquare,
   MessageSquarePlus,
   Minus,
