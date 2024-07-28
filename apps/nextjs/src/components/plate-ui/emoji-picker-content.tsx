@@ -35,7 +35,7 @@ const Button = memo(
     return (
       <button
         type="button"
-        aria-label={emoji.skins[0].native}
+        aria-label={emoji.skins[0]?.native}
         tabIndex={-1}
         data-index={index}
         onClick={() => onSelect(emoji)}
@@ -48,7 +48,7 @@ const Button = memo(
           className="absolute inset-0 rounded-full bg-[rgba(0,0,0,0.05)] opacity-0 group-hover:opacity-100"
         />
         <span data-emoji-set="native" style={{ position: "relative" }}>
-          {emoji.skins[0].native}
+          {emoji.skins[0]?.native}
         </span>
       </button>
     );

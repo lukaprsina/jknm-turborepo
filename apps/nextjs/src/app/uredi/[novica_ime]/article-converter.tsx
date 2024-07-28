@@ -1,3 +1,5 @@
+"use server";
+
 import fs from "node:fs";
 import { finished } from "node:stream/promises";
 import { parse } from "csv-parse";

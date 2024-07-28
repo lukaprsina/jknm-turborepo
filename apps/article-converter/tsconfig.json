@@ -1,5 +1,0 @@
-{
-  "extends": "@acme/tsconfig/base.json",
-  "include": [".", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
-}

@@ -18,17 +18,12 @@ import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import type { DraggableProps } from "./draggable";
 import { Draggable } from "./draggable";
 
-export const withDraggable = (
-  Component: FC,
-  options?: WithDraggableOptions<
-    Partial<Omit<DraggableProps, "children" | "editor" | "element">>
-  >,
-) =>
-  withDraggablePrimitive<DraggableProps>(Draggable, Component, options as any);
+export const withDraggable = (Component: FC, options?: WithDraggableOptions) =>
+  withDraggablePrimitive<DraggableProps>(Draggable, Component, options);
 
 export const withDraggablesPrimitive = createNodesWithHOC(withDraggable);
 
-export const withDraggables = (components: any) => {
+export const withDraggables = (components: unknown) => {
   return withDraggablesPrimitive(components, [
     {
       keys: [ELEMENT_PARAGRAPH, ELEMENT_UL, ELEMENT_OL],

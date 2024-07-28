@@ -1,6 +1,6 @@
+import type { PlateEditor } from "@udecode/plate-common/server";
 import type React from "react";
 import { findEventRange } from "@udecode/plate-common";
-import type { PlateEditor} from "@udecode/plate-common/server";
 import { select } from "@udecode/plate-common/server";
 
 import { uploadFiles } from "./uploadFiles";

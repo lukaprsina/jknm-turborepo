@@ -54,8 +54,8 @@ interface InlineComboboxContextValue {
   trigger: string;
 }
 
-const InlineComboboxContext = createContext<InlineComboboxContextValue>(
-  null as any,
+const InlineComboboxContext = createContext<InlineComboboxContextValue | null>(
+  null,
 );
 
 export const defaultFilter: FilterFn = ({ keywords = [], value }, search) =>
@@ -206,12 +206,16 @@ const InlineComboboxInput = forwardRef<
   HTMLInputElement,
   HTMLAttributes<HTMLInputElement>
 >(({ className, ...props }, propRef) => {
+  const inline_combobox_context_nullish = useContext(InlineComboboxContext);
+  if (inline_combobox_context_nullish == null)
+    throw new Error("Inline combobox context is null");
+
   const {
     inputProps,
     inputRef: contextRef,
     showTrigger,
     trigger,
-  } = useContext(InlineComboboxContext);
+  } = inline_combobox_context_nullish;
 
   const store = useComboboxContext()!;
   const value = store.useState("value");

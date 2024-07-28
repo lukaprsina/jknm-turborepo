@@ -21,9 +21,7 @@ const getBarProperty = (
   let position = 0;
   if (focusedCategory) {
     width = 100 / emojiLibrary.getGrid().size;
-    position = focusedCategory
-      ? emojiLibrary.indexOf(focusedCategory) * 100
-      : 0;
+    position = emojiLibrary.indexOf(focusedCategory) * 100;
   }
 
   return { width, position };
