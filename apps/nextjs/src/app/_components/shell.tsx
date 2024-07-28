@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
-import { auth } from "@acme/auth";
+import { auth, signOut } from "@acme/auth";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import {
@@ -169,7 +169,19 @@ async function Footer() {
         <Button asChild variant="link">
           <Link href="/prijava">Prijava</Link>
         </Button>
-      ) : null}
+      ) : (
+        <form>
+          <Button
+            variant="link"
+            formAction={async () => {
+              "use server";
+              await signOut();
+            }}
+          >
+            Odjava
+          </Button>
+        </form>
+      )}
     </div>
   );
 }

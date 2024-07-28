@@ -8,7 +8,7 @@ import { getPluginOptions, Value } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
 
-import { useSaving } from "./save-context";
+import { save_store } from "./save-store";
 
 export const KEY_SAVE = "save";
 
@@ -35,7 +35,12 @@ export const onKeyDownSave =
     if (isHotkey(options.hotkey, event as any)) {
       event.preventDefault();
       event.stopPropagation();
+
+      save_store.set.saving(true);
       options.save_callback(editor.children);
+      setTimeout(() => {
+        save_store.set.saving(false);
+      }, 1500);
 
       clearTimeout(save_timeout_id);
       clearTimeout(save_max_time_timeout_id);
@@ -44,18 +49,22 @@ export const onKeyDownSave =
 
 let save_timeout_id: number | undefined = undefined;
 let save_max_time_timeout_id: number | undefined = undefined;
-let dirty = false;
 
 export const createSavePlugin = createPluginFactory<SavePlugin>({
   key: KEY_SAVE,
   useHooks: () => {
-    const saving = useSaving();
     useEffect(() => {
-      console.log("SavePlugin useHooks setting saving to true");
-      saving?.setSaving(true);
-    }, [saving]);
-  },
+      const onBeforeUnload = (e: BeforeUnloadEvent) => {
+        if (save_store.get.dirty()) e.preventDefault();
+      };
 
+      window.addEventListener("beforeunload", onBeforeUnload);
+
+      return () => {
+        window.removeEventListener("beforeunload", onBeforeUnload);
+      };
+    });
+  },
   handlers: {
     onKeyDown: onKeyDownSave,
     onChange: (editor) => (value) => {
@@ -70,23 +79,35 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
         alert("Save callback not set");
         return;
       }
+
       if (!autosave_after_inactive) return;
 
-      dirty = true;
       clearTimeout(save_timeout_id);
+      save_store.set.dirty(true);
 
       if (typeof save_max_time_timeout_id === "undefined") {
         save_max_time_timeout_id = setTimeout(() => {
-          if (!dirty) return;
+          if (!save_store.get.dirty) return;
+
+          save_store.set.saving(true);
           save_callback(value);
-          dirty = false;
+          setTimeout(() => {
+            save_store.set.saving(false);
+          }, 1500);
+
+          save_store.set.dirty(false);
           save_max_time_timeout_id = undefined;
         }, max_ms_without_autosave) as unknown as number;
       }
 
       save_timeout_id = setTimeout(() => {
+        save_store.set.saving(true);
         save_callback(value);
-        dirty = false;
+        setTimeout(() => {
+          save_store.set.saving(false);
+        }, 1500);
+
+        save_store.set.dirty(false);
         save_max_time_timeout_id = undefined;
       }, autosave_after_inactive_ms) as unknown as number;
     },

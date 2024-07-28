@@ -5,14 +5,14 @@ import { withRef } from "@udecode/cn";
 import { SaveIcon } from "lucide-react";
 
 import { ToolbarButton } from "../../../components/plate-ui/toolbar";
-import { useSaving } from "./save-context";
+import { save_store } from "./save-store";
 import { useSaveButton } from "./useSaveButton";
 
 export const SaveToolbarButton = withRef<typeof ToolbarButton>((rest, ref) => {
   const {
     props: { onClick, ...props },
   } = useSaveButton();
-  const saving = useSaving();
+  const saving = save_store.use.saving;
 
   return (
     <ToolbarButton
@@ -20,16 +20,16 @@ export const SaveToolbarButton = withRef<typeof ToolbarButton>((rest, ref) => {
       tooltip="Save"
       {...props}
       onClick={() => {
-        saving?.setSaving(true);
-        setTimeout(() => {
-          saving?.setSaving(false);
-        }, 1500);
+        save_store.set.saving(true);
         onClick();
+        setTimeout(() => {
+          save_store.set.saving(false);
+        }, 1500);
       }}
       {...rest}
     >
       <div className="flex gap-2">
-        <p hidden={!saving?.saving}>Saving...</p>
+        <p hidden={!saving()}>Saving...</p>
         <SaveIcon />
       </div>
     </ToolbarButton>

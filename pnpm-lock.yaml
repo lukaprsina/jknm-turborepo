@@ -522,6 +522,12 @@ importers:
       zod:
         specifier: 'catalog:'
         version: 3.23.8
+      zustand:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
+      zustand-x:
+        specifier: ^3.0.4
+        version: 3.0.4(react-dom@18.3.1(react@18.3.1))(react-native@0.74.3(@types/react@18.3.3)(react@18.3.1))(react@18.3.1)(scheduler@0.24.0-canary-efb381bbf-20230505)(zustand@4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1))
     devDependencies:
       '@acme/eslint-config':
         specifier: workspace:*

@@ -102,7 +102,9 @@
     "superjson": "2.2.1",
     "tailwind-merge": "^2.3.0",
     "uuid": "^10.0.0",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "zustand": "^4.5.4",
+    "zustand-x": "^3.0.4"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",

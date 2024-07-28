@@ -12,7 +12,6 @@ import { FloatingToolbar } from "~/components/plate-ui/floating-toolbar";
 import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-buttons";
 import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import plugins from "./plugins";
-import { SavingProvider } from "./save-plugin/save-context";
 
 const initialValue = [
   {
@@ -26,19 +25,17 @@ export function PlateComponent() {
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
-        <SavingProvider>
-          <Plate plugins={plugins} initialValue={initialValue}>
-            <FixedToolbar>
-              <FixedToolbarButtons />
-            </FixedToolbar>
+        <Plate plugins={plugins} initialValue={initialValue}>
+          <FixedToolbar>
+            <FixedToolbarButtons />
+          </FixedToolbar>
 
-            <Editor />
+          <Editor />
 
-            <FloatingToolbar>
-              <FloatingToolbarButtons />
-            </FloatingToolbar>
-          </Plate>
-        </SavingProvider>
+          <FloatingToolbar>
+            <FloatingToolbarButtons />
+          </FloatingToolbar>
+        </Plate>
       </DndProvider>
     </TooltipProvider>
   );

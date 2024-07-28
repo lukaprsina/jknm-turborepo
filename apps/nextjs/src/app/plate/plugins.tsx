@@ -367,8 +367,6 @@ const plugins = createPlugins(
           console.log("Saving...", value);
         },
         autosave_after_inactive: true,
-        autosave_after_inactive_ms: 5000,
-        max_ms_without_autosave: 10000,
         autosave_on_before_unload: true,
         autosave_on_lost_focus: true,
       },
