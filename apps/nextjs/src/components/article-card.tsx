@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
-export async function FeaturedArticleCard() {
+export function FeaturedArticleCard() {
   return (
     <Link
       href="#test"
@@ -30,7 +30,7 @@ export async function FeaturedArticleCard() {
   );
 }
 
-export async function ArticleCard() {
+export function ArticleCard() {
   return (
     <Link
       href="/article/1"

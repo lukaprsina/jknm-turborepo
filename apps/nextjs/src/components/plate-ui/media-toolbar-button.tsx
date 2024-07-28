@@ -2,9 +2,8 @@ import type { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
 import React, { useState } from "react";
 import { withRef } from "@udecode/cn";
 import { useEditorRef } from "@udecode/plate-common";
-import { insertMedia, useMediaToolbarButton } from "@udecode/plate-media";
 
-import { uploadFile } from "~/app/uredi/[novica_ime]/cloud";
+import { uploadFile } from "~/app/uredi/[novica_ime]/cloud/uploadFiles";
 import { Icons } from "~/components/icons";
 import { ToolbarButton } from "./toolbar";
 

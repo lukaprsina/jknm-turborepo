@@ -2,8 +2,6 @@ import fs from "node:fs";
 import { finished } from "node:stream/promises";
 import { parse } from "csv-parse";
 
-import { db } from "@acme/db/client";
-
 export const name = "article-converter";
 
 interface CSVType {
@@ -23,8 +21,17 @@ async function main() {
     fs
       .createReadStream(`${cwd}../assets/Objave.txt`)
       .pipe(parse({ delimiter: "," }))
-      .on("data", function (csvrow) {
-        if (csvrow[2] !== 1) return;
+      .on("data", function (csvrow: string[]) {
+        if (
+          typeof csvrow[2] == "undefined" ||
+          !csvrow[4] ||
+          !csvrow[6] ||
+          !csvrow[8] ||
+          !csvrow[15]
+        )
+          throw new Error("Missing data");
+
+        if (parseInt(csvrow[2]) !== 1) return;
 
         csvData.push({
           title: csvrow[4],
@@ -38,7 +45,7 @@ async function main() {
   console.log(csvData.slice(0, 3));
 }
 
-main()
+await main()
   .catch((error) => {
     console.error(error);
     process.exit(1);

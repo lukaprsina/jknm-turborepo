@@ -33,7 +33,7 @@ export const onKeyDownSave =
 
     if (!options.hotkey || !options.save_callback) return;
 
-    if (isHotkey(options.hotkey, event as any)) {
+    if (isHotkey(options.hotkey, event)) {
       event.preventDefault();
       event.stopPropagation();
 
@@ -88,7 +88,7 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
 
       if (typeof save_max_time_timeout_id === "undefined") {
         save_max_time_timeout_id = setTimeout(() => {
-          if (!save_store.get.dirty) return;
+          if (!save_store.get.dirty()) return;
 
           save_store.set.saving(true);
           save_callback(value);

@@ -19,7 +19,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const { filename, content_type } = await request.json();
+  const { filename, content_type } = (await request.json()) as {
+    filename: string;
+    content_type: string;
+  };
 
   try {
     const client = new S3Client({ region: env.AWS_REGION });

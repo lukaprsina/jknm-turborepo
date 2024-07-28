@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import { auth, signIn, signOut } from "@acme/auth";
 import { Button } from "@acme/ui/button";
-import { Card, CardContent } from "@acme/ui/card";
 
 import logo from "./logo.png";
 
@@ -60,7 +59,7 @@ export default async function SignIn() {
   );
 }
 
-async function GoogleSignInButton() {
+function GoogleSignInButton() {
   return (
     <button
       className="gsi-material-button"

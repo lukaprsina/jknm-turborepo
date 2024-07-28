@@ -62,7 +62,7 @@ export const NavigationMenuTrigger = React.forwardRef<
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [forwarded_ref]);
 
   return (
     <NavigationMenuPrimitive.Trigger

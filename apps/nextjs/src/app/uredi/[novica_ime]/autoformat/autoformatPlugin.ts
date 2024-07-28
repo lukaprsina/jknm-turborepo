@@ -5,7 +5,7 @@ import { autoformatRules } from "./autoformatRules";
 
 export const autoformatPlugin: Partial<PlatePlugin<AutoformatPlugin>> = {
   options: {
-    rules: autoformatRules as any,
+    rules: autoformatRules,
     enableUndoOnDelete: true,
   },
 };

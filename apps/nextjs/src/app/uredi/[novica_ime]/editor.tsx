@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Plate } from "@udecode/plate-common";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";

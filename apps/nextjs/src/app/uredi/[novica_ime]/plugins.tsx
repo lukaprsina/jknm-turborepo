@@ -28,10 +28,6 @@ import {
 } from "@udecode/plate-break";
 import { createCaptionPlugin } from "@udecode/plate-caption";
 import {
-  ELEMENT_CLOUD_ATTACHMENT,
-  ELEMENT_CLOUD_IMAGE,
-} from "@udecode/plate-cloud";
-import {
   createCodeBlockPlugin,
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
@@ -126,8 +122,6 @@ import { createTogglePlugin, ELEMENT_TOGGLE } from "@udecode/plate-toggle";
 import { createTrailingBlockPlugin } from "@udecode/plate-trailing-block";
 
 import { BlockquoteElement } from "~/components/plate-ui/blockquote-element";
-import { CloudAttachmentElement } from "~/components/plate-ui/cloud-attachment-element";
-import { CloudImageElement } from "~/components/plate-ui/cloud-image-element";
 import { CodeBlockElement } from "~/components/plate-ui/code-block-element";
 import { CodeLeaf } from "~/components/plate-ui/code-leaf";
 import { CodeLineElement } from "~/components/plate-ui/code-line-element";
@@ -156,12 +150,8 @@ import { TodoListElement } from "~/components/plate-ui/todo-list-element";
 import { ToggleElement } from "~/components/plate-ui/toggle-element";
 import { withDraggables } from "~/components/plate-ui/with-draggables";
 import { autoformatPlugin } from "./autoformat/autoformatPlugin";
-import {
-  createCloudAttachmentPlugin,
-  createCloudImagePlugin,
-  createCloudPlugin,
-  uploadFile,
-} from "./cloud";
+import { createCloudPlugin } from "./cloud/createCloudPlugin";
+import { uploadFile } from "./cloud/uploadFiles";
 import { createSavePlugin } from "./save-plugin/save-plugin";
 import { TabbableElement } from "./tabbable-element";
 
@@ -351,15 +341,6 @@ const plugins = createPlugins(
         upload_file_callback: uploadFile,
       },
     }),
-    createCloudAttachmentPlugin(),
-    createCloudImagePlugin({
-      options: {
-        maxInitialHeight: 320,
-        maxInitialWidth: 320,
-        maxResizeWidth: 720,
-        minResizeWidth: 100,
-      },
-    }),
     createSavePlugin({
       options: {
         hotkey: ["ctrl+m", "ctrl+s"],
@@ -432,9 +413,6 @@ const plugins = createPlugins(
         [MARK_SUPERSCRIPT]: withProps(PlateLeaf, { as: "sup" }),
         [MARK_UNDERLINE]: withProps(PlateLeaf, { as: "u" }),
         // My stuff
-        [ELEMENT_CLOUD_ATTACHMENT]: CloudAttachmentElement,
-        [ELEMENT_CLOUD_IMAGE]: CloudImageElement,
-        // lol
         [ELEMENT_CODE_BLOCK]: CodeBlockElement,
         [ELEMENT_CODE_LINE]: CodeLineElement,
         [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,

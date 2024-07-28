@@ -53,7 +53,7 @@ export const authConfig = {
         },
       };
     },
-    signIn: async ({ account, profile }) => {
+    signIn: ({ account, profile }) => {
       if (account?.provider != "google") return false;
       if (!(profile as GoogleProfile).email_verified) return false;
 

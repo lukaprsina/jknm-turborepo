@@ -1,11 +1,6 @@
 import type { PlateEditor, Value } from "@udecode/plate-common/server";
 import { getPluginOptions } from "@udecode/plate-common/server";
-import {
-  ELEMENT_IMAGE,
-  insertImage,
-  insertMedia,
-  insertMediaEmbed,
-} from "@udecode/plate-media";
+import { insertImage } from "@udecode/plate-media";
 import mime from "mime/lite";
 
 import type { CloudPlugin } from "./types";
@@ -32,11 +27,14 @@ export const uploadFile = async <V extends Value = Value>(
   });
 
   if (response.ok) {
-    const { url, fields } = await response.json();
+    const { url, fields } = (await response.json()) as {
+      url: string;
+      fields: Record<string, string>;
+    };
 
     const formData = new FormData();
     Object.entries(fields).forEach(([key, value]) => {
-      formData.append(key, value as string);
+      formData.append(key, value);
     });
     formData.append("file", file);
 
