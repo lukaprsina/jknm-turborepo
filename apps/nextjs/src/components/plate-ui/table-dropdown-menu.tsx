@@ -58,7 +58,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           <DropdownMenuSubContent>
             <DropdownMenuItem
               className="min-w-[180px]"
-              onSelect={async () => {
+              onSelect={() => {
                 insertTable(editor);
                 focusEditor(editor);
               }}
@@ -69,7 +69,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={async () => {
+              onSelect={() => {
                 deleteTable(editor);
                 focusEditor(editor);
               }}
@@ -89,7 +89,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={async () => {
+              onSelect={() => {
                 insertTableColumn(editor);
                 focusEditor(editor);
               }}
@@ -100,7 +100,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={async () => {
+              onSelect={() => {
                 deleteColumn(editor);
                 focusEditor(editor);
               }}
@@ -120,7 +120,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={async () => {
+              onSelect={() => {
                 insertTableRow(editor);
                 focusEditor(editor);
               }}
@@ -131,7 +131,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={async () => {
+              onSelect={() => {
                 deleteRow(editor);
                 focusEditor(editor);
               }}

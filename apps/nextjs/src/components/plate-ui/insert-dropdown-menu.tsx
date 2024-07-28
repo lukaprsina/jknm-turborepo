@@ -15,10 +15,7 @@ import {
 } from "@udecode/plate-common";
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from "@udecode/plate-heading";
 import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
-import {
-  KEY_LIST_STYLE_TYPE,
-  toggleIndentList,
-} from "@udecode/plate-indent-list";
+import { toggleIndentList } from "@udecode/plate-indent-list";
 import { ELEMENT_LINK, triggerFloatingLink } from "@udecode/plate-link";
 import {
   ELEMENT_IMAGE,

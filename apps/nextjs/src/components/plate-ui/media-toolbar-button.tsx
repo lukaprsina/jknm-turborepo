@@ -12,7 +12,7 @@ export const MediaToolbarButton = withRef<
   {
     nodeType?: typeof ELEMENT_IMAGE | typeof ELEMENT_MEDIA_EMBED;
   }
->(({ nodeType, ...rest }, ref) => {
+>(({ ...rest }, ref) => {
   const editor = useEditorRef();
   const [uploading, setUploading] = useState(false);
   const file_input_ref = React.useRef<HTMLInputElement>(null);

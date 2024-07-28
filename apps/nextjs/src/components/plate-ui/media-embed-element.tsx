@@ -7,7 +7,7 @@ import {
   parseVideoUrl,
   useMediaState,
 } from "@udecode/plate-media";
-import { ResizableProvider, useResizableStore } from "@udecode/plate-resizable";
+import { ResizableProvider } from "@udecode/plate-resizable";
 import LiteYouTubeEmbed from "react-lite-youtube-embed";
 import { Tweet } from "react-tweet";
 
@@ -38,6 +38,8 @@ export const MediaEmbedElement = withHOC(
     // const width = useResizableStore().get.width();
     const provider = embed?.provider;
 
+    if (!embed?.id) throw new Error("MediaEmbedElement: embed.id is required");
+
     return (
       <MediaPopover pluginKey={ELEMENT_MEDIA_EMBED}>
         <PlateElement
@@ -62,7 +64,7 @@ export const MediaEmbedElement = withHOC(
             {isVideo ? (
               isYoutube ? (
                 <LiteYouTubeEmbed
-                  id={embed!.id!}
+                  id={embed.id}
                   title="youtube"
                   wrapperClass={cn(
                     "rounded-sm",
@@ -94,11 +96,10 @@ export const MediaEmbedElement = withHOC(
                   <iframe
                     allowFullScreen
                     className={cn(
-                      "absolute left-0 top-0 size-full rounded-sm",
-                      isVideo && "border-0",
+                      "absolute left-0 top-0 size-full rounded-sm border-0",
                       focused && selected && "ring-2 ring-ring ring-offset-2",
                     )}
-                    src={embed!.url}
+                    src={embed.url}
                     title="embed"
                   />
                 </div>
@@ -114,7 +115,7 @@ export const MediaEmbedElement = withHOC(
                     "[&_.react-tweet-theme]:ring-2 [&_.react-tweet-theme]:ring-ring [&_.react-tweet-theme]:ring-offset-2",
                 )}
               >
-                <Tweet id={embed!.id} />
+                <Tweet id={embed.id} />
               </div>
             )}
 

@@ -2,7 +2,10 @@ import type { WithDraggableOptions } from "@udecode/plate-dnd";
 import type { FC } from "react";
 import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
 import { ELEMENT_CODE_BLOCK } from "@udecode/plate-code-block";
-import { createNodesWithHOC } from "@udecode/plate-common";
+import {
+  createNodesWithHOC,
+  PlatePluginComponent,
+} from "@udecode/plate-common";
 import { withDraggable as withDraggablePrimitive } from "@udecode/plate-dnd";
 import {
   ELEMENT_H1,
@@ -23,7 +26,9 @@ export const withDraggable = (Component: FC, options?: WithDraggableOptions) =>
 
 export const withDraggablesPrimitive = createNodesWithHOC(withDraggable);
 
-export const withDraggables = (components: unknown) => {
+export const withDraggables = (
+  components: Record<string, PlatePluginComponent<any>>,
+): Record<string, PlatePluginComponent<any>> => {
   return withDraggablesPrimitive(components, [
     {
       keys: [ELEMENT_PARAGRAPH, ELEMENT_UL, ELEMENT_OL],

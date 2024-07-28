@@ -173,8 +173,6 @@ const InlineCombobox = ({
 
   const items = store.useState("items");
 
-  useEffect;
-
   /**
    * If there is no active ID and the list of items changes, select the first
    * item.
@@ -217,7 +215,9 @@ const InlineComboboxInput = forwardRef<
     trigger,
   } = inline_combobox_context_nullish;
 
-  const store = useComboboxContext()!;
+  const store = useComboboxContext();
+  if (!store) throw new Error("Combobox context is null");
+
   const value = store.useState("value");
 
   const ref = useComposedRef(propRef, contextRef);
@@ -305,7 +305,11 @@ const InlineComboboxItem = ({
 }: InlineComboboxItemProps) => {
   const { value } = props;
 
-  const { filter, removeInput } = useContext(InlineComboboxContext);
+  const inline_combobox_context_nullish = useContext(InlineComboboxContext);
+  if (inline_combobox_context_nullish == null)
+    throw new Error("Inline combobox context is null");
+
+  const { filter, removeInput } = inline_combobox_context_nullish;
 
   const store = useComboboxContext()!;
 
@@ -335,7 +339,11 @@ const InlineComboboxEmpty = ({
   children,
   className,
 }: HTMLAttributes<HTMLDivElement>) => {
-  const { setHasEmpty } = useContext(InlineComboboxContext);
+  const inline_combobox_context_nullish = useContext(InlineComboboxContext);
+  if (inline_combobox_context_nullish == null)
+    throw new Error("Inline combobox context is null");
+
+  const { setHasEmpty } = inline_combobox_context_nullish;
   const store = useComboboxContext()!;
   const items = store.useState("items");
 

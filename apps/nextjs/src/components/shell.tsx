@@ -25,7 +25,8 @@ interface ShellProps {
   editable?: boolean;
 }
 
-export async function Shell({ editable, children }: ShellProps) {
+export function Shell({ editable, children }: ShellProps) {
+  console.log({ editable });
   return (
     <HydrateClient>
       <div className="w-full">
@@ -41,7 +42,7 @@ export async function Shell({ editable, children }: ShellProps) {
   );
 }
 
-async function Header() {
+function Header() {
   return (
     <div className="container flex items-center justify-between">
       <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
@@ -62,7 +63,7 @@ async function Header() {
   );
 }
 
-async function DesktopHeaderLink({
+function DesktopHeaderLink({
   href,
   children,
 }: {
@@ -85,7 +86,7 @@ async function DesktopHeaderLink({
   );
 }
 
-async function DesktopHeader() {
+function DesktopHeader() {
   return (
     <div className="flex gap-6">
       <NavigationMenu>

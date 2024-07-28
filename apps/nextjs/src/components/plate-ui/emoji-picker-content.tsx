@@ -1,4 +1,9 @@
-import type { Emoji, GridRow, UseEmojiPickerType } from "@udecode/plate-emoji";
+import type {
+  Emoji,
+  EmojiCategoryList,
+  GridRow,
+  UseEmojiPickerType,
+} from "@udecode/plate-emoji";
 import React, { memo, useCallback } from "react";
 import { cn } from "@udecode/cn";
 import { EmojiSettings } from "@udecode/plate-emoji";
@@ -87,7 +92,7 @@ export function EmojiPickerContent({
   const getRowWidth = settings.perLine.value * settings.buttonSize.value;
 
   const isCategoryVisible = useCallback(
-    (categoryId: any) => {
+    (categoryId: EmojiCategoryList) => {
       return visibleCategories.has(categoryId)
         ? visibleCategories.get(categoryId)
         : false;

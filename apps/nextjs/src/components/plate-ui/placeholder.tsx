@@ -1,4 +1,7 @@
-import type { PlaceholderProps } from "@udecode/plate-common";
+import type {
+  PlaceholderProps,
+  PlatePluginComponent,
+} from "@udecode/plate-common";
 import React from "react";
 import { cn } from "@udecode/cn";
 import {
@@ -33,7 +36,9 @@ export const withPlaceholder = createNodeHOC(Placeholder);
 
 export const withPlaceholdersPrimitive = createNodesHOC(Placeholder);
 
-export const withPlaceholders = (components: any) =>
+export const withPlaceholders = (
+  components: Record<string, PlatePluginComponent<any>>,
+): Record<string, PlatePluginComponent<any>> =>
   withPlaceholdersPrimitive(components, [
     {
       hideOnBlur: true,

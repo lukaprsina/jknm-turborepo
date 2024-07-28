@@ -16,6 +16,9 @@ export const MentionElement = withRef<
   const selected = useSelected();
   const focused = useFocused();
 
+  if (!element.children[0])
+    throw new Error("MentionElement: children[0] is required");
+
   return (
     <PlateElement
       className={cn(
