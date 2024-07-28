@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
+import { findNodePath, useEditorRef } from "@udecode/plate-common";
+import { setNodes } from "@udecode/plate-common/server";
+import { useFocused, useSelected } from "slate-react";
 
-import { findNodePath, useEditorRef } from '@udecode/plate-common';
-import { setNodes } from '@udecode/plate-common/server';
-import { useFocused, useSelected } from 'slate-react';
-
-import { type TCloudImageElement, generateSrcAndSrcSet, useUpload } from '..';
+import type { TCloudImageElement } from "..";
+import { generateSrcAndSrcSet, useUpload } from "..";
 
 export const useCloudImageElementState = ({
   element,
@@ -14,7 +14,7 @@ export const useCloudImageElementState = ({
   const editor = useEditorRef();
   const upload = useUpload(element.url);
 
-  const url = upload.status === 'not-found' ? undefined : upload.url;
+  const url = upload.status === "not-found" ? undefined : upload.url;
 
   React.useEffect(() => {
     /**
@@ -29,8 +29,8 @@ export const useCloudImageElementState = ({
      * appears to have the final URL.
      */
     if (
-      typeof url === 'string' &&
-      !url.startsWith('blob:') &&
+      typeof url === "string" &&
+      !url.startsWith("blob:") &&
       url !== element.url
     ) {
       const path = findNodePath(editor, element);
@@ -39,7 +39,7 @@ export const useCloudImageElementState = ({
         { url },
         {
           at: path,
-        }
+        },
       );
     }
   }, [editor, element, url]);
@@ -59,7 +59,7 @@ export const useCloudImageElementState = ({
   const { src, srcSet } = generateSrcAndSrcSet({
     maxSize: [element.maxWidth, element.maxHeight],
     size: [element.width, element.height],
-    url: upload.status === 'not-found' ? undefined : upload.url,
+    url: upload.status === "not-found" ? undefined : upload.url,
   });
 
   return {

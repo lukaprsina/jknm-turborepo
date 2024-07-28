@@ -1,18 +1,15 @@
-import * as portiveClient from '@portive/client';
-import {
-  type Value,
-  type WithPlatePlugin,
-  insertNode,
-} from '@udecode/plate-common/server';
-import Defer from 'p-defer';
+import type { Value, WithPlatePlugin } from "@udecode/plate-common/server";
+import * as portiveClient from "@portive/client";
+import { insertNode } from "@udecode/plate-common/server";
+import Defer from "p-defer";
 
-import type { PlateCloudEditor } from '../cloud';
-import type { UploadError, UploadSuccess } from '../upload';
+import type { PlateCloudEditor } from "../cloud";
+import type { UploadError, UploadSuccess } from "../upload";
 import type {
   CloudImagePlugin,
   PlateCloudImageEditor,
   TCloudImageElement,
-} from './types';
+} from "./types";
 
 const DEFAULT_MAX_INITIAL_WIDTH = 320;
 const DEFAULT_MAX_INITIAL_HEIGHT = 320;
@@ -24,7 +21,7 @@ export const withCloudImage = <
   E extends PlateCloudImageEditor<V> = PlateCloudImageEditor<V>,
 >(
   $editor: E,
-  plugin: WithPlatePlugin<CloudImagePlugin, V, E>
+  plugin: WithPlatePlugin<CloudImagePlugin, V, E>,
 ) => {
   const editor = $editor as E & PlateCloudEditor<V>;
   const { maxInitialHeight, maxInitialWidth, maxResizeWidth, minResizeWidth } =
@@ -57,7 +54,7 @@ export const withCloudImage = <
     onError(e) {
       const upload: UploadError = {
         message: e.message,
-        status: 'error',
+        status: "error",
         url: e.url,
       };
       editor.cloud.uploadStore.set.upload(e.id, upload);
@@ -67,7 +64,7 @@ export const withCloudImage = <
       editor.cloud.uploadStore.set.upload(e.id, {
         finishPromise,
         sentBytes: e.sentBytes,
-        status: 'progress',
+        status: "progress",
         totalBytes: e.totalBytes,
         url: e.url,
       });
@@ -75,15 +72,15 @@ export const withCloudImage = <
     onStart(e) {
       const { height, width } = portiveClient.resizeIn(
         { height: e.height, width: e.width },
-        { height: maxInitialHeight, width: maxInitialWidth }
+        { height: maxInitialHeight, width: maxInitialWidth },
       );
       const node: TCloudImageElement = {
         bytes: e.file.size,
-        children: [{ text: '' }],
+        children: [{ text: "" }],
         height,
         maxHeight: e.height,
         maxWidth: e.width,
-        type: 'cloud_image',
+        type: "cloud_image",
         url: e.id,
         width,
       };
@@ -91,14 +88,14 @@ export const withCloudImage = <
       editor.cloud.uploadStore.set.upload(e.id, {
         finishPromise,
         sentBytes: 0,
-        status: 'progress',
+        status: "progress",
         totalBytes: e.file.size,
         url: e.url,
       });
     },
     onSuccess(e) {
       const upload: UploadSuccess = {
-        status: 'success',
+        status: "success",
         url: e.url,
       };
       editor.cloud.uploadStore.set.upload(e.id, upload);

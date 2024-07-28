@@ -1,21 +1,14 @@
-'use client';
-
-import React, {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+"use client";
 
 import type {
   PlateCloudEditor,
   PlateCloudImageEditor,
   TCloudImageElement,
-} from '@udecode/plate-cloud';
-
-import { resizeInWidth } from '@portive/client';
-import { findNodePath, setNodes, useEditorRef } from '@udecode/plate-common';
+} from "@udecode/plate-cloud";
+import type { Dispatch, SetStateAction } from "react";
+import React, { useCallback, useRef, useState } from "react";
+import { resizeInWidth } from "@portive/client";
+import { findNodePath, setNodes, useEditorRef } from "@udecode/plate-common";
 
 type ImageSize = { height: number; width: number };
 
@@ -29,18 +22,18 @@ function ResizeLabel({ size }: { size: { height: number; width: number } }) {
   return (
     <div
       style={{
-        background: '#404040',
+        background: "#404040",
         borderRadius: 3,
         bottom,
-        boxShadow: '0px 0px 2px 1px rgba(255, 255, 255, 0.5)',
-        color: 'white',
-        font: '10px/20px sans-serif',
+        boxShadow: "0px 0px 2px 1px rgba(255, 255, 255, 0.5)",
+        color: "white",
+        font: "10px/20px sans-serif",
         left: 4,
         minWidth: 50,
-        padding: '0 7px',
-        position: 'absolute',
-        textAlign: 'center',
-        transition: 'bottom 250ms',
+        padding: "0 7px",
+        position: "absolute",
+        textAlign: "center",
+        transition: "bottom 250ms",
         zIndex: 100,
       }}
     >
@@ -51,9 +44,9 @@ function ResizeLabel({ size }: { size: { height: number; width: number } }) {
 
 /** The little divets on the resize handle bar. */
 const barStyle = {
-  background: 'rgba(255,255,255,0.75)',
+  background: "rgba(255,255,255,0.75)",
   height: 16,
-  position: 'absolute',
+  position: "absolute",
   top: 8,
   width: 1,
 } as const;
@@ -70,10 +63,10 @@ function ResizeHandles({
       <div
         onMouseDown={onMouseDown}
         style={{
-          background: 'rgba(127,127,127,0.01)',
+          background: "rgba(127,127,127,0.01)",
           bottom: 0,
-          cursor: 'ew-resize',
-          position: 'absolute',
+          cursor: "ew-resize",
+          position: "absolute",
           right: -8,
           top: 0,
           width: 16,
@@ -82,13 +75,13 @@ function ResizeHandles({
         {/* Visible Handle */}
         <div
           style={{
-            background: 'DodgerBlue',
+            background: "DodgerBlue",
             borderRadius: 4,
             height: 32,
             left: 0,
             marginTop: -16,
-            position: 'absolute',
-            top: '50%',
+            position: "absolute",
+            top: "50%",
             width: 16,
           }}
         >
@@ -140,7 +133,7 @@ export function ResizeControls({
 
         const currentSize = resizeInWidth(
           { height: element.maxHeight, width: element.maxWidth },
-          nextWidth
+          nextWidth,
         );
 
         currentSizeRef.current = currentSize;
@@ -152,8 +145,8 @@ export function ResizeControls({
       /** When the user releases the mouse, remove all the event handlers */
       function onDocumentMouseUp() {
         setIsResizing(false);
-        document.removeEventListener('mousemove', onDocumentMouseMove);
-        document.removeEventListener('mouseup', onDocumentMouseUp);
+        document.removeEventListener("mousemove", onDocumentMouseMove);
+        document.removeEventListener("mouseup", onDocumentMouseUp);
         document.body.style.cursor = originalCursor;
 
         const at = findNodePath(editor, element);
@@ -164,8 +157,8 @@ export function ResizeControls({
       }
 
       /** Attach document event listeners */
-      document.addEventListener('mousemove', onDocumentMouseMove);
-      document.addEventListener('mouseup', onDocumentMouseUp);
+      document.addEventListener("mousemove", onDocumentMouseMove);
+      document.addEventListener("mouseup", onDocumentMouseUp);
 
       /**
        * While dragging, we want the cursor to be `ew-resize` (left-right arrow)
@@ -175,9 +168,9 @@ export function ResizeControls({
        *
        * Also, image has max width/height and the cursor can fall outside of it.
        */
-      document.body.style.cursor = 'ew-resize';
+      document.body.style.cursor = "ew-resize";
     },
-    [size.width, minResizeWidth, element, maxResizeWidth, setSize, editor]
+    [size.width, minResizeWidth, element, maxResizeWidth, setSize, editor],
   );
 
   if (element.width < minResizeWidth) return null;

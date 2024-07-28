@@ -1,11 +1,11 @@
-import React from 'react';
-import { AutoformatRule } from '@udecode/plate-autoformat';
-import { ELEMENT_BLOCKQUOTE } from '@udecode/plate-block-quote';
+import React from "react";
+import { AutoformatRule } from "@udecode/plate-autoformat";
+import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
 import {
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
-} from '@udecode/plate-code-block';
-import { TCommentText } from '@udecode/plate-comments';
+} from "@udecode/plate-code-block";
+import { TCommentText } from "@udecode/plate-comments";
 import {
   createPlateEditor,
   CreatePlateEditorOptions,
@@ -47,11 +47,11 @@ import {
   useEditorRef,
   useEditorState,
   WithOverride,
-} from '@udecode/plate-common';
+} from "@udecode/plate-common";
 import {
   ELEMENT_EXCALIDRAW,
   TExcalidrawElement,
-} from '@udecode/plate-excalidraw';
+} from "@udecode/plate-excalidraw";
 import {
   ELEMENT_H1,
   ELEMENT_H2,
@@ -59,42 +59,42 @@ import {
   ELEMENT_H4,
   ELEMENT_H5,
   ELEMENT_H6,
-} from '@udecode/plate-heading';
-import { ELEMENT_HR } from '@udecode/plate-horizontal-rule';
-import { ELEMENT_LINK, TLinkElement } from '@udecode/plate-link';
+} from "@udecode/plate-heading";
+import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
+import { ELEMENT_LINK, TLinkElement } from "@udecode/plate-link";
 import {
   ELEMENT_LI,
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
   TTodoListItemElement,
-} from '@udecode/plate-list';
+} from "@udecode/plate-list";
 import {
   ELEMENT_IMAGE,
   ELEMENT_MEDIA_EMBED,
   TImageElement,
   TMediaEmbedElement,
-} from '@udecode/plate-media';
+} from "@udecode/plate-media";
 import {
   ELEMENT_MENTION,
   ELEMENT_MENTION_INPUT,
   TMentionElement,
   TMentionInputElement,
-} from '@udecode/plate-mention';
-import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
+} from "@udecode/plate-mention";
+import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import {
   ELEMENT_TABLE,
   ELEMENT_TD,
   ELEMENT_TR,
   TTableElement,
-} from '@udecode/plate-table';
+} from "@udecode/plate-table";
 
 /**
  * Text
  */
 
 export type EmptyText = {
-  text: '';
+  text: "";
 };
 
 export type PlainText = {
@@ -109,11 +109,11 @@ export interface RichText extends TText, TCommentText {
   code?: boolean;
   kbd?: boolean;
   subscript?: boolean;
-  backgroundColor?: React.CSSProperties['backgroundColor'];
-  fontFamily?: React.CSSProperties['fontFamily'];
-  color?: React.CSSProperties['color'];
-  fontSize?: React.CSSProperties['fontSize'];
-  fontWeight?: React.CSSProperties['fontWeight'];
+  backgroundColor?: React.CSSProperties["backgroundColor"];
+  fontFamily?: React.CSSProperties["fontFamily"];
+  color?: React.CSSProperties["color"];
+  fontSize?: React.CSSProperties["fontSize"];
+  fontWeight?: React.CSSProperties["fontWeight"];
 }
 
 /**
@@ -157,11 +157,11 @@ export interface MyIndentListProps extends MyIndentProps {
 }
 
 export interface MyLineHeightProps {
-  lineHeight?: React.CSSProperties['lineHeight'];
+  lineHeight?: React.CSSProperties["lineHeight"];
 }
 
 export interface MyAlignProps {
-  align?: React.CSSProperties['textAlign'];
+  align?: React.CSSProperties["textAlign"];
 }
 
 export interface MyBlockElement
@@ -374,17 +374,17 @@ export const useMyEditorState = () => useEditorState<MyValue, MyEditor>();
  */
 export const createMyEditor = () => createTEditor() as MyEditor;
 export const createMyPlateEditor = (
-  options: CreatePlateEditorOptions<MyValue, MyEditor> = {}
+  options: CreatePlateEditorOptions<MyValue, MyEditor> = {},
 ) => createPlateEditor<MyValue, MyEditor>(options);
 export const createMyPluginFactory = <P = PluginOptions>(
-  defaultPlugin: PlatePlugin<NoInfer<P>, MyValue, MyEditor>
+  defaultPlugin: PlatePlugin<NoInfer<P>, MyValue, MyEditor>,
 ) => createPluginFactory(defaultPlugin);
 export const createMyPlugins = (
   plugins: PlatePlugin[],
   options?: {
     components?: Record<string, PlatePluginComponent>;
     overrideByKey?: OverrideByKey;
-  }
+  },
 ) => createPlugins<MyValue, MyEditor>(plugins, options);
 
 export type MyAutoformatRule = AutoformatRule<MyValue, MyEditor>;

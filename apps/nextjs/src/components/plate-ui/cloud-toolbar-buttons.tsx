@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
-import React from 'react';
-
-import type { PlateCloudEditor } from '@udecode/plate-cloud';
-
-import { type Value, useEditorRef } from '@udecode/plate-common';
+import type { PlateCloudEditor } from "@udecode/plate-cloud";
+import type { Value } from "@udecode/plate-common";
+import React from "react";
+import { useEditorRef } from "@udecode/plate-common";
 
 const buttonStyle: React.CSSProperties = {
-  background: '#f0f0f0',
-  border: 'none',
-  cursor: 'pointer',
+  background: "#f0f0f0",
+  border: "none",
+  cursor: "pointer",
   marginRight: 4,
   padding: 8,
 };
@@ -17,8 +16,8 @@ const buttonStyle: React.CSSProperties = {
 export function CloudToolbarButtons() {
   const editor = useEditorRef<Value, PlateCloudEditor>();
   const getSaveValue = () => {
-    console.info('editor.children', editor.children);
-    console.info('editor.cloud.getSaveValue()', editor.cloud.getSaveValue());
+    console.info("editor.children", editor.children);
+    console.info("editor.cloud.getSaveValue()", editor.cloud.getSaveValue());
   };
 
   const finishUploads = async () => {

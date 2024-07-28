@@ -2,20 +2,18 @@ import type {
   PlateEditor,
   Value,
   WithPlatePlugin,
-} from '@udecode/plate-common/server';
-
-import * as portiveClient from '@portive/client';
+} from "@udecode/plate-common/server";
+import * as portiveClient from "@portive/client";
 
 import type {
   CloudEditorProps,
   CloudPlugin,
   FinishUploadsOptions,
-} from './types';
-
-import { createUploadStore } from '../upload/createUploadStore';
-import { finishUploads } from './finishUploads';
-import { getSaveValue } from './getSaveValue';
-import { uploadFiles } from './uploadFiles';
+} from "./types";
+import { createUploadStore } from "../upload/createUploadStore";
+import { finishUploads } from "./finishUploads";
+import { getSaveValue } from "./getSaveValue";
+import { uploadFiles } from "./uploadFiles";
 
 export const withCloud = <
   V extends Value = Value,
@@ -23,7 +21,7 @@ export const withCloud = <
   EE extends CloudEditorProps<V> & E = CloudEditorProps<V> & E,
 >(
   e: E,
-  plugin: WithPlatePlugin<CloudPlugin, V, E>
+  plugin: WithPlatePlugin<CloudPlugin, V, E>,
 ) => {
   const editor = e as unknown as EE;
 

@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
+import { findNodePath, useEditorRef } from "@udecode/plate-common";
+import { isDefined, setNodes } from "@udecode/plate-common/server";
+import { useFocused, useSelected } from "slate-react";
 
-import { findNodePath, useEditorRef } from '@udecode/plate-common';
-import { isDefined, setNodes } from '@udecode/plate-common/server';
-import { useFocused, useSelected } from 'slate-react';
-
-import { type TCloudAttachmentElement, useUpload } from '..';
+import type { TCloudAttachmentElement } from "..";
+import { useUpload } from "..";
 
 export const useCloudAttachmentElementState = ({
   element,
@@ -15,7 +15,7 @@ export const useCloudAttachmentElementState = ({
 
   const upload = useUpload(element.url);
 
-  const url = upload.status === 'not-found' ? undefined : upload.url;
+  const url = upload.status === "not-found" ? undefined : upload.url;
 
   React.useEffect(() => {
     /**
@@ -29,14 +29,14 @@ export const useCloudAttachmentElementState = ({
      * change the edit history so that the initial insertion of the cloud image
      * appears to have the final URL.
      */
-    if (isDefined(url) && !url.startsWith('blob:') && url !== element.url) {
+    if (isDefined(url) && !url.startsWith("blob:") && url !== element.url) {
       const path = findNodePath(editor, element);
       setNodes<TCloudAttachmentElement>(
         editor,
         { url },
         {
           at: path,
-        }
+        },
       );
     }
   }, [editor, element, url]);

@@ -1,6 +1,6 @@
-import type { Value } from '@udecode/plate-common/server';
+import type { Value } from "@udecode/plate-common/server";
 
-import type { Upload } from '../upload/types';
+import type { Upload } from "../upload/types";
 
 /**
  * This is a local type that describes any Slate node we could possibly run
@@ -18,25 +18,25 @@ type MaybeUploadNode = {
  * Returns `true` only if the `url` passed in looks like it's not a real URL but
  * rather a reference to be used to do a lookup in our uploads store.
  */
-export const isStoreRef = (url: string) => url.startsWith('#');
+export const isStoreRef = (url: string) => url.startsWith("#");
 
 /** Recursive part of `normalizeOrigins` function with correct types. */
 const _getSaveValue = (
   nodes: MaybeUploadNode[],
-  uploads: Record<string, Upload>
+  uploads: Record<string, Upload>,
 ): MaybeUploadNode[] => {
   const nextNodes: MaybeUploadNode[] = [];
 
   for (const node of nodes) {
     if (
-      'url' in node &&
+      "url" in node &&
       /**
        * If the `node` has an `id` then we either
        *
        * - Leave it alone and add it (it's already normalized)
        * - If found in lookup, replace the url and add it
        * - If not found in lookup, skip it
-       */ typeof node.url === 'string'
+       */ typeof node.url === "string"
     ) {
       /** If the `url` isn't a reference to a store then leave it as it is. */
       if (isStoreRef(node.url)) {
@@ -52,7 +52,7 @@ const _getSaveValue = (
          */
         const origin: Upload | undefined = uploads[node.url];
 
-        if (origin && origin.status === 'success') {
+        if (origin && origin.status === "success") {
           nextNodes.push({ ...node, url: origin.url });
         }
       } else {
@@ -104,5 +104,5 @@ const _getSaveValue = (
  */
 export const getSaveValue = <V extends Value>(
   nodes: V,
-  uploads: Record<string, Upload>
+  uploads: Record<string, Upload>,
 ): V => _getSaveValue(nodes as MaybeUploadNode[], uploads) as V;

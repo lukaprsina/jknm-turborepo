@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
-
-import type { Upload, UploadProgress } from '@udecode/plate-cloud';
-
-import { cn } from '@udecode/cn';
+import type { Upload, UploadProgress } from "@udecode/plate-cloud";
+import type { HTMLAttributes } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { cn } from "@udecode/cn";
 
 export function ProgressBar({
   className,
@@ -39,7 +38,7 @@ export function ProgressBar({
 
   return (
     <div
-      className={cn('h-4 rounded-lg bg-gray-100 shadow-md', className)}
+      className={cn("h-4 rounded-lg bg-gray-100 shadow-md", className)}
       ref={ref}
       {...props}
     >
@@ -60,8 +59,8 @@ export function FailBar({
   return (
     <div
       className={cn(
-        'h-4 rounded-lg border bg-red-700 text-center text-xs font-bold uppercase leading-tight text-white shadow-md',
-        className
+        "h-4 rounded-lg border bg-red-700 text-center text-xs font-bold uppercase leading-tight text-white shadow-md",
+        className,
       )}
       {...props}
     />
@@ -75,16 +74,16 @@ export function StatusBar(props: {
   const { children, upload } = props;
 
   switch (upload.status) {
-    case 'progress': {
+    case "progress": {
       return <ProgressBar upload={upload} />;
     }
-    case 'error': {
+    case "error": {
       return <FailBar>Upload Failed</FailBar>;
     }
-    case 'not-found': {
+    case "not-found": {
       return <FailBar>Uploading...</FailBar>;
     }
-    case 'success': {
+    case "success": {
       return children || null;
     }
     default: {

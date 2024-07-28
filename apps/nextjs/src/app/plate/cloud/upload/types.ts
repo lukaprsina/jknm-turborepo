@@ -2,14 +2,14 @@
 export type UploadProgress = {
   finishPromise: Promise<UploadError | UploadSuccess>;
   sentBytes: number;
-  status: 'progress';
+  status: "progress";
   totalBytes: number;
   url: string;
 };
 
 /** Indicates an `Upload` that has completed uploading */
 export type UploadSuccess = {
-  status: 'success';
+  status: "success";
   url: string;
 };
 
@@ -19,13 +19,13 @@ export type UploadSuccess = {
  */
 export type UploadError = {
   message: string;
-  status: 'error';
+  status: "error";
   url: string;
 };
 
 /** Indicated the `Upload` could not be found. */
 export type UploadStateNotFound = {
-  status: 'not-found';
+  status: "not-found";
   // no url here
 };
 

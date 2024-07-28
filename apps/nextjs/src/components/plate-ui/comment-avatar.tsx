@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
+import { useUserById } from "@udecode/plate-comments";
 
-import { useUserById } from '@udecode/plate-comments';
-
-import { Avatar, AvatarFallback, AvatarImage } from './avatar';
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 
 export function CommentAvatar({ userId }: { userId: null | string }) {
   const user = useUserById(userId);

@@ -1,7 +1,7 @@
-import { useEditorRef } from '@udecode/plate-common';
+import { useEditorRef } from "@udecode/plate-common";
 
-import type { PlateCloudEditor } from '../cloud/types';
-import type { Upload } from './types';
+import type { PlateCloudEditor } from "../cloud/types";
+import type { Upload } from "./types";
 
 /**
  * Takes an `element` (which it only needs for its `id`) and returns the Upload
@@ -18,15 +18,15 @@ export const useUpload = (id: string): Upload => {
   //   (state) => state.uploads[id] || { status: 'not-found' }
   // );
   const upload: Upload = editor.cloud.uploadStore.use.upload(id) || {
-    status: 'not-found',
+    status: "not-found",
   };
 
   // (
   //   (state) => state.uploads[id] || { status: 'not-found' }
   // );
-  if (id.includes('/')) {
+  if (id.includes("/")) {
     return {
-      status: 'success',
+      status: "success",
       url: id,
     };
   }

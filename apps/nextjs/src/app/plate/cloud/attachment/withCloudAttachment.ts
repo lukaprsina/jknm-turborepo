@@ -1,14 +1,14 @@
-import {
-  type EElementOrText,
-  type Value,
-  type WithPlatePlugin,
-  insertNode,
-} from '@udecode/plate-common/server';
-import Defer from 'p-defer';
+import type {
+  EElementOrText,
+  Value,
+  WithPlatePlugin,
+} from "@udecode/plate-common/server";
+import { insertNode } from "@udecode/plate-common/server";
+import Defer from "p-defer";
 
-import type { PlateCloudEditor } from '../cloud/types';
-import type { UploadError, UploadSuccess } from '../upload';
-import type { CloudAttachmentPlugin, TCloudAttachmentElement } from './types';
+import type { PlateCloudEditor } from "../cloud/types";
+import type { UploadError, UploadSuccess } from "../upload";
+import type { CloudAttachmentPlugin, TCloudAttachmentElement } from "./types";
 
 type CloudAttachmentValue = TCloudAttachmentElement[];
 
@@ -19,7 +19,7 @@ export const withCloudAttachment = <
   E extends PlateCloudEditor<V> = PlateCloudEditor<V>,
 >(
   editor: E,
-  _plugin: WithPlatePlugin<CloudAttachmentPlugin, V, E>
+  _plugin: WithPlatePlugin<CloudAttachmentPlugin, V, E>,
 ) => {
   /**
    * We create a deferredFinish which is an object with a `promise` and a way to
@@ -35,7 +35,7 @@ export const withCloudAttachment = <
     onError(e) {
       const upload: UploadError = {
         message: e.message,
-        status: 'error',
+        status: "error",
         url: e.url,
       };
       editor.cloud.uploadStore.set.upload(e.id, upload);
@@ -45,7 +45,7 @@ export const withCloudAttachment = <
       editor.cloud.uploadStore.set.upload(e.id, {
         finishPromise,
         sentBytes: e.sentBytes,
-        status: 'progress',
+        status: "progress",
         totalBytes: e.totalBytes,
         url: e.url,
       });
@@ -53,23 +53,23 @@ export const withCloudAttachment = <
     onStart(e) {
       const node: EElementOrText<CloudAttachmentValue> = {
         bytes: e.file.size,
-        children: [{ text: '' }],
+        children: [{ text: "" }],
         filename: e.file.name,
-        type: 'cloud_attachment',
+        type: "cloud_attachment",
         url: e.id,
       };
       insertNode<Value>(editor, node);
       editor.cloud.uploadStore.set.upload(e.id, {
         finishPromise,
         sentBytes: 0,
-        status: 'progress',
+        status: "progress",
         totalBytes: e.file.size,
         url: e.url,
       });
     },
     onSuccess(e) {
       const upload: UploadSuccess = {
-        status: 'success',
+        status: "success",
         url: e.url,
       };
       editor.cloud.uploadStore.set.upload(e.id, upload);

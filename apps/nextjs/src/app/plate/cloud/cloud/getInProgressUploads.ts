@@ -1,8 +1,7 @@
-import type { Descendant } from 'slate';
+import type { Descendant } from "slate";
 
-import type { Upload, UploadProgress } from '../upload/types';
-
-import { isStoreRef } from './getSaveValue';
+import type { Upload, UploadProgress } from "../upload/types";
+import { isStoreRef } from "./getSaveValue";
 
 type MaybeUploadNode = {
   [key: string]: unknown;
@@ -14,18 +13,18 @@ type MaybeUploadNode = {
 const _getInProgressUploads = (
   nodes: MaybeUploadNode[],
   uploads: Record<string, Upload>,
-  progressUploads: UploadProgress[]
+  progressUploads: UploadProgress[],
 ): UploadProgress[] => {
   for (const node of nodes) {
     if (
-      'url' in node &&
+      "url" in node &&
       /**
        * If the `node` has a `url` then we either
        *
        * - Leave it alone and add it (it's already an actual URL)
        * - If found in the store lookup, replace the store ref with a URL
        * - If not found in lookup, skip it
-       */ typeof node.url === 'string'
+       */ typeof node.url === "string"
     ) {
       /** If the `url` is a ref (i.e. starts with a `#`) */
       if (isStoreRef(node.url)) {
@@ -41,7 +40,7 @@ const _getInProgressUploads = (
          */
         const origin: Upload | undefined = uploads[node.url];
 
-        if (origin && origin.status === 'progress') {
+        if (origin && origin.status === "progress") {
           progressUploads.push(origin);
         }
       }
@@ -82,13 +81,13 @@ const _getInProgressUploads = (
  */
 export const getInProgressUploads = (
   nodes: Descendant[],
-  origins: Record<string, Upload>
+  origins: Record<string, Upload>,
 ): UploadProgress[] => {
   const progressUploads: UploadProgress[] = [];
 
   return _getInProgressUploads(
     nodes as MaybeUploadNode[],
     origins,
-    progressUploads
+    progressUploads,
   );
 };

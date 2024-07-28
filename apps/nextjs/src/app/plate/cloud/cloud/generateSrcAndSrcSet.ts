@@ -8,9 +8,9 @@ function generateSrc({
   url: string;
 }) {
   /** If it's a url from `createObjectURL` then just return it */
-  if (url.startsWith('blob:')) return url;
+  if (url.startsWith("blob:")) return url;
   if (size[0] >= maxSize[0] || size[1] >= maxSize[1]) return url;
-  if (url.endsWith('.gif')) return url;
+  if (url.endsWith(".gif")) return url;
 
   return `${url}?size=${size[0]}x${size[1]}`;
 }
@@ -25,7 +25,7 @@ function generateSrcSet({
   url: string;
 }) {
   /** If it's a url from `createObjectURL` then just return it */
-  if (url.startsWith('blob:')) return url;
+  if (url.startsWith("blob:")) return url;
 
   const src1x = generateSrc({
     maxSize,
@@ -51,7 +51,7 @@ export function generateSrcAndSrcSet({
   url?: string;
 }) {
   if (url === undefined) {
-    return { src: '', srcSet: '' };
+    return { src: "", srcSet: "" };
   }
 
   const src = generateSrc({ maxSize, size, url });

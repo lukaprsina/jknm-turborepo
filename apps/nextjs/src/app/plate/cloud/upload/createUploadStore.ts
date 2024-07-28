@@ -1,6 +1,6 @@
-import { createZustandStore } from '@udecode/plate-common/server';
+import { createZustandStore } from "@udecode/plate-common/server";
 
-import type { Upload } from './types';
+import type { Upload } from "./types";
 
 /**
  * Creates an origin store using `zustood`.
@@ -15,7 +15,7 @@ export const createUploadStore = ({
 }: {
   uploads?: Record<string, Upload>;
 } = {}) => {
-  return createZustandStore('upload')({ uploads: initialUploads })
+  return createZustandStore("upload")({ uploads: initialUploads })
     .extendActions((set, get) => ({
       upload: (id: string, upload: Upload): void => {
         const uploads = get.uploads();
