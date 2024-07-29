@@ -1,6 +1,6 @@
 import { useEditorRef } from "@udecode/plate-common";
 
-import type { ImageElement } from "~/components/plate-ui/image-element";
+import { settings_store } from "./settings-store";
 
 export const useSettingsButton = () => {
   const editor = useEditorRef();
@@ -12,15 +12,15 @@ export const useSettingsButton = () => {
           editor,
           KEY_SETTINGS,
         ); */
-        console.log(editor.children);
+        settings_store.set.settings_open(!settings_store.get.settings_open());
 
         const image_urls = editor.children
           .filter((child) => child.type === "img")
           .map((child) => {
-            return child.url as typeof ImageElement;
+            return child.url as string;
           });
 
-        console.log(image_urls);
+        settings_store.set.image_urls(image_urls);
       },
       onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

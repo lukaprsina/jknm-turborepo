@@ -97,6 +97,7 @@ export const SessionRelations = relations(Session, ({ one }) => ({
 export const Article = pgTable("article", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: varchar("title", { length: 255 }).notNull(),
+  url: varchar("url", { length: 255 }).notNull().unique(),
   published: boolean("published").default(false),
   content: text("content"),
   draftContent: text("draft_content"),
@@ -111,6 +112,7 @@ export const Article = pgTable("article", {
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
+  url: z.string().max(255).url(),
   content: z.string(),
   draftContent: z.string(),
   previewImage: z.string().max(255).url(),
