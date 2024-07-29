@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { cn } from "@udecode/cn";
 import {
-  CODE_BLOCK_LANGUAGES,
-  CODE_BLOCK_LANGUAGES_POPULAR,
+  // CODE_BLOCK_LANGUAGES,
+  // CODE_BLOCK_LANGUAGES_POPULAR,
   useCodeBlockCombobox,
   useCodeBlockComboboxState,
 } from "@udecode/plate-code-block";
@@ -23,8 +23,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 const languages: { value: string; label: string }[] = [
   { value: "text", label: "Plain Text" },
   ...Object.entries({
-    ...CODE_BLOCK_LANGUAGES_POPULAR,
-    ...CODE_BLOCK_LANGUAGES,
+    // ...CODE_BLOCK_LANGUAGES_POPULAR,
+    // ...CODE_BLOCK_LANGUAGES,
   }).map(([key, val]) => ({
     value: key,
     label: val as string,

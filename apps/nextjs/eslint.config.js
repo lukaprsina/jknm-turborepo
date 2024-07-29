@@ -5,7 +5,7 @@ import reactConfig from "@acme/eslint-config/react";
 /** @type {import('typescript-eslint').Config} */
 export default [
   {
-    ignores: [".next/**", "src/components/plate-ui/**"],
+    ignores: [".next/**" /* "src/components/plate-ui/**" */],
   },
   ...baseConfig,
   ...reactConfig,
