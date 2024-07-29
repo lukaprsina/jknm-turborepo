@@ -1,6 +1,8 @@
-import { useMemo } from "react";
+// "use client";
 
-import { Article } from "@acme/db/schema";
+// import { useState } from "react";
+
+import { cn } from "@acme/ui";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,7 +22,9 @@ import {
 import { Button } from "~/components/plate-ui/button";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
+// import { api } from "~/trpc/react";
 import PlateEditor from "./editor";
+import NewArticleLoader from "./new_article";
 import SettingsDialog from "./settings-dialog";
 
 interface PlatePageProps {
@@ -32,6 +36,12 @@ interface PlatePageProps {
 export default async function PlatePage({
   params: { novica_ime },
 }: PlatePageProps) {
+  // const [loadingNewArticle, setLoadingNewArticle] = useState(false);
+
+  /* const article_by_url = api.article.byUrl.useQuery({
+    url: decodeURIComponent(novica_ime),
+  }); */
+
   const article_by_url = await api.article.byUrl({
     url: decodeURIComponent(novica_ime),
   });
@@ -59,9 +69,7 @@ export default async function PlatePage({
                 <Button asChild variant="secondary">
                   <a href="/">Domov</a>
                 </Button>
-                <Button asChild>
-                  <a href="/novica/nova">Ustvari novičko</a>
-                </Button>
+                <NewArticleLoader />
               </CardFooter>
             </Card>
           </div>

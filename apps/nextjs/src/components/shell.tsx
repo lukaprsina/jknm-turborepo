@@ -17,6 +17,7 @@ import {
 import { ThemeToggle } from "@acme/ui/theme";
 
 import logo from "~/../assets/logo.png";
+import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
@@ -172,13 +173,7 @@ async function Footer() {
         </Button>
       ) : (
         <form>
-          <Button
-            variant="link"
-            formAction={async () => {
-              "use server";
-              await signOut();
-            }}
-          >
+          <Button variant="link" formAction={sign_out}>
             Odjava
           </Button>
         </form>
