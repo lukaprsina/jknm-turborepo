@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 
+import { Article } from "@acme/db/schema";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -7,10 +8,18 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@acme/ui/breadcrumb";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui/card";
 
+import { Button } from "~/components/plate-ui/button";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
-import Client from "./client";
 import PlateEditor from "./editor";
 import SettingsDialog from "./settings-dialog";
 
@@ -27,32 +36,67 @@ export default async function PlatePage({
     url: decodeURIComponent(novica_ime),
   });
 
-  const article = article_by_url?.published
-    ? article_by_url?.content
-    : article_by_url?.draftContent;
+  if (!article_by_url) {
+    return (
+      <Shell>
+        <div className="container h-full min-h-screen pt-8">
+          <ArticleBreadcrumb novica_ime={novica_ime} />
+          <div className="flex h-full w-full items-center justify-center">
+            <Card className="max-w-2xl">
+              <CardHeader>
+                <CardTitle>
+                  Novička <strong>{novica_ime}</strong> ne obstaja.
+                </CardTitle>
+                <CardDescription>
+                  Preverite, če ste vnesli pravilno ime novičke.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Lahko pa ustvarite novo novičko z imenom{" "}
+                <strong>{novica_ime}</strong>.
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button asChild variant="secondary">
+                  <a href="/">Domov</a>
+                </Button>
+                <Button asChild>
+                  <a href="/novica/nova">Ustvari novičko</a>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
       <div className="container min-h-screen pt-8">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink href="/">Domov</BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>Uredi</BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink href={`/novica/${novica_ime}`}>
-                {novica_ime}
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        {/* <Client novica_ime={novica_ime} /> */}
+        <ArticleBreadcrumb novica_ime={novica_ime} />
         <PlateEditor article={article_by_url} />
         <SettingsDialog novica_ime={novica_ime} />
       </div>
     </Shell>
+  );
+}
+
+function ArticleBreadcrumb({ novica_ime }: { novica_ime: string }) {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink href="/">Domov</BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>Uredi</BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbLink href={`/novica/${novica_ime}`}>
+            {novica_ime}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
   );
 }

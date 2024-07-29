@@ -1,3 +1,4 @@
+import { TElement, Value } from "@udecode/plate-common/server";
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
@@ -99,8 +100,9 @@ export const Article = pgTable("article", {
   title: varchar("title", { length: 255 }).notNull(),
   url: varchar("url", { length: 255 }).notNull().unique(),
   published: boolean("published").default(false),
-  content: text("content"),
-  draftContent: text("draft_content"),
+  contentHtml: text("content_html").default(""),
+  content: json("content").$type<Value>().default([]),
+  draftContent: json("draft_content").$type<Value>().default([]),
   previewImage: varchar("preview_image", { length: 255 }),
   publishedAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at", {
@@ -112,13 +114,12 @@ export const Article = pgTable("article", {
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
-  url: z.string().max(255).url(),
-  content: z.string(),
-  draftContent: z.string(),
-  previewImage: z.string().max(255).url(),
+  url: z.string().max(255),
+  contentHtml: z.string(),
+  previewImage: z.string().max(255),
   imageSizes: z
     .record(
-      z.string().url(),
+      z.string(),
       z.object({
         width: z.number(),
         height: z.number(),
@@ -130,6 +131,8 @@ export const CreateArticleSchema = createInsertSchema(Article, {
 }).omit({
   id: true,
   updatedAt: true,
+  content: true,
+  draftContent: true,
 });
 
 export const CreditedPeople = pgTable("credited_people", {
