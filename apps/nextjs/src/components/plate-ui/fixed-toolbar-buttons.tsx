@@ -11,11 +11,10 @@ import { MARK_BG_COLOR, MARK_COLOR } from "@udecode/plate-font";
 import { ListStyleType } from "@udecode/plate-indent-list";
 import { ELEMENT_IMAGE } from "@udecode/plate-media";
 
-import { SaveToolbarButton } from "~/app/uredi/[novica_ime]/save-plugin/save-toolbar-button";
-import { SettingsToolbarButton } from "~/app/uredi/[novica_ime]/settings-plugins/settings-toolbar-button";
 import { Icons, iconVariants } from "~/components/icons";
 import { AlignDropdownMenu } from "~/components/plate-ui/align-dropdown-menu";
 import { ColorDropdownMenu } from "~/components/plate-ui/color-dropdown-menu";
+import { CommentToolbarButton } from "~/components/plate-ui/comment-toolbar-button";
 import { EmojiDropdownMenu } from "~/components/plate-ui/emoji-dropdown-menu";
 import { IndentListToolbarButton } from "~/components/plate-ui/indent-list-toolbar-button";
 import { IndentToolbarButton } from "~/components/plate-ui/indent-toolbar-button";
@@ -109,18 +108,13 @@ export function FixedToolbarButtons() {
 
               <MoreDropdownMenu />
             </ToolbarGroup>
-
-            <ToolbarGroup>
-              <SaveToolbarButton />
-
-              <SettingsToolbarButton />
-            </ToolbarGroup>
           </>
         )}
 
         <div className="grow" />
 
         <ToolbarGroup noSeparator>
+          <CommentToolbarButton />
           <ModeDropdownMenu />
         </ToolbarGroup>
       </div>

@@ -1,18 +1,18 @@
-import React from "react";
-import { cn, withRef } from "@udecode/cn";
-import { PlateElement } from "@udecode/plate-common";
+import React from 'react';
+import { cn, withRef } from '@udecode/cn';
+import { PlateElement } from '@udecode/plate-common';
 
 export const TableRowElement = withRef<
   typeof PlateElement,
   {
     hideBorder?: boolean;
   }
->(({ children, hideBorder, ...props }, ref) => {
+>(({ hideBorder, children, ...props }, ref) => {
   return (
     <PlateElement
       asChild
-      className={cn("h-full", hideBorder && "border-none")}
       ref={ref}
+      className={cn('h-full', hideBorder && 'border-none')}
       {...props}
     >
       <tr>{children}</tr>

@@ -1,5 +1,5 @@
-import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import {
   focusEditor,
   someNode,
@@ -58,7 +58,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
           <DropdownMenuSubContent>
             <DropdownMenuItem
               className="min-w-[180px]"
-              onSelect={() => {
+              onSelect={async () => {
                 insertTable(editor);
                 focusEditor(editor);
               }}
@@ -69,7 +69,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={() => {
+              onSelect={async () => {
                 deleteTable(editor);
                 focusEditor(editor);
               }}
@@ -89,7 +89,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={() => {
+              onSelect={async () => {
                 insertTableColumn(editor);
                 focusEditor(editor);
               }}
@@ -100,7 +100,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={() => {
+              onSelect={async () => {
                 deleteColumn(editor);
                 focusEditor(editor);
               }}
@@ -120,7 +120,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={() => {
+              onSelect={async () => {
                 insertTableRow(editor);
                 focusEditor(editor);
               }}
@@ -131,7 +131,7 @@ export function TableDropdownMenu(props: DropdownMenuProps) {
             <DropdownMenuItem
               className="min-w-[180px]"
               disabled={!tableSelected}
-              onSelect={() => {
+              onSelect={async () => {
                 deleteRow(editor);
                 focusEditor(editor);
               }}

@@ -1,13 +1,12 @@
-import type { ReactNode } from "react";
-import React from "react";
-import * as Popover from "@radix-ui/react-popover";
+import React, { ReactNode } from 'react';
+import * as Popover from '@radix-ui/react-popover';
 
-interface EmojiToolbarDropdownProps {
+type EmojiToolbarDropdownProps = {
   control: ReactNode;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   children: ReactNode;
-}
+};
 
 export function EmojiToolbarDropdown({
   control,

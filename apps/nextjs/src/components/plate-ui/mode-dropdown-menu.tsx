@@ -1,5 +1,5 @@
-import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import {
   focusEditor,
   useEditorReadOnly,
@@ -24,11 +24,10 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
   const readOnly = useEditorReadOnly();
   const openState = useOpenState();
 
-  let value: "editing" | "viewing" = "editing";
-
+  let value = "editing";
   if (readOnly) value = "viewing";
 
-  const item = {
+  const item: any = {
     editing: (
       <>
         <Icons.editing className="mr-2 size-5" />
@@ -47,10 +46,10 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
     <DropdownMenu modal={false} {...openState} {...props}>
       <DropdownMenuTrigger asChild>
         <ToolbarButton
-          className="min-w-[auto] lg:min-w-[130px]"
-          isDropdown
           pressed={openState.open}
           tooltip="Editing mode"
+          isDropdown
+          className="min-w-[auto] lg:min-w-[130px]"
         >
           {item[value]}
         </ToolbarButton>
@@ -59,22 +58,22 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
       <DropdownMenuContent align="start" className="min-w-[180px]">
         <DropdownMenuRadioGroup
           className="flex flex-col gap-0.5"
+          value={value}
           onValueChange={(newValue) => {
             if (newValue !== "viewing") {
               setReadOnly(false);
             }
+
             if (newValue === "viewing") {
               setReadOnly(true);
-
               return;
             }
+
             if (newValue === "editing") {
               focusEditor(editor);
-
               return;
             }
           }}
-          value={value}
         >
           <DropdownMenuRadioItem value="editing">
             {item.editing}
