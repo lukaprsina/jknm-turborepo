@@ -31,20 +31,20 @@ export default function PlateEditor({
 }) {
   const update_article = api.article.update.useMutation();
 
-  const save_callback = async (value: Value) => {
+  const save_callback = (value: Value) => {
     update_article.mutate({
       title: "test",
       content: value,
       url: "test",
     });
-    console.log({ update_article });
+    console.log("update_article save_callback", { update_article });
   };
 
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
         <Plate
-          plugins={plugins}
+          plugins={plugins(save_callback)}
           initialValue={article?.content ?? INITIAL_VALUE}
         >
           <FixedToolbar>
