@@ -27,6 +27,7 @@ export default function NewArticleLoader() {
         <Button
           onClick={() => {
             const article_url = `nova-novica-${Date.now()}`;
+
             create_article.mutate({
               title: "Nova novica",
               url: article_url,

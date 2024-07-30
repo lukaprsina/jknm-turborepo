@@ -54,7 +54,10 @@ export const articleRouter = {
   update: protectedProcedure
     .input(UpdateArticleSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.db.update(Article).set(input);
+      return ctx.db
+        .update(Article)
+        .set(input)
+        .where(eq(Article.url, input.url));
     }),
 
   delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {

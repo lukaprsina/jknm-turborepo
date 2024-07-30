@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Plate } from "@udecode/plate-common";
 import { type Value } from "@udecode/plate-common/server";
 import { DndProvider } from "react-dnd";
@@ -16,6 +16,7 @@ import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-b
 import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import { api } from "~/trpc/react";
 import plugins from "./plugins";
+import { settings_store } from "./settings-plugins/settings-store";
 
 const INITIAL_VALUE = [
   {
@@ -30,7 +31,13 @@ export default function PlateEditor({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
-  const update_article = api.article.update.useMutation();
+  const settings = settings_store.useStore();
+  const update_article = api.article.update.useMutation({
+    onSuccess: (_, variables) => {
+      settings_store.set.settings_open(false);
+      console.log("Article updated", variables);
+    },
+  });
 
   const content = useMemo(
     () =>
@@ -40,13 +47,17 @@ export default function PlateEditor({
     [article?.content],
   );
 
+  useEffect(() => {
+    settings_store.set.title(article?.title || "Neimenovana novička");
+    settings_store.set.url(article?.url || "");
+  });
+
   const save_callback = (value: Value) => {
     update_article.mutate({
-      title: "test",
+      title: settings.title,
       content: value,
-      url: "test",
+      url: settings.url,
     });
-    console.log("update_article save_callback", { update_article });
   };
 
   return (
@@ -63,6 +74,7 @@ export default function PlateEditor({
             <FloatingToolbarButtons />
           </FloatingToolbar>
         </Plate>
+        <code>{JSON.stringify(settings, null, 4)}</code>
       </DndProvider>
     </TooltipProvider>
   );
