@@ -4,7 +4,7 @@ import type {
   PlateEditor,
   WithPlatePlugin,
 } from "@udecode/plate-common/server";
-import { useEffect } from "react";
+// import { useEffect } from "react";
 import { getPluginOptions } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
@@ -54,7 +54,7 @@ let save_max_time_timeout_id: number | undefined = undefined;
 export const createSavePlugin = createPluginFactory<SavePlugin>({
   key: KEY_SAVE,
   useHooks: () => {
-    useEffect(() => {
+    /* useEffect(() => {
       const onBeforeUnload = (e: BeforeUnloadEvent) => {
         if (save_store.get.dirty()) e.preventDefault();
       };
@@ -64,7 +64,7 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
       return () => {
         window.removeEventListener("beforeunload", onBeforeUnload);
       };
-    });
+    }); */
   },
   handlers: {
     onKeyDown: onKeyDownSave,

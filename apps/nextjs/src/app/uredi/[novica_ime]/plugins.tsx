@@ -1,5 +1,3 @@
-"use client";
-
 import type { RenderAfterEditable } from "@udecode/plate-common";
 import { withProps } from "@udecode/cn";
 import { createAlignPlugin } from "@udecode/plate-alignment";
@@ -169,263 +167,264 @@ const resetBlockTypesCodeBlockRule = {
   onReset: unwrapCodeBlock,
 };
 
-const plugins = (save_callback: (value: Value) => void) =>
-  createPlugins(
-    [
-      createParagraphPlugin(),
-      createHeadingPlugin(),
-      createBlockquotePlugin(),
-      createCodeBlockPlugin(),
-      createHorizontalRulePlugin(),
-      createLinkPlugin({
-        renderAfterEditable: LinkFloatingToolbar as RenderAfterEditable,
-      }),
-      createImagePlugin(),
-      createTogglePlugin(),
-      createColumnPlugin(),
-      createMediaEmbedPlugin(),
-      createCaptionPlugin({
-        options: {
-          pluginKeys: [ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED],
+const plugins = createPlugins(
+  [
+    createParagraphPlugin(),
+    createHeadingPlugin(),
+    createBlockquotePlugin(),
+    createCodeBlockPlugin(),
+    createHorizontalRulePlugin(),
+    createLinkPlugin({
+      renderAfterEditable: LinkFloatingToolbar as RenderAfterEditable,
+    }),
+    createImagePlugin(),
+    createTogglePlugin(),
+    createColumnPlugin(),
+    createMediaEmbedPlugin(),
+    createCaptionPlugin({
+      options: {
+        pluginKeys: [ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED],
+      },
+    }),
+    createMentionPlugin(),
+    createTablePlugin(),
+    createTodoListPlugin(),
+    createBoldPlugin(),
+    createItalicPlugin(),
+    createUnderlinePlugin(),
+    createStrikethroughPlugin(),
+    createCodePlugin(),
+    createSubscriptPlugin(),
+    createSuperscriptPlugin(),
+    createFontColorPlugin(),
+    createFontBackgroundColorPlugin(),
+    createFontSizePlugin(),
+    createHighlightPlugin(),
+    createKbdPlugin(),
+    createAlignPlugin({
+      inject: {
+        props: {
+          validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
         },
-      }),
-      createMentionPlugin(),
-      createTablePlugin(),
-      createTodoListPlugin(),
-      createBoldPlugin(),
-      createItalicPlugin(),
-      createUnderlinePlugin(),
-      createStrikethroughPlugin(),
-      createCodePlugin(),
-      createSubscriptPlugin(),
-      createSuperscriptPlugin(),
-      createFontColorPlugin(),
-      createFontBackgroundColorPlugin(),
-      createFontSizePlugin(),
-      createHighlightPlugin(),
-      createKbdPlugin(),
-      createAlignPlugin({
-        inject: {
-          props: {
-            validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
-          },
-        },
-      }),
-      createIndentPlugin({
-        inject: {
-          props: {
-            validTypes: [
-              ELEMENT_PARAGRAPH,
-              ELEMENT_H1,
-              ELEMENT_H2,
-              ELEMENT_H3,
-              ELEMENT_BLOCKQUOTE,
-              ELEMENT_CODE_BLOCK,
-            ],
-          },
-        },
-      }),
-      createIndentListPlugin({
-        inject: {
-          props: {
-            validTypes: [
-              ELEMENT_PARAGRAPH,
-              ELEMENT_H1,
-              ELEMENT_H2,
-              ELEMENT_H3,
-              ELEMENT_BLOCKQUOTE,
-              ELEMENT_CODE_BLOCK,
-            ],
-          },
-        },
-      }),
-      createLineHeightPlugin({
-        inject: {
-          props: {
-            defaultNodeValue: 1.5,
-            validNodeValues: [1, 1.2, 1.5, 2, 3],
-            validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
-          },
-        },
-      }),
-      createAutoformatPlugin(autoformatPlugin),
-      createBlockSelectionPlugin({
-        options: {
-          sizes: {
-            top: 0,
-            bottom: 0,
-          },
-        },
-      }),
-      createDndPlugin({
-        options: { enableScroller: true },
-      }),
-      createEmojiPlugin(),
-      createExitBreakPlugin({
-        options: {
-          rules: [
-            {
-              hotkey: "mod+enter",
-            },
-            {
-              hotkey: "mod+shift+enter",
-              before: true,
-            },
-            {
-              hotkey: "enter",
-              query: {
-                start: true,
-                end: true,
-                allow: KEYS_HEADING,
-              },
-              relative: true,
-              level: 1,
-            },
+      },
+    }),
+    createIndentPlugin({
+      inject: {
+        props: {
+          validTypes: [
+            ELEMENT_PARAGRAPH,
+            ELEMENT_H1,
+            ELEMENT_H2,
+            ELEMENT_H3,
+            ELEMENT_BLOCKQUOTE,
+            ELEMENT_CODE_BLOCK,
           ],
         },
-      }),
-      createNodeIdPlugin(),
-      createResetNodePlugin({
-        options: {
-          rules: [
-            {
-              ...resetBlockTypesCommonRule,
-              hotkey: "Enter",
-              predicate: isBlockAboveEmpty,
-            },
-            {
-              ...resetBlockTypesCommonRule,
-              hotkey: "Backspace",
-              predicate: isSelectionAtBlockStart,
-            },
-            {
-              ...resetBlockTypesCodeBlockRule,
-              hotkey: "Enter",
-              predicate: isCodeBlockEmpty,
-            },
-            {
-              ...resetBlockTypesCodeBlockRule,
-              hotkey: "Backspace",
-              predicate: isSelectionAtCodeBlockStart,
-            },
+      },
+    }),
+    createIndentListPlugin({
+      inject: {
+        props: {
+          validTypes: [
+            ELEMENT_PARAGRAPH,
+            ELEMENT_H1,
+            ELEMENT_H2,
+            ELEMENT_H3,
+            ELEMENT_BLOCKQUOTE,
+            ELEMENT_CODE_BLOCK,
           ],
         },
-      }),
-      createDeletePlugin(),
-      createSoftBreakPlugin({
-        options: {
-          rules: [
-            { hotkey: "shift+enter" },
-            {
-              hotkey: "enter",
-              query: {
-                allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD],
-              },
-            },
-          ],
+      },
+    }),
+    createLineHeightPlugin({
+      inject: {
+        props: {
+          defaultNodeValue: 1.5,
+          validNodeValues: [1, 1.2, 1.5, 2, 3],
+          validTypes: [ELEMENT_PARAGRAPH, ELEMENT_H1, ELEMENT_H2, ELEMENT_H3],
         },
-      }),
-      createTrailingBlockPlugin({
-        options: { type: ELEMENT_PARAGRAPH },
-      }),
-      createDeserializeDocxPlugin(),
-      createDeserializeCsvPlugin(),
-      createDeserializeMdPlugin(),
-
-      // My stuff
-      // createJuicePlugin(),
-      createTrailingBlockPlugin({ options: { type: ELEMENT_PARAGRAPH } }),
-      createNormalizeTypesPlugin({
-        options: {
-          rules: [{ path: [0], strictType: ELEMENT_H1 }],
+      },
+    }),
+    createAutoformatPlugin(autoformatPlugin),
+    createBlockSelectionPlugin({
+      options: {
+        sizes: {
+          top: 0,
+          bottom: 0,
         },
-      }),
-      createCloudPlugin({
-        options: {
-          upload_file_callback: uploadFile,
-        },
-      }),
-      createSavePlugin({
-        options: {
-          save_callback,
-          hotkey: ["ctrl+m", "ctrl+s"],
-          autosave_after_inactive: true,
-          autosave_on_before_unload: true,
-          autosave_on_lost_focus: true,
-        },
-      }),
-      createTabbablePlugin({
-        options: {
-          query: (editor) => {
-            if (isSelectionAtBlockStart(editor)) return false;
-
-            return !someNode(editor, {
-              match: (n) => {
-                return !!(
-                  n.type &&
-                  ([ELEMENT_TABLE, ELEMENT_LI].includes(n.type as string) ||
-                    n[KEY_LIST_STYLE_TYPE])
-                );
-              },
-            });
-          },
-        },
-        plugins: [
+      },
+    }),
+    createDndPlugin({
+      options: { enableScroller: true },
+    }),
+    createEmojiPlugin(),
+    createExitBreakPlugin({
+      options: {
+        rules: [
           {
-            key: "tabbable_element",
-            isElement: true,
-            isVoid: true,
-            component: TabbableElement,
+            hotkey: "mod+enter",
+          },
+          {
+            hotkey: "mod+shift+enter",
+            before: true,
+          },
+          {
+            hotkey: "enter",
+            query: {
+              start: true,
+              end: true,
+              allow: KEYS_HEADING,
+            },
+            relative: true,
+            level: 1,
           },
         ],
-      }),
-      createFilePlugin(),
-    ],
-    {
-      components: withDraggables(
-        withPlaceholders({
-          [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
-          [ELEMENT_HR]: HrElement,
-          [ELEMENT_IMAGE]: ImageElement,
-          [ELEMENT_LINK]: LinkElement,
-          [ELEMENT_TOGGLE]: ToggleElement,
-          [ELEMENT_COLUMN_GROUP]: ColumnGroupElement,
-          [ELEMENT_COLUMN]: ColumnElement,
-          [ELEMENT_H1]: withProps(HeadingElement, { variant: "h1" }),
-          [ELEMENT_H2]: withProps(HeadingElement, { variant: "h2" }),
-          [ELEMENT_H3]: withProps(HeadingElement, { variant: "h3" }),
-          [ELEMENT_H4]: withProps(HeadingElement, { variant: "h4" }),
-          [ELEMENT_H5]: withProps(HeadingElement, { variant: "h5" }),
-          [ELEMENT_H6]: withProps(HeadingElement, { variant: "h6" }),
-          [ELEMENT_MEDIA_EMBED]: MediaEmbedElement,
-          [ELEMENT_MENTION]: MentionElement,
-          [ELEMENT_MENTION_INPUT]: MentionInputElement,
-          [ELEMENT_PARAGRAPH]: ParagraphElement,
-          [ELEMENT_TABLE]: TableElement,
-          [ELEMENT_TR]: TableRowElement,
-          [ELEMENT_TD]: TableCellElement,
-          [ELEMENT_TH]: TableCellHeaderElement,
-          [ELEMENT_TODO_LI]: TodoListElement,
-          [MARK_BOLD]: withProps(PlateLeaf, { as: "strong" }),
-          [MARK_HIGHLIGHT]: HighlightLeaf,
-          [MARK_ITALIC]: withProps(PlateLeaf, { as: "em" }),
-          [MARK_KBD]: KbdLeaf,
-          [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: "s" }),
-          [MARK_SUBSCRIPT]: withProps(PlateLeaf, { as: "sub" }),
-          [MARK_SUPERSCRIPT]: withProps(PlateLeaf, { as: "sup" }),
-          [MARK_UNDERLINE]: withProps(PlateLeaf, { as: "u" }),
-          // My stuff
-          [ELEMENT_CODE_BLOCK]: CodeBlockElement,
-          [ELEMENT_CODE_LINE]: CodeLineElement,
-          [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
-          /* [ELEMENT_LI]: withProps(PlateElement, { as: "li" }),
+      },
+    }),
+    createNodeIdPlugin(),
+    createResetNodePlugin({
+      options: {
+        rules: [
+          {
+            ...resetBlockTypesCommonRule,
+            hotkey: "Enter",
+            predicate: isBlockAboveEmpty,
+          },
+          {
+            ...resetBlockTypesCommonRule,
+            hotkey: "Backspace",
+            predicate: isSelectionAtBlockStart,
+          },
+          {
+            ...resetBlockTypesCodeBlockRule,
+            hotkey: "Enter",
+            predicate: isCodeBlockEmpty,
+          },
+          {
+            ...resetBlockTypesCodeBlockRule,
+            hotkey: "Backspace",
+            predicate: isSelectionAtCodeBlockStart,
+          },
+        ],
+      },
+    }),
+    createDeletePlugin(),
+    createSoftBreakPlugin({
+      options: {
+        rules: [
+          { hotkey: "shift+enter" },
+          {
+            hotkey: "enter",
+            query: {
+              allow: [ELEMENT_CODE_BLOCK, ELEMENT_BLOCKQUOTE, ELEMENT_TD],
+            },
+          },
+        ],
+      },
+    }),
+    createTrailingBlockPlugin({
+      options: { type: ELEMENT_PARAGRAPH },
+    }),
+    createDeserializeDocxPlugin(),
+    createDeserializeCsvPlugin(),
+    createDeserializeMdPlugin(),
+
+    // My stuff
+    // createJuicePlugin(),
+    createTrailingBlockPlugin({ options: { type: ELEMENT_PARAGRAPH } }),
+    createNormalizeTypesPlugin({
+      options: {
+        rules: [{ path: [0], strictType: ELEMENT_H1 }],
+      },
+    }),
+    createCloudPlugin({
+      options: {
+        upload_file_callback: uploadFile,
+      },
+    }),
+    createSavePlugin({
+      options: {
+        save_callback: () => {
+          console.log("SAVING LOL");
+        },
+        hotkey: ["ctrl+m", "ctrl+s"],
+        autosave_after_inactive: true,
+        autosave_on_before_unload: true,
+        autosave_on_lost_focus: true,
+      },
+    }),
+    createTabbablePlugin({
+      options: {
+        query: (editor) => {
+          if (isSelectionAtBlockStart(editor)) return false;
+
+          return !someNode(editor, {
+            match: (n) => {
+              return !!(
+                n.type &&
+                ([ELEMENT_TABLE, ELEMENT_LI].includes(n.type as string) ||
+                  n[KEY_LIST_STYLE_TYPE])
+              );
+            },
+          });
+        },
+      },
+      plugins: [
+        {
+          key: "tabbable_element",
+          isElement: true,
+          isVoid: true,
+          component: TabbableElement,
+        },
+      ],
+    }),
+    createFilePlugin(),
+  ],
+  {
+    components: withDraggables(
+      withPlaceholders({
+        [ELEMENT_BLOCKQUOTE]: BlockquoteElement,
+        [ELEMENT_HR]: HrElement,
+        [ELEMENT_IMAGE]: ImageElement,
+        [ELEMENT_LINK]: LinkElement,
+        [ELEMENT_TOGGLE]: ToggleElement,
+        [ELEMENT_COLUMN_GROUP]: ColumnGroupElement,
+        [ELEMENT_COLUMN]: ColumnElement,
+        [ELEMENT_H1]: withProps(HeadingElement, { variant: "h1" }),
+        [ELEMENT_H2]: withProps(HeadingElement, { variant: "h2" }),
+        [ELEMENT_H3]: withProps(HeadingElement, { variant: "h3" }),
+        [ELEMENT_H4]: withProps(HeadingElement, { variant: "h4" }),
+        [ELEMENT_H5]: withProps(HeadingElement, { variant: "h5" }),
+        [ELEMENT_H6]: withProps(HeadingElement, { variant: "h6" }),
+        [ELEMENT_MEDIA_EMBED]: MediaEmbedElement,
+        [ELEMENT_MENTION]: MentionElement,
+        [ELEMENT_MENTION_INPUT]: MentionInputElement,
+        [ELEMENT_PARAGRAPH]: ParagraphElement,
+        [ELEMENT_TABLE]: TableElement,
+        [ELEMENT_TR]: TableRowElement,
+        [ELEMENT_TD]: TableCellElement,
+        [ELEMENT_TH]: TableCellHeaderElement,
+        [ELEMENT_TODO_LI]: TodoListElement,
+        [MARK_BOLD]: withProps(PlateLeaf, { as: "strong" }),
+        [MARK_HIGHLIGHT]: HighlightLeaf,
+        [MARK_ITALIC]: withProps(PlateLeaf, { as: "em" }),
+        [MARK_KBD]: KbdLeaf,
+        [MARK_STRIKETHROUGH]: withProps(PlateLeaf, { as: "s" }),
+        [MARK_SUBSCRIPT]: withProps(PlateLeaf, { as: "sub" }),
+        [MARK_SUPERSCRIPT]: withProps(PlateLeaf, { as: "sup" }),
+        [MARK_UNDERLINE]: withProps(PlateLeaf, { as: "u" }),
+        // My stuff
+        [ELEMENT_CODE_BLOCK]: CodeBlockElement,
+        [ELEMENT_CODE_LINE]: CodeLineElement,
+        [ELEMENT_CODE_SYNTAX]: CodeSyntaxLeaf,
+        /* [ELEMENT_LI]: withProps(PlateElement, { as: "li" }),
         [ELEMENT_UL]: withProps(ListElement, { variant: "ul" }),
         [ELEMENT_OL]: withProps(ListElement, { variant: "ol" }), */
-          [MARK_CODE]: CodeLeaf,
-          // [MARK_COMMENT]: CommentLeaf,
-        }),
-      ),
-    },
-  );
+        [MARK_CODE]: CodeLeaf,
+        // [MARK_COMMENT]: CommentLeaf,
+      }),
+    ),
+  },
+);
 
 export default plugins;
