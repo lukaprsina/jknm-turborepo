@@ -1,6 +1,7 @@
 "use client";
 
 import { Plate } from "@udecode/plate-common";
+import { Value } from "@udecode/slate";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -12,6 +13,7 @@ import { FixedToolbarButtons } from "~/components/plate-ui/fixed-toolbar-buttons
 import { FloatingToolbar } from "~/components/plate-ui/floating-toolbar";
 import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-buttons";
 import { TooltipProvider } from "~/components/plate-ui/tooltip";
+import { api } from "~/trpc/react";
 import plugins from "./plugins";
 
 const INITIAL_VALUE = [
@@ -27,6 +29,17 @@ export default function PlateEditor({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
+  const update_article = api.article.update.useMutation();
+
+  const save_callback = async (value: Value) => {
+    update_article.mutate({
+      title: "test",
+      content: value,
+      url: "test",
+    });
+    console.log({ update_article });
+  };
+
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>

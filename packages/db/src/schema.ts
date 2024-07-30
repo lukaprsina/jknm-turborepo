@@ -1,4 +1,4 @@
-import { TElement, Value } from "@udecode/plate-common/server";
+import { TDescendant, TElement, Value } from "@udecode/plate-common/server";
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
@@ -100,21 +100,23 @@ export const Article = pgTable("article", {
   title: varchar("title", { length: 255 }).notNull(),
   url: varchar("url", { length: 255 }).notNull().unique(),
   published: boolean("published").default(false),
-  contentHtml: text("content_html").default(""),
-  content: json("content").$type<Value>().default([]),
-  draftContent: json("draft_content").$type<Value>().default([]),
-  previewImage: varchar("preview_image", { length: 255 }),
-  publishedAt: timestamp("created_at"),
+  publishedAt: timestamp("published_at"),
   updatedAt: timestamp("updated_at", {
     mode: "date",
     withTimezone: true,
   }).$onUpdateFn(() => sql`now()`),
+  contentHtml: text("content_html").default(""),
+  content: json("content").$type<Value>().default([]),
+  draftContent: json("draft_content").$type<Value>().default([]),
+  previewImage: varchar("preview_image", { length: 255 }),
   imageSizes: json("image_sizes"),
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
   url: z.string().max(255),
+  published: z.boolean().optional(),
+  publishedAt: z.date().optional(),
   contentHtml: z.string(),
   previewImage: z.string().max(255),
   imageSizes: z
@@ -126,12 +128,40 @@ export const CreateArticleSchema = createInsertSchema(Article, {
       }),
     )
     .optional(),
-  published: z.boolean().optional(),
-  publishedAt: z.date().optional(),
 }).omit({
   id: true,
   updatedAt: true,
   content: true,
+  draftContent: true,
+});
+
+export const UpdateArticleSchema = createInsertSchema(Article, {
+  title: z.string().max(255),
+  url: z.string().max(255),
+  published: z.boolean().optional(),
+  publishedAt: z.date().optional(),
+  contentHtml: z.string(),
+  content: z
+    .array(
+      z.object({
+        children: z.array(z.any()),
+        type: z.string(),
+      }),
+    )
+    .optional(),
+  previewImage: z.string().max(255),
+  imageSizes: z
+    .record(
+      z.string(),
+      z.object({
+        width: z.number(),
+        height: z.number(),
+      }),
+    )
+    .optional(),
+}).omit({
+  id: true,
+  updatedAt: true,
   draftContent: true,
 });
 

@@ -1,3 +1,5 @@
+"use client";
+
 import type { RenderAfterEditable } from "@udecode/plate-common";
 import { withProps } from "@udecode/cn";
 import { createAlignPlugin } from "@udecode/plate-alignment";
@@ -149,6 +151,7 @@ import { TableRowElement } from "~/components/plate-ui/table-row-element";
 import { TodoListElement } from "~/components/plate-ui/todo-list-element";
 import { ToggleElement } from "~/components/plate-ui/toggle-element";
 import { withDraggables } from "~/components/plate-ui/with-draggables";
+import { api } from "~/trpc/react";
 import { autoformatPlugin } from "./autoformat/autoformatPlugin";
 import { createCloudPlugin } from "./cloud/createCloudPlugin";
 import { uploadFile } from "./cloud/uploadFiles";
@@ -344,9 +347,6 @@ const plugins = createPlugins(
     createSavePlugin({
       options: {
         hotkey: ["ctrl+m", "ctrl+s"],
-        save_callback: (value) => {
-          console.log("Saving...", value);
-        },
         autosave_after_inactive: true,
         autosave_on_before_unload: true,
         autosave_on_lost_focus: true,

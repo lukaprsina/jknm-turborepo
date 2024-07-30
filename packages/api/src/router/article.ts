@@ -2,7 +2,11 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
 import { desc, eq } from "@acme/db";
-import { Article, CreateArticleSchema } from "@acme/db/schema";
+import {
+  Article,
+  CreateArticleSchema,
+  UpdateArticleSchema,
+} from "@acme/db/schema";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
@@ -45,6 +49,12 @@ export const articleRouter = {
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.insert(Article).values(input);
+    }),
+
+  update: protectedProcedure
+    .input(UpdateArticleSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.db.update(Article).set(input);
     }),
 
   delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
