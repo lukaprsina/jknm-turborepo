@@ -63,7 +63,7 @@ export interface DraggableProps
       dragItem: DragItemNode;
       id: string;
       monitor: DropTargetMonitor<DragItemNode, unknown>;
-      nodeRef: unknown;
+      nodeRef: any;
     },
   ) => boolean;
 }
@@ -95,64 +95,73 @@ const DragHandle = () => {
   );
 };
 
-export const Draggable = withRef<
-  "div",
-  DraggableProps & { children: React.ReactNode }
->(({ className, classNames = {}, onDropHandler, children, ...props }, ref) => {
-  const { element } = props;
+export const Draggable = withRef<"div", DraggableProps>(
+  ({ className, classNames = {}, onDropHandler, ...props }, ref) => {
+    const { children, element } = props;
 
-  const state = useDraggableState({ element, onDropHandler });
-  const { dropLine, isDragging, isHovered } = state;
-  const { droplineProps, groupProps, gutterLeftProps, handleRef, previewRef } =
-    useDraggable(state);
+    const state = useDraggableState({ element, onDropHandler });
+    const { dropLine, isDragging, isHovered } = state;
+    const {
+      droplineProps,
+      groupProps,
+      gutterLeftProps,
+      handleRef,
+      previewRef,
+    } = useDraggable(state);
 
-  return (
-    <div
-      className={cn("relative", isDragging && "opacity-50", "group", className)}
-      ref={ref}
-      {...groupProps}
-    >
+    return (
       <div
         className={cn(
-          "pointer-events-none absolute -top-px z-50 flex h-full -translate-x-full cursor-text opacity-0 group-hover:opacity-100",
-          classNames.gutterLeft,
+          "relative",
+          isDragging && "opacity-50",
+          "group",
+          className,
         )}
-        {...gutterLeftProps}
+        ref={ref}
+        {...groupProps}
       >
-        <div className={cn("flex h-[1.5em]", classNames.blockToolbarWrapper)}>
-          <div
-            className={cn(
-              "pointer-events-auto mr-1 flex items-center",
-              classNames.blockToolbar,
-            )}
-          >
+        <div
+          className={cn(
+            "pointer-events-none absolute -top-px z-50 flex h-full -translate-x-full cursor-text opacity-0 group-hover:opacity-100",
+            classNames.gutterLeft,
+          )}
+          {...gutterLeftProps}
+        >
+          <div className={cn("flex h-[1.5em]", classNames.blockToolbarWrapper)}>
             <div
-              className="size-4"
-              data-key={element.id as string}
-              ref={handleRef}
+              className={cn(
+                "pointer-events-auto mr-1 flex items-center",
+                classNames.blockToolbar,
+              )}
             >
-              {isHovered && <DragHandle />}
+              <div
+                className="size-4"
+                data-key={element.id as string}
+                ref={handleRef}
+              >
+                {isHovered && <DragHandle />}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className={classNames.blockWrapper} ref={previewRef}>
-        {children}
+        <div className={classNames.blockWrapper} ref={previewRef}>
+          {children}
 
-        {!!dropLine && (
-          <div
-            className={cn(
-              "absolute inset-x-0 h-0.5 opacity-100",
-              "bg-ring",
-              dropLine === "top" && "-top-px",
-              dropLine === "bottom" && "-bottom-px",
-              classNames.dropLine,
-            )}
-            {...droplineProps}
-          />
-        )}
+          {!!dropLine && (
+            <div
+              className={cn(
+                "absolute inset-x-0 h-0.5 opacity-100",
+                "bg-ring",
+                dropLine === "top" && "-top-px",
+                dropLine === "bottom" && "-bottom-px",
+                classNames.dropLine,
+              )}
+              {...droplineProps}
+            />
+          )}
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);

@@ -106,14 +106,14 @@ export function FixedToolbarButtons() {
               <TableDropdownMenu />
 
               <EmojiDropdownMenu />
-
-              <MoreDropdownMenu />
             </ToolbarGroup>
 
             <ToolbarGroup>
               <SaveToolbarButton />
 
               <SettingsToolbarButton />
+
+              <MoreDropdownMenu />
             </ToolbarGroup>
           </>
         )}

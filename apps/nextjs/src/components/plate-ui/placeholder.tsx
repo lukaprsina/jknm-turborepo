@@ -1,16 +1,14 @@
-import type {
-  PlaceholderProps,
-  PlatePluginComponent,
-} from "@udecode/plate-common";
-import React from "react";
-import { cn } from "@udecode/cn";
+import React from 'react';
+
+import { cn } from '@udecode/cn';
 import {
+  type PlaceholderProps,
   createNodeHOC,
   createNodesHOC,
   usePlaceholderState,
-} from "@udecode/plate-common";
-import { ELEMENT_H1 } from "@udecode/plate-heading";
-import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
+} from '@udecode/plate-common';
+import { ELEMENT_H1 } from '@udecode/plate-heading';
+import { ELEMENT_PARAGRAPH } from '@udecode/plate-paragraph';
 
 export const Placeholder = (props: PlaceholderProps) => {
   const { children, nodeProps, placeholder } = props;
@@ -24,7 +22,7 @@ export const Placeholder = (props: PlaceholderProps) => {
         ...nodeProps,
         className: cn(
           enabled &&
-            "before:absolute before:cursor-text before:opacity-30 before:content-[attr(placeholder)]",
+            'before:absolute before:cursor-text before:opacity-30 before:content-[attr(placeholder)]'
         ),
         placeholder,
       },
@@ -36,14 +34,12 @@ export const withPlaceholder = createNodeHOC(Placeholder);
 
 export const withPlaceholdersPrimitive = createNodesHOC(Placeholder);
 
-export const withPlaceholders = (
-  components: Record<string, PlatePluginComponent<any>>,
-): Record<string, PlatePluginComponent<any>> =>
+export const withPlaceholders = (components: any) =>
   withPlaceholdersPrimitive(components, [
     {
       hideOnBlur: true,
       key: ELEMENT_PARAGRAPH,
-      placeholder: "Type a paragraph",
+      placeholder: 'Type a paragraph',
       query: {
         maxLevel: 1,
       },
@@ -51,6 +47,6 @@ export const withPlaceholders = (
     {
       hideOnBlur: false,
       key: ELEMENT_H1,
-      placeholder: "Untitled",
+      placeholder: 'Untitled',
     },
   ]);

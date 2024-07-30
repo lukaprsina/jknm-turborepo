@@ -5,25 +5,16 @@ import React from "react";
 import { MinusIcon } from "@radix-ui/react-icons";
 import { ELEMENT_BLOCKQUOTE } from "@udecode/plate-block-quote";
 import {
-  ELEMENT_CODE_BLOCK,
-  insertEmptyCodeBlock,
-} from "@udecode/plate-code-block";
-import {
   focusEditor,
   insertEmptyElement,
   useEditorRef,
 } from "@udecode/plate-common";
 import { ELEMENT_H1, ELEMENT_H2, ELEMENT_H3 } from "@udecode/plate-heading";
 import { ELEMENT_HR } from "@udecode/plate-horizontal-rule";
-import { toggleIndentList } from "@udecode/plate-indent-list";
-import { ELEMENT_LINK, triggerFloatingLink } from "@udecode/plate-link";
-import {
-  ELEMENT_IMAGE,
-  ELEMENT_MEDIA_EMBED,
-  insertMedia,
-} from "@udecode/plate-media";
+import { ELEMENT_LINK } from "@udecode/plate-link";
+import { ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED } from "@udecode/plate-media";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
-import { ELEMENT_TABLE, insertTable } from "@udecode/plate-table";
+import { ELEMENT_TABLE } from "@udecode/plate-table";
 import { FilmIcon } from "lucide-react";
 
 import { Icons } from "~/components/icons";
@@ -40,7 +31,6 @@ import { ToolbarButton } from "./toolbar";
 
 const items = [
   {
-    label: "Basic blocks",
     items: [
       {
         description: "Paragraph",
@@ -96,23 +86,18 @@ const items = [
         description: "Divider (---)",
         icon: MinusIcon,
       },
-      {
-        value: ELEMENT_LINK,
-        label: "Link",
-        description: "Link",
-        icon: Icons.link,
-      },
     ],
+    label: "Basic blocks",
   },
   {
     label: "Media",
     items: [
-      {
-        value: ELEMENT_CODE_BLOCK,
-        label: "Code",
-        description: "Code (```)",
-        icon: Icons.codeblock,
-      },
+      // {
+      //   value: ELEMENT_CODE_BLOCK,
+      //   label: 'Code',
+      //   description: 'Code (```)',
+      //   icon: Icons.codeblock,
+      // },
       {
         value: ELEMENT_IMAGE,
         label: "Image",
@@ -131,6 +116,17 @@ const items = [
       //   description: 'Excalidraw',
       //   icon: Icons.excalidraw,
       // },
+    ],
+  },
+  {
+    label: "Inline",
+    items: [
+      {
+        value: ELEMENT_LINK,
+        label: "Link",
+        description: "Link",
+        icon: Icons.link,
+      },
     ],
   },
 ];
@@ -161,52 +157,52 @@ export function InsertDropdownMenu(props: DropdownMenuProps) {
                 <DropdownMenuItem
                   className="min-w-[180px]"
                   key={type}
-                  onSelect={async () => {
+                  onSelect={() => {
                     switch (type) {
-                      case ELEMENT_CODE_BLOCK: {
-                        insertEmptyCodeBlock(editor);
-
-                        break;
-                      }
-                      case ELEMENT_IMAGE: {
-                        await insertMedia(editor, { type: ELEMENT_IMAGE });
-
-                        break;
-                      }
-                      case ELEMENT_MEDIA_EMBED: {
-                        await insertMedia(editor, {
-                          type: ELEMENT_MEDIA_EMBED,
-                        });
-
-                        break;
-                      }
-                      case "ul":
-                      case "ol": {
-                        insertEmptyElement(editor, ELEMENT_PARAGRAPH, {
-                          select: true,
-                          nextBlock: true,
-                        });
-
-                        // if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
-                        toggleIndentList(editor, {
-                          listStyleType: type === "ul" ? "disc" : "decimal",
-                        });
-                        /* } else if (settingsStore.get.checkedId('list')) {
-                          toggleList(editor, { type });
-                        } */
-
-                        break;
-                      }
-                      case ELEMENT_TABLE: {
-                        insertTable(editor);
-
-                        break;
-                      }
-                      case ELEMENT_LINK: {
-                        triggerFloatingLink(editor, { focused: true });
-
-                        break;
-                      }
+                      // case ELEMENT_CODE_BLOCK: {
+                      //   insertEmptyCodeBlock(editor);
+                      //
+                      //   break;
+                      // }
+                      // case ELEMENT_IMAGE: {
+                      //   await insertMedia(editor, { type: ELEMENT_IMAGE });
+                      //
+                      //   break;
+                      // }
+                      // case ELEMENT_MEDIA_EMBED: {
+                      //   await insertMedia(editor, {
+                      //     type: ELEMENT_MEDIA_EMBED,
+                      //   });
+                      //
+                      //   break;
+                      // }
+                      // case 'ul':
+                      // case 'ol': {
+                      //   insertEmptyElement(editor, ELEMENT_PARAGRAPH, {
+                      //     select: true,
+                      //     nextBlock: true,
+                      //   });
+                      //
+                      //   if (settingsStore.get.checkedId(KEY_LIST_STYLE_TYPE)) {
+                      //     toggleIndentList(editor, {
+                      //       listStyleType: type === 'ul' ? 'disc' : 'decimal',
+                      //     });
+                      //   } else if (settingsStore.get.checkedId('list')) {
+                      //     toggleList(editor, { type });
+                      //   }
+                      //
+                      //   break;
+                      // }
+                      // case ELEMENT_TABLE: {
+                      //   insertTable(editor);
+                      //
+                      //   break;
+                      // }
+                      // case ELEMENT_LINK: {
+                      //   triggerFloatingLink(editor, { focused: true });
+                      //
+                      //   break;
+                      // }
                       default: {
                         insertEmptyElement(editor, type, {
                           nextBlock: true,

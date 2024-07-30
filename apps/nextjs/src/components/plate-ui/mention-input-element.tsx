@@ -1,19 +1,21 @@
 import React, { useState } from "react";
 import { cn, withRef } from "@udecode/cn";
 import { PlateElement } from "@udecode/plate-common";
+import { getMentionOnSelectItem } from "@udecode/plate-mention";
 
 import {
   InlineCombobox,
   InlineComboboxContent,
   InlineComboboxEmpty,
   InlineComboboxInput,
+  InlineComboboxItem,
 } from "./inline-combobox";
 
-// const onSelectItem = getMentionOnSelectItem();
+const onSelectItem = getMentionOnSelectItem();
 
 export const MentionInputElement = withRef<typeof PlateElement>(
   ({ className, ...props }, ref) => {
-    const { children, element } = props;
+    const { children, editor, element } = props;
     const [search, setSearch] = useState("");
 
     return (

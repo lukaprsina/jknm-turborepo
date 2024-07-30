@@ -1,12 +1,12 @@
 "use client";
 
-import type { DropdownMenuItemProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { DropdownMenuItemProps } from "@radix-ui/react-dropdown-menu";
 import { cn } from "@udecode/cn";
 
-import type { TColor } from "./color-dropdown-menu";
 import { Icons } from "~/components/icons";
 import { buttonVariants } from "./button";
+import { TColor } from "./color-dropdown-menu";
 import { DropdownMenuItem } from "./dropdown-menu";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
@@ -79,7 +79,7 @@ export function ColorDropdownMenuItems({
     >
       {colors.map(({ name, value, isBrightColor }) => (
         <ColorDropdownMenuItem
-          key={name}
+          key={name ?? value}
           name={name}
           value={value}
           isBrightColor={isBrightColor}

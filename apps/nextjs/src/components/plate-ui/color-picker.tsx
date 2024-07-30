@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React from "react";
-import { cn, withRef } from "@udecode/cn";
+import React from 'react';
+import { cn, withRef } from '@udecode/cn';
 
-import type { TColor } from "./color-dropdown-menu";
-import { buttonVariants } from "./button";
-import { ColorDropdownMenuItems } from "./color-dropdown-menu-items";
-import { ColorsCustom } from "./colors-custom";
-import { DropdownMenuItem } from "./dropdown-menu";
-import { Separator } from "./separator";
+import { buttonVariants } from './button';
+import { TColor } from './color-dropdown-menu';
+import { ColorDropdownMenuItems } from './color-dropdown-menu-items';
+import { ColorsCustom } from './colors-custom';
+import { DropdownMenuItem } from './dropdown-menu';
+import { Separator } from './separator';
 
 export const ColorPickerContent = withRef<
-  "div",
+  'div',
   {
     color?: string;
     colors: TColor[];
@@ -32,12 +32,12 @@ export const ColorPickerContent = withRef<
       className,
       ...props
     },
-    ref,
+    ref
   ) => {
     return (
       <div
         ref={ref}
-        className={cn("flex flex-col gap-4 p-4", className)}
+        className={cn('flex flex-col gap-4 p-4', className)}
         {...props}
       >
         <ColorsCustom
@@ -58,7 +58,7 @@ export const ColorPickerContent = withRef<
         {color && (
           <DropdownMenuItem
             className={buttonVariants({
-              variant: "outline",
+              variant: 'outline',
               isMenu: true,
             })}
             onClick={clearColor}
@@ -68,7 +68,7 @@ export const ColorPickerContent = withRef<
         )}
       </div>
     );
-  },
+  }
 );
 
 export const ColorPicker = React.memo(
@@ -76,5 +76,5 @@ export const ColorPicker = React.memo(
   (prev, next) =>
     prev.color === next.color &&
     prev.colors === next.colors &&
-    prev.customColors === next.customColors,
+    prev.customColors === next.customColors
 );

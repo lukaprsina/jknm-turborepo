@@ -24,11 +24,11 @@ export function ModeDropdownMenu(props: DropdownMenuProps) {
   const readOnly = useEditorReadOnly();
   const openState = useOpenState();
 
-  let value: "editing" | "viewing" = "editing";
+  let value = "editing";
 
   if (readOnly) value = "viewing";
 
-  const item = {
+  const item: any = {
     editing: (
       <>
         <Icons.editing className="mr-2 size-5" />

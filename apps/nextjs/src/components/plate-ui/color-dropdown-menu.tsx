@@ -1,26 +1,26 @@
-"use client";
+'use client';
 
-import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
-import React from "react";
+import React from 'react';
+import { DropdownMenuProps } from '@radix-ui/react-dropdown-menu';
 import {
   useColorDropdownMenu,
   useColorDropdownMenuState,
-} from "@udecode/plate-font";
+} from '@udecode/plate-font';
 
-import { DEFAULT_COLORS, DEFAULT_CUSTOM_COLORS } from "./color-constants";
-import { ColorPicker } from "./color-picker";
+import { DEFAULT_COLORS, DEFAULT_CUSTOM_COLORS } from './color-constants';
+import { ColorPicker } from './color-picker';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
-} from "./dropdown-menu";
-import { ToolbarButton } from "./toolbar";
+} from './dropdown-menu';
+import { ToolbarButton } from './toolbar';
 
-export interface TColor {
+export type TColor = {
   name: string;
   value: string;
   isBrightColor: boolean;
-}
+};
 
 type ColorDropdownMenuProps = {
   nodeType: string;
@@ -51,7 +51,7 @@ export function ColorDropdownMenu({
 
       <DropdownMenuContent align="start">
         <ColorPicker
-          color={state.selectedColor ?? state.color}
+          color={state.selectedColor || state.color}
           colors={state.colors}
           customColors={state.customColors}
           updateColor={state.updateColorAndClose}

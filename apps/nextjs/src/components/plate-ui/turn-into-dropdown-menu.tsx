@@ -70,12 +70,7 @@ const items = [
   // },
 ];
 
-const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH) ?? {
-  description: "Paragraph",
-  icon: Icons.paragraph,
-  label: "Paragraph",
-  value: ELEMENT_PARAGRAPH,
-};
+const defaultItem = items.find((item) => item.value === ELEMENT_PARAGRAPH)!;
 
 export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
   const value: string = useEditorSelector((editor) => {
@@ -87,10 +82,10 @@ export function TurnIntoDropdownMenu(props: DropdownMenuProps) {
     });
     const nodes = Array.from(codeBlockEntries);
 
-    if (nodes[0] && nodes.length > 0) {
+    if (nodes.length > 0) {
       initialNodeType = nodes[0][0].type as string;
       allNodesMatchInitialNodeType = nodes.every(([node]) => {
-        const type: string = (node.type as string) || ELEMENT_PARAGRAPH;
+        const type: string = (node?.type as string) || ELEMENT_PARAGRAPH;
 
         return type === initialNodeType;
       });

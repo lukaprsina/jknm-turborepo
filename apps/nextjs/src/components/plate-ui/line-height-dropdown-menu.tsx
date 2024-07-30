@@ -1,5 +1,5 @@
-import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import {
   useLineHeightDropdownMenu,
   useLineHeightDropdownMenuState,
@@ -38,7 +38,7 @@ export function LineHeightDropdownMenu({ ...props }: DropdownMenuProps) {
           className="flex flex-col gap-0.5"
           {...radioGroupProps}
         >
-          {state.values.map((_value: string) => (
+          {state.values.map((_value) => (
             <DropdownMenuRadioItem
               key={_value}
               value={_value}

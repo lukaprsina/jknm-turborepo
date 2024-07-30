@@ -1,7 +1,7 @@
 "use client";
 
-import type { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import React from "react";
+import { DropdownMenuProps } from "@radix-ui/react-dropdown-menu";
 import {
   useAlignDropdownMenu,
   useAlignDropdownMenuState,
@@ -37,7 +37,7 @@ const items = [
   },
 ];
 
-export function AlignDropdownMenu(props: DropdownMenuProps) {
+export function AlignDropdownMenu({ children, ...props }: DropdownMenuProps) {
   const state = useAlignDropdownMenuState();
   const { radioGroupProps } = useAlignDropdownMenu(state);
 
