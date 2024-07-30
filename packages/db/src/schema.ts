@@ -100,11 +100,11 @@ export const Article = pgTable("article", {
   title: varchar("title", { length: 255 }).notNull(),
   url: varchar("url", { length: 255 }).notNull().unique(),
   published: boolean("published").default(false),
-  publishedAt: timestamp("published_at"),
+  /* publishedAt: timestamp("published_at"),
   updatedAt: timestamp("updated_at", {
     mode: "date",
     withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
+  }).$onUpdateFn(() => sql`now()`), */
   contentHtml: text("content_html").default(""),
   content: json("content").$type<Value>().default([]),
   draftContent: json("draft_content").$type<Value>().default([]),
@@ -116,7 +116,7 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
   url: z.string().max(255),
   published: z.boolean().optional(),
-  publishedAt: z.date().optional(),
+  // publishedAt: z.date().optional(),
   contentHtml: z.string(),
   previewImage: z.string().max(255),
   imageSizes: z
@@ -130,7 +130,7 @@ export const CreateArticleSchema = createInsertSchema(Article, {
     .optional(),
 }).omit({
   id: true,
-  updatedAt: true,
+  // updatedAt: true,
   content: true,
   draftContent: true,
 });
@@ -139,7 +139,7 @@ export const UpdateArticleSchema = createInsertSchema(Article, {
   title: z.string().max(255),
   url: z.string().max(255),
   published: z.boolean().optional(),
-  publishedAt: z.date().optional(),
+  // publishedAt: z.date().optional(),
   contentHtml: z.string(),
   content: z
     .array(
@@ -161,7 +161,7 @@ export const UpdateArticleSchema = createInsertSchema(Article, {
     .optional(),
 }).omit({
   id: true,
-  updatedAt: true,
+  // updatedAt: true,
   draftContent: true,
 });
 

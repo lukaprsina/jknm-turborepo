@@ -14,7 +14,7 @@ export const articleRouter = {
   all: publicProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
-      orderBy: desc(Article.publishedAt),
+      // orderBy: desc(Article.publishedAt),
       limit: 10,
     });
   }),
