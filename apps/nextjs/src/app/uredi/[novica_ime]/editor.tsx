@@ -48,9 +48,14 @@ export default function PlateEditor({
   );
 
   useEffect(() => {
+    console.log(
+      "setting settings_store from useEffect",
+      article?.title,
+      article?.url,
+    );
     settings_store.set.title(article?.title || "Neimenovana novička");
     settings_store.set.url(article?.url || "");
-  });
+  }, [article?.title, article?.url]);
 
   const save_callback = (value: Value) => {
     update_article.mutate({
