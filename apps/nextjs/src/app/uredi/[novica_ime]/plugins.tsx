@@ -150,11 +150,11 @@ import { TableRowElement } from "~/components/plate-ui/table-row-element";
 import { TodoListElement } from "~/components/plate-ui/todo-list-element";
 import { ToggleElement } from "~/components/plate-ui/toggle-element";
 import { withDraggables } from "~/components/plate-ui/with-draggables";
+import { TabbableElement } from "../../../components/tabbable-element";
 import { autoformatPlugin } from "./autoformat/autoformatPlugin";
 import { createCloudPlugin } from "./cloud/createCloudPlugin";
 import { uploadFile } from "./cloud/uploadFiles";
 import { createSavePlugin } from "./save-plugin/save-plugin";
-import { TabbableElement } from "./tabbable-element";
 
 const resetBlockTypesCommonRule = {
   types: [ELEMENT_BLOCKQUOTE, ELEMENT_TODO_LI],
@@ -347,7 +347,7 @@ const plugins = (save_callback: (value: Value) => void) =>
         options: {
           save_callback,
           hotkey: ["ctrl+m", "ctrl+s"],
-          autosave_after_inactive: true,
+          // autosave_after_inactive: true,
           autosave_on_before_unload: true,
           autosave_on_lost_focus: true,
         },

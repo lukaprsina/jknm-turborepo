@@ -22,7 +22,7 @@ const INITIAL_VALUE = [
   {
     id: "1",
     type: "h1",
-    children: [{ text: "Neimenovana novička" }],
+    children: [{ text: "Neimenovana novička - manjka" }],
   },
 ];
 
@@ -55,6 +55,7 @@ export default function PlateEditor({
     );
     settings_store.set.title(article?.title || "Neimenovana novička");
     settings_store.set.url(article?.url || "");
+    settings_store.set.id(article?.id || "");
   }, [article?.title, article?.url]);
 
   const save_callback = (value: Value) => {

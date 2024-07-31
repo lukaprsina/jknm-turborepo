@@ -1,5 +1,6 @@
 "use client";
 
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { redirect, useRouter } from "next/navigation";
 import {
   Popover,
@@ -7,13 +8,14 @@ import {
   PopoverTrigger,
 } from "@radix-ui/react-popover";
 
+import type { ButtonProps } from "@acme/ui/button";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
 import { api } from "~/trpc/react";
 
-export default function NewArticleLoader() {
+export default function NewArticleLoader(props: ButtonProps) {
   const router = useRouter();
   const create_article = api.article.create.useMutation({
     onSuccess: (_, variables) => {
@@ -25,6 +27,7 @@ export default function NewArticleLoader() {
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          {...props}
           onClick={() => {
             const article_url = `nova-novica-${Date.now()}`;
 
@@ -33,9 +36,7 @@ export default function NewArticleLoader() {
               url: article_url,
             });
           }}
-        >
-          Ustvari novico
-        </Button>
+        />
       </PopoverTrigger>
       <PopoverContent className="w-80 bg-background">
         <Card>

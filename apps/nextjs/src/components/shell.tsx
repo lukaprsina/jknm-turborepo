@@ -1,7 +1,12 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import {
+  HamburgerMenuIcon,
+  MagnifyingGlassIcon,
+  Pencil1Icon,
+  PlusIcon,
+} from "@radix-ui/react-icons";
 
 import { auth, signOut } from "@acme/auth";
 import { cn } from "@acme/ui";
@@ -19,15 +24,14 @@ import { ThemeToggle } from "@acme/ui/theme";
 import logo from "~/../assets/logo.png";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
+import EditingButtons from "./editing-buttons";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {
   children: React.ReactNode;
-  editable?: boolean;
 }
 
-export function Shell({ editable, children }: ShellProps) {
-  console.log({ editable });
+export function Shell({ children }: ShellProps) {
   return (
     <HydrateClient>
       <div className="w-full">
@@ -87,7 +91,9 @@ function DesktopHeaderLink({
   );
 }
 
-function DesktopHeader() {
+async function DesktopHeader() {
+  const session = await auth();
+
   return (
     <div className="flex gap-6">
       <NavigationMenu>
@@ -118,6 +124,7 @@ function DesktopHeader() {
         </NavigationMenuList>
       </NavigationMenu>
       <div className="flex gap-1">
+        <EditingButtons session={session ?? undefined}/>
         <Button
           className="dark:bg-primary/80 dark:text-primary-foreground"
           variant="ghost"

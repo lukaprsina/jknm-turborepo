@@ -136,6 +136,7 @@ export const CreateArticleSchema = createInsertSchema(Article, {
 });
 
 export const UpdateArticleSchema = createInsertSchema(Article, {
+  id: z.string().uuid(),
   title: z.string().max(255),
   url: z.string().max(255),
   published: z.boolean().optional(),
@@ -160,7 +161,6 @@ export const UpdateArticleSchema = createInsertSchema(Article, {
     )
     .optional(),
 }).omit({
-  id: true,
   // updatedAt: true,
   draftContent: true,
 });

@@ -5,4 +5,5 @@ export const settings_store = createStore("settings")({
   image_urls: [] as string[],
   title: "",
   url: "",
+  id: "",
 });

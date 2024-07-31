@@ -1,14 +1,18 @@
+"use client";
+
 import type { Value } from "@udecode/plate-common";
 import type {
   KeyboardHandlerReturnType,
   PlateEditor,
   WithPlatePlugin,
 } from "@udecode/plate-common/server";
-// import { useEffect } from "react";
-import { getPluginOptions } from "@udecode/plate-common";
+import { useEffect } from "react";
+import { getPluginOptions, useEditorRef } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
 
+import { api } from "~/trpc/react";
+import { settings_store } from "../settings-plugins/settings-store";
 import { save_store } from "./save-store";
 
 export const KEY_SAVE = "save";
@@ -51,10 +55,30 @@ export const onKeyDownSave =
 let save_timeout_id: number | undefined = undefined;
 let save_max_time_timeout_id: number | undefined = undefined;
 
+function save(editor: PlateEditor<Value>) {
+  get_stuff_from_editor(editor);
+}
+
 export const createSavePlugin = createPluginFactory<SavePlugin>({
   key: KEY_SAVE,
   useHooks: () => {
-    /* useEffect(() => {
+    const editor = useEditorRef();
+
+    const { save_callback, autosave_on_before_unload } =
+      getPluginOptions<SavePlugin>(editor, KEY_SAVE);
+
+    const update_article = api.article.update.useMutation({
+      onSuccess: (_, variables) => {
+        settings_store.set.settings_open(false);
+        console.log("Article updated", variables);
+      },
+    });
+
+    save_store.use.saving;
+
+    useEffect(() => {
+      if (!autosave_on_before_unload) return;
+
       const onBeforeUnload = (e: BeforeUnloadEvent) => {
         if (save_store.get.dirty()) e.preventDefault();
       };
@@ -64,7 +88,7 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
       return () => {
         window.removeEventListener("beforeunload", onBeforeUnload);
       };
-    }); */
+    });
   },
   handlers: {
     onKeyDown: onKeyDownSave,
@@ -91,7 +115,8 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
           if (!save_store.get.dirty()) return;
 
           save_store.set.saving(true);
-          save_callback(value);
+          // save_callback(value);
+          save(editor);
           setTimeout(() => {
             save_store.set.saving(false);
           }, 1500);
@@ -123,3 +148,50 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
     max_ms_without_autosave: 60 * 1000,
   },
 });
+
+function get_title_from_editor(editor: PlateEditor<Value>) {
+  const possible_h1 = editor.children[0];
+  if (!possible_h1 || possible_h1.type !== "h1") return;
+  if (
+    possible_h1.children.length !== 1 ||
+    typeof possible_h1.children[0]?.text !== "string"
+  )
+    return;
+
+  return possible_h1.children[0].text;
+}
+
+function get_images_from_editor(editor: PlateEditor<Value>) {
+  const image_urls = editor.children
+    .filter((child) => child.type === "img")
+    .map((child) => {
+      return child.url as string;
+    });
+
+  return image_urls;
+}
+
+function get_stuff_from_editor(editor: PlateEditor<Value>) {
+  const title = get_title_from_editor(editor);
+
+  if (!title) {
+    alert(
+      "Naslov ni pravilno nastavljen. Naslov mora biti v prvem odstavku in mora biti označen z H1 oznako.",
+    );
+    return;
+  }
+
+  const new_url = title.toLowerCase().replace(/\s/g, "-");
+
+  const image_urls = get_images_from_editor(editor);
+  settings_store.set.image_urls(image_urls);
+
+  console.log("Updating", title, editor.children, new_url);
+
+  /* update_article.mutate({
+          id: settings_store.get.id(),
+          title,
+          content: editor.children,
+          url: new_url,
+        }); */
+}

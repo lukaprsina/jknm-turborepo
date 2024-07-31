@@ -15,11 +15,11 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
+import NewArticleLoader from "~/components/new-article-loader";
 import { Button } from "~/components/plate-ui/button";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
 import PlateEditor from "./editor";
-import NewArticleLoader from "./new_article";
 import SettingsDialog from "./settings-dialog";
 
 interface PlatePageProps {
@@ -58,7 +58,7 @@ export default async function PlatePage({
                 <Button asChild variant="secondary">
                   <a href="/">Domov</a>
                 </Button>
-                <NewArticleLoader />
+                <NewArticleLoader children="Ustvari novico" />
               </CardFooter>
             </Card>
           </div>
