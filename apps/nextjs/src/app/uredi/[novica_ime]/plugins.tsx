@@ -1,4 +1,4 @@
-import type { RenderAfterEditable } from "@udecode/plate-common";
+import type { PlateEditor, RenderAfterEditable } from "@udecode/plate-common";
 import { withProps } from "@udecode/cn";
 import { createAlignPlugin } from "@udecode/plate-alignment";
 import { createAutoformatPlugin } from "@udecode/plate-autoformat";
@@ -167,7 +167,7 @@ const resetBlockTypesCodeBlockRule = {
   onReset: unwrapCodeBlock,
 };
 
-const plugins = (save_callback: (value: Value) => void) =>
+const plugins = (save_callback: (editor: PlateEditor) => void) =>
   createPlugins(
     [
       createParagraphPlugin(),

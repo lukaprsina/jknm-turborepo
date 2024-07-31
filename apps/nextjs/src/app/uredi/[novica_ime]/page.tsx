@@ -19,7 +19,7 @@ import NewArticleLoader from "~/components/new-article-loader";
 import { Button } from "~/components/plate-ui/button";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
-import PlateEditor from "./editor";
+import MyEditor from "./editor";
 import SettingsDialog from "./settings-dialog";
 
 interface PlatePageProps {
@@ -71,7 +71,7 @@ export default async function PlatePage({
     <Shell>
       <div className="container min-h-screen pt-8">
         <ArticleBreadcrumb novica_ime={novica_ime} />
-        <PlateEditor article={article_by_url} />
+        <MyEditor article={article_by_url} />
         <SettingsDialog novica_ime={novica_ime} />
       </div>
     </Shell>

@@ -9,27 +9,13 @@ import { save_store } from "./save-store";
 import { useSaveButton } from "./useSaveButton";
 
 export const SaveToolbarButton = withRef<typeof ToolbarButton>((rest, ref) => {
-  const {
-    props: { onClick, ...props },
-  } = useSaveButton();
-  const saving = save_store.use.saving;
+  const { props } = useSaveButton();
+  const saving_text = save_store.use.saving_text;
 
   return (
-    <ToolbarButton
-      ref={ref}
-      tooltip="Save"
-      {...props}
-      onClick={() => {
-        save_store.set.saving(true);
-        onClick();
-        setTimeout(() => {
-          save_store.set.saving(false);
-        }, 1500);
-      }}
-      {...rest}
-    >
+    <ToolbarButton ref={ref} tooltip="Save" {...props} {...rest}>
       <div className="flex gap-2">
-        <p hidden={!saving()}>Saving...</p>
+        <p hidden={!saving_text()}>Saving...</p>
         <SaveIcon />
       </div>
     </ToolbarButton>

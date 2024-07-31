@@ -1,7 +1,6 @@
-import { getPluginOptions, useEditorRef } from "@udecode/plate-common";
+import { useEditorRef } from "@udecode/plate-common";
 
-import type { SavePlugin } from "./save-plugin";
-import { KEY_SAVE } from "./save-plugin";
+import { save_store } from "./save-store";
 
 export const useSaveButton = () => {
   const editor = useEditorRef();
@@ -9,14 +8,7 @@ export const useSaveButton = () => {
   return {
     props: {
       onClick: () => {
-        const { save_callback } = getPluginOptions<SavePlugin>(
-          editor,
-          KEY_SAVE,
-        );
-
-        if (!save_callback) return;
-
-        save_callback(editor.children);
+        save_store.set.saving(true);
       },
       onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();

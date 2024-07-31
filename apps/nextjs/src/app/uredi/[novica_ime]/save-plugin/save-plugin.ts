@@ -19,7 +19,7 @@ export const KEY_SAVE = "save";
 
 export interface SavePlugin {
   hotkey?: string | string[];
-  save_callback?: (value: Value) => void;
+  save_callback?: (editor: PlateEditor) => void;
   autosave_on_lost_focus?: boolean;
   autosave_on_before_unload?: boolean;
   autosave_after_inactive?: boolean;
@@ -42,10 +42,10 @@ export const onKeyDownSave =
       event.stopPropagation();
 
       save_store.set.saving(true);
-      options.save_callback(editor.children);
+      /* options.save_callback(editor.children);
       setTimeout(() => {
         save_store.set.saving(false);
-      }, 1500);
+      }, 1500); */
 
       clearTimeout(save_timeout_id);
       clearTimeout(save_max_time_timeout_id);
@@ -55,10 +55,6 @@ export const onKeyDownSave =
 let save_timeout_id: number | undefined = undefined;
 let save_max_time_timeout_id: number | undefined = undefined;
 
-function save(editor: PlateEditor<Value>) {
-  get_stuff_from_editor(editor);
-}
-
 export const createSavePlugin = createPluginFactory<SavePlugin>({
   key: KEY_SAVE,
   useHooks: () => {
@@ -67,14 +63,21 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
     const { save_callback, autosave_on_before_unload } =
       getPluginOptions<SavePlugin>(editor, KEY_SAVE);
 
-    const update_article = api.article.update.useMutation({
-      onSuccess: (_, variables) => {
-        settings_store.set.settings_open(false);
-        console.log("Article updated", variables);
-      },
-    });
+    const saving = save_store.use.saving();
 
-    save_store.use.saving;
+    useEffect(() => {
+      if (!saving) return;
+
+      if (!save_callback) {
+        alert("Save callback not set");
+        return;
+      }
+
+      save_store.set.saving_text(true);
+
+      save_callback(editor);
+      save_store.set.saving(false);
+    }, [saving]);
 
     useEffect(() => {
       if (!autosave_on_before_unload) return;
@@ -92,7 +95,7 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
   },
   handlers: {
     onKeyDown: onKeyDownSave,
-    onChange: (editor) => (value) => {
+    onChange: (editor) => (_) => {
       const {
         save_callback,
         autosave_after_inactive,
@@ -115,25 +118,12 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
           if (!save_store.get.dirty()) return;
 
           save_store.set.saving(true);
-          // save_callback(value);
-          save(editor);
-          setTimeout(() => {
-            save_store.set.saving(false);
-          }, 1500);
-
-          save_store.set.dirty(false);
           save_max_time_timeout_id = undefined;
         }, max_ms_without_autosave) as unknown as number;
       }
 
       save_timeout_id = setTimeout(() => {
         save_store.set.saving(true);
-        save_callback(value);
-        setTimeout(() => {
-          save_store.set.saving(false);
-        }, 1500);
-
-        save_store.set.dirty(false);
         save_max_time_timeout_id = undefined;
       }, autosave_after_inactive_ms) as unknown as number;
     },
@@ -148,50 +138,3 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
     max_ms_without_autosave: 60 * 1000,
   },
 });
-
-function get_title_from_editor(editor: PlateEditor<Value>) {
-  const possible_h1 = editor.children[0];
-  if (!possible_h1 || possible_h1.type !== "h1") return;
-  if (
-    possible_h1.children.length !== 1 ||
-    typeof possible_h1.children[0]?.text !== "string"
-  )
-    return;
-
-  return possible_h1.children[0].text;
-}
-
-function get_images_from_editor(editor: PlateEditor<Value>) {
-  const image_urls = editor.children
-    .filter((child) => child.type === "img")
-    .map((child) => {
-      return child.url as string;
-    });
-
-  return image_urls;
-}
-
-function get_stuff_from_editor(editor: PlateEditor<Value>) {
-  const title = get_title_from_editor(editor);
-
-  if (!title) {
-    alert(
-      "Naslov ni pravilno nastavljen. Naslov mora biti v prvem odstavku in mora biti označen z H1 oznako.",
-    );
-    return;
-  }
-
-  const new_url = title.toLowerCase().replace(/\s/g, "-");
-
-  const image_urls = get_images_from_editor(editor);
-  settings_store.set.image_urls(image_urls);
-
-  console.log("Updating", title, editor.children, new_url);
-
-  /* update_article.mutate({
-          id: settings_store.get.id(),
-          title,
-          content: editor.children,
-          url: new_url,
-        }); */
-}

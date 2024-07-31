@@ -1,4 +1,4 @@
-import PlateEditor from "~/app/uredi/[novica_ime]/editor";
+import MyEditor from "~/app/uredi/[novica_ime]/editor";
 import { EditableProvider } from "~/components/editable-context";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
@@ -16,14 +16,14 @@ export default async function NovicaPage({
     url: decodeURIComponent(novica_ime),
   });
 
-  console.warn({ article_by_url });
+  // console.warn({ article_by_url });
 
   return (
     <EditableProvider editable={true}>
       <Shell>
         <div className="container h-full min-h-screen pt-8">
           <p>Readonly: {decodeURIComponent(novica_ime)}</p>
-          <PlateEditor article={article_by_url} />
+          <MyEditor article={article_by_url} />
         </div>
       </Shell>
     </EditableProvider>
