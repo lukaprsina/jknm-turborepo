@@ -179,7 +179,7 @@ const plugins = (save_callback: (editor: PlateEditor) => void) =>
         renderAfterEditable: LinkFloatingToolbar as RenderAfterEditable,
       }),
       createImagePlugin(),
-      createTogglePlugin(),
+      // createTogglePlugin(),
       createColumnPlugin(),
       createMediaEmbedPlugin(),
       createCaptionPlugin({
@@ -247,14 +247,14 @@ const plugins = (save_callback: (editor: PlateEditor) => void) =>
         },
       }),
       createAutoformatPlugin(autoformatPlugin),
-      createBlockSelectionPlugin({
+      /* createBlockSelectionPlugin({
         options: {
           sizes: {
             top: 0,
             bottom: 0,
           },
         },
-      }),
+      }), */
       createDndPlugin({
         options: { enableScroller: true },
       }),

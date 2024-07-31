@@ -4,7 +4,7 @@ import type { Value } from "@udecode/plate-common/server";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Plate } from "@udecode/plate-common";
-import { PlateEditor } from "@udecode/plate-common/server";
+import { createPlateEditor, PlateEditor } from "@udecode/plate-common/server";
 import { serializeHtml } from "@udecode/plate-serializer-html";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -55,6 +55,18 @@ export default function MyEditor({
     [article?.content],
   );
 
+  const temp_editor = useMemo(() => {
+    return createPlateEditor({
+      // TODO: some plugin is still causing this shit. find out which
+      plugins: plugins(null).filter(
+        (plugin) =>
+          plugin?.key !== "toggle" &&
+          plugin?.key !== "blockSelection" &&
+          plugin?.key !== "p",
+      ),
+    });
+  }, []);
+
   useEffect(() => {
     /* console.log(
       "setting settings_store from useEffect",
@@ -83,13 +95,13 @@ export default function MyEditor({
 
     // console.log("Updating", { title, value, new_url, image_urls });
 
-    const html = serializeHtml(editor, {
+    const html = serializeHtml(temp_editor, {
       nodes: editor.children,
-      // if you use @udecode/plate-dnd
       dndWrapper: (props: any) => (
-        <DndProvider backend={HTML5Backend} {...props} />
+        <DndProvider context={window} backend={HTML5Backend} {...props} />
       ),
     });
+
     console.log({ html });
 
     update_article.mutate({
