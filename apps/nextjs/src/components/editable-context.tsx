@@ -2,10 +2,12 @@
 
 import React, { createContext } from "react";
 
-export const EditableContext = createContext<boolean>(false);
+export type EditableOptions = "editable" | "readonly" | "not_an_article";
+
+export const EditableContext = createContext<EditableOptions>("not_an_article");
 
 type EditableProviderProps = {
-  editable: boolean;
+  editable: EditableOptions;
   children: React.ReactNode;
 };
 

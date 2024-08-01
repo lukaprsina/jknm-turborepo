@@ -1,17 +1,17 @@
 "use client";
 
 import type { Value } from "@udecode/plate-common/server";
-import { useEffect, useMemo } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Plate } from "@udecode/plate-common";
-import { createPlateEditor, PlateEditor } from "@udecode/plate-common/server";
-import { serializeHtml } from "@udecode/plate-serializer-html";
+import { PlateEditor } from "@udecode/plate-common/server";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 
+import { EditableContext } from "~/components/editable-context";
 import { Editor } from "~/components/plate-ui/editor";
 import { FixedToolbar } from "~/components/plate-ui/fixed-toolbar";
 import { FixedToolbarButtons } from "~/components/plate-ui/fixed-toolbar-buttons";
@@ -19,7 +19,7 @@ import { FloatingToolbar } from "~/components/plate-ui/floating-toolbar";
 import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-buttons";
 import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import { api } from "~/trpc/react";
-import { basic_plugins, editor_plugins } from "./plugins";
+import { editor_plugins } from "./plugins";
 import { save_store } from "./save-plugin/save-store";
 import { settings_store } from "./settings-plugins/settings-store";
 
@@ -33,13 +33,11 @@ const INITIAL_VALUE = [
 
 export default function MyEditor({
   article,
-  viewer,
 }: {
   article?: typeof Article.$inferSelect;
-  viewer?: boolean;
 }) {
   const router = useRouter();
-  const settings = settings_store.useStore();
+  const editable = useContext(EditableContext);
   const update_article = api.article.update.useMutation({
     onSuccess: (_, variables) => {
       settings_store.set.settings_open(false);
@@ -90,7 +88,7 @@ export default function MyEditor({
     const image_urls = get_images_from_editor(editor.children);
     settings_store.set.image_urls(image_urls);
 
-    // console.log("Updating", { title, value, new_url, image_urls });
+    console.log("Updating", { title, editor, new_url, image_urls });
 
     /* const html = serializeHtml(temp_editor, {
       nodes: editor.children,
@@ -114,17 +112,19 @@ export default function MyEditor({
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
         <Plate
-          readOnly={viewer}
+          readOnly={editable == "readonly"}
           plugins={editor_plugins(save_callback)}
           initialValue={content}
         >
-          <FixedToolbar className={cn(viewer ? "border-none" : null)}>
+          <FixedToolbar
+            className={cn(editable == "readonly" ? "border-none" : null)}
+          >
             <FixedToolbarButtons />
           </FixedToolbar>
 
           <Editor
-            className={cn(viewer ? "border-none p-0" : null)}
-            readOnly={viewer}
+            className={cn(editable == "readonly" ? "border-none p-0" : null)}
+            readOnly={editable == "readonly"}
           />
 
           <FloatingToolbar>

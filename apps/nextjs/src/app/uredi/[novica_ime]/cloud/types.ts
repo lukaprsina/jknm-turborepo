@@ -5,5 +5,6 @@ export interface CloudPlugin {
   upload_file_callback?: <V extends Value = Value>(
     editor: PlateEditor<V>,
     file: File,
+    article_url: string,
   ) => Promise<void>;
 }

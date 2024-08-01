@@ -24,7 +24,7 @@ export default function EditingButtons({
     <>
       {session?.user ? (
         <>
-          {editable ? (
+          {editable == "readonly" ? (
             <Button
               className="dark:bg-primary/80 dark:text-primary-foreground"
               variant="ghost"

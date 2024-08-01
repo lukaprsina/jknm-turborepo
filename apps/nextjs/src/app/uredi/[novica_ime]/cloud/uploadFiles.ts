@@ -9,10 +9,11 @@ import { KEY_CLOUD } from "./createCloudPlugin";
 export const uploadFile = async <V extends Value = Value>(
   editor: PlateEditor<V>,
   file: File,
+  article_url: string,
 ) => {
   const file_mime = mime.getType(file.name);
   if (file_mime?.includes("image")) {
-    console.log("Uploading image to S3:", file.name);
+    console.log("Uploading image to S3:", `${article_url}/${file.name}`);
   } else {
     alert("Only images are supported.");
     return;
@@ -23,7 +24,10 @@ export const uploadFile = async <V extends Value = Value>(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ filename: file.name, content_type: file.type }),
+    body: JSON.stringify({
+      filename: `${article_url}/${file.name}`,
+      content_type: file.type,
+    }),
   });
 
   if (response.ok) {
@@ -57,6 +61,7 @@ export const uploadFile = async <V extends Value = Value>(
 export const uploadFiles = (
   editor: PlateEditor<Value>,
   files: Iterable<File>,
+  article_url: string,
 ) => {
   const { upload_file_callback } = getPluginOptions<CloudPlugin>(
     editor,
@@ -65,6 +70,6 @@ export const uploadFiles = (
   if (!upload_file_callback) return;
 
   for (const file of files) {
-    void upload_file_callback(editor, file);
+    void upload_file_callback(editor, file, article_url);
   }
 };

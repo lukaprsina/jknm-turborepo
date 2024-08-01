@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       Bucket: env.AWS_BUCKET_NAME,
       Key: filename, //uuidv4(),
       Conditions: [
-        ["content-length-range", 0, 10485760], // up to 10 MB
+        ["content-length-range", 0, 5 * 10485760], // up to 10 MB
         ["starts-with", "$Content-Type", content_type],
       ],
       Fields: {

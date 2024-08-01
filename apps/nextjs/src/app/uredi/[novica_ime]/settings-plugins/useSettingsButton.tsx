@@ -1,20 +1,14 @@
-import type { Value } from "@udecode/plate-common/server";
-import { useEditorRef } from "@udecode/plate-common";
-import { TText } from "@udecode/plate-common/server";
-import { PlateEditor } from "@udecode/plate-core";
+"use client";
 
-import { api } from "~/trpc/react";
+import { useEditorRef } from "@udecode/plate-common";
+
+import { clean_directory } from "~/server/image-s3";
 import { settings_store } from "./settings-store";
 
 export const useSettingsButton = () => {
   const editor = useEditorRef();
 
   return {
-    props: {
-      onClick: () => {},
-      onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-      },
-    },
+    props: {},
   };
 };

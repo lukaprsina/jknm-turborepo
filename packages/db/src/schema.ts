@@ -142,14 +142,15 @@ export const UpdateArticleSchema = createInsertSchema(Article, {
   published: z.boolean().optional(),
   // publishedAt: z.date().optional(),
   contentHtml: z.string(),
-  content: z
+  /* content: z
     .array(
       z.object({
         children: z.array(z.any()),
         type: z.string(),
       }),
     )
-    .optional(),
+    .optional(), */
+  content: z.array(z.any()).optional(),
   previewImage: z.string().max(255),
   imageSizes: z
     .record(

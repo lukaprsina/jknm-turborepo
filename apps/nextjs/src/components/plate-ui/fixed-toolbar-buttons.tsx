@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext } from "react";
 import {
   MARK_BOLD,
@@ -108,12 +110,6 @@ export function FixedToolbarButtons() {
               <TableDropdownMenu />
 
               <EmojiDropdownMenu />
-            </ToolbarGroup>
-
-            <ToolbarGroup>
-              <SaveToolbarButton />
-
-              <SettingsToolbarButton />
 
               <MoreDropdownMenu />
             </ToolbarGroup>
@@ -121,8 +117,12 @@ export function FixedToolbarButtons() {
         )}
 
         <div className="grow" />
-        {editable ? (
+        {editable == "editable" ? (
           <ToolbarGroup noSeparator>
+            <SaveToolbarButton />
+
+            <SettingsToolbarButton />
+
             <ModeDropdownMenu />
           </ToolbarGroup>
         ) : null}

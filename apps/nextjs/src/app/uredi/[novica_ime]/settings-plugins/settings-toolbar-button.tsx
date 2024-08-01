@@ -1,32 +1,32 @@
 import React from "react";
 import { GearIcon } from "@radix-ui/react-icons";
 import { withRef } from "@udecode/cn";
-import { useEditorRef } from "@udecode/plate-common";
-import { serializeHtml } from "@udecode/plate-serializer-html";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { ToolbarButton } from "~/components/plate-ui/toolbar";
-import editor from "../editor";
+import { clean_directory } from "~/server/image-s3";
+import { settings_store } from "./settings-store";
 import { useSettingsButton } from "./useSettingsButton";
 
 export const SettingsToolbarButton = withRef<typeof ToolbarButton>(
   (rest, ref) => {
-    const { props } = useSettingsButton();
-    /* const editor = useEditorRef();
-
-    const html = serializeHtml(editor, {
-      nodes: editor.children,
-      // if you use @udecode/plate-dnd
-      dndWrapper: (props: any) => (
-        <DndProvider backend={HTML5Backend} {...props} />
-      ),
-    }); 
-
-    console.log({ html });*/
-
+    // const { props } = useSettingsButton();
     return (
-      <ToolbarButton ref={ref} tooltip="Settings" {...props} {...rest}>
+      <ToolbarButton
+        ref={ref}
+        tooltip="Settings"
+        onClick={() => {
+          const spliced_urls = settings_store.get
+            .image_urls()
+            .map((image_url) => {
+              // get the last part of the url
+              const parts = image_url.split("/");
+              const filename = parts.slice(-1).join("/");
+              return filename;
+            });
+          clean_directory(settings_store.get.url(), spliced_urls);
+        }}
+        {...rest}
+      >
         <GearIcon />
       </ToolbarButton>
     );

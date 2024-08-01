@@ -38,46 +38,46 @@ export default async function PlatePage({
 
   if (!article_by_url) {
     return (
-      <EditableProvider editable={true}>
-        <Shell>
-          <div className="container h-full min-h-screen pt-8">
-            <ArticleBreadcrumb novica_ime={novica_ime} />
-            <div className="flex h-full w-full items-center justify-center">
-              <Card className="max-w-2xl">
-                <CardHeader>
-                  <CardTitle>
-                    Novička <strong>{novica_ime}</strong> ne obstaja.
-                  </CardTitle>
-                  <CardDescription>
-                    Preverite, če ste vnesli pravilno ime novičke.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  Lahko pa ustvarite novo novičko z imenom{" "}
-                  <strong>{novica_ime}</strong>.
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Button asChild variant="secondary">
-                    <a href="/">Domov</a>
-                  </Button>
-                  <NewArticleLoader children="Ustvari novico" />
-                </CardFooter>
-              </Card>
-            </div>
+      <Shell>
+        <div className="container h-full min-h-screen pt-8">
+          <ArticleBreadcrumb novica_ime={novica_ime} />
+          <div className="flex h-full w-full items-center justify-center">
+            <Card className="max-w-2xl">
+              <CardHeader>
+                <CardTitle>
+                  Novička <strong>{novica_ime}</strong> ne obstaja.
+                </CardTitle>
+                <CardDescription>
+                  Preverite, če ste vnesli pravilno ime novičke.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                Lahko pa ustvarite novo novičko z imenom{" "}
+                <strong>{novica_ime}</strong>.
+              </CardContent>
+              <CardFooter className="flex justify-between">
+                <Button asChild variant="secondary">
+                  <a href="/">Domov</a>
+                </Button>
+                <NewArticleLoader children="Ustvari novico" />
+              </CardFooter>
+            </Card>
           </div>
-        </Shell>
-      </EditableProvider>
+        </div>
+      </Shell>
     );
   }
 
   return (
-    <Shell>
-      <div className="container min-h-screen pt-8">
-        <ArticleBreadcrumb novica_ime={novica_ime} />
-        <MyEditor article={article_by_url} />
-        <SettingsDialog novica_ime={novica_ime} />
-      </div>
-    </Shell>
+    <EditableProvider editable="editable">
+      <Shell>
+        <div className="container min-h-screen pt-8">
+          <ArticleBreadcrumb novica_ime={novica_ime} />
+          <MyEditor article={article_by_url} />
+          <SettingsDialog novica_ime={novica_ime} />
+        </div>
+      </Shell>
+    </EditableProvider>
   );
 }
 
