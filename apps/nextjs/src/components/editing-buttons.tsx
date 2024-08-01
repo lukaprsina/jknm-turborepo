@@ -11,7 +11,13 @@ import { settings_store } from "~/app/uredi/[novica_ime]/settings-plugins/settin
 import { EditableContext } from "~/components/editable-context";
 import NewArticleLoader from "./new-article-loader";
 
-export default function EditingButtons({ session }: { session?: Session }) {
+export default function EditingButtons({
+  session,
+  article_url,
+}: {
+  session?: Session;
+  article_url?: string;
+}) {
   const editable = useContext(EditableContext);
 
   return (
@@ -25,7 +31,7 @@ export default function EditingButtons({ session }: { session?: Session }) {
               size="icon"
               asChild
             >
-              <Link href={`/uredi/${settings_store.get.url()}`}>
+              <Link href={`/uredi/${article_url}`}>
                 <Pencil1Icon />
               </Link>
             </Button>

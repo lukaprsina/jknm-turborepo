@@ -10,6 +10,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { Article } from "@acme/db/schema";
+import { cn } from "@acme/ui";
 
 import { Editor } from "~/components/plate-ui/editor";
 import { FixedToolbar } from "~/components/plate-ui/fixed-toolbar";
@@ -18,7 +19,7 @@ import { FloatingToolbar } from "~/components/plate-ui/floating-toolbar";
 import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-buttons";
 import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import { api } from "~/trpc/react";
-import plugins from "./plugins";
+import { basic_plugins, editor_plugins } from "./plugins";
 import { save_store } from "./save-plugin/save-store";
 import { settings_store } from "./settings-plugins/settings-store";
 
@@ -32,8 +33,10 @@ const INITIAL_VALUE = [
 
 export default function MyEditor({
   article,
+  viewer,
 }: {
   article?: typeof Article.$inferSelect;
+  viewer?: boolean;
 }) {
   const router = useRouter();
   const settings = settings_store.useStore();
@@ -55,18 +58,12 @@ export default function MyEditor({
     [article?.content],
   );
 
-  const temp_editor = useMemo(() => {
+  /* const temp_editor = useMemo(() => {
     return createPlateEditor({
-      // TODO: some plugin is still causing this shit. find out which
-      plugins: plugins(null).filter(
-        (plugin) =>
-          plugin?.key !== "toggle" &&
-          plugin?.key !== "blockSelection" &&
-          plugin?.key !== "p",
-      ),
+      plugins: basic_plugins,
     });
   }, []);
-
+ */
   useEffect(() => {
     /* console.log(
       "setting settings_store from useEffect",
@@ -95,14 +92,14 @@ export default function MyEditor({
 
     // console.log("Updating", { title, value, new_url, image_urls });
 
-    const html = serializeHtml(temp_editor, {
+    /* const html = serializeHtml(temp_editor, {
       nodes: editor.children,
       dndWrapper: (props: any) => (
         <DndProvider context={window} backend={HTML5Backend} {...props} />
       ),
     });
 
-    console.log({ html });
+    console.log({ html }); */
 
     update_article.mutate({
       id: settings_store.get.id(),
@@ -116,18 +113,24 @@ export default function MyEditor({
   return (
     <TooltipProvider>
       <DndProvider backend={HTML5Backend}>
-        <Plate plugins={plugins(save_callback)} initialValue={content}>
-          <FixedToolbar>
+        <Plate
+          readOnly={viewer}
+          plugins={editor_plugins(save_callback)}
+          initialValue={content}
+        >
+          <FixedToolbar className={cn(viewer ? "border-none" : null)}>
             <FixedToolbarButtons />
           </FixedToolbar>
 
-          <Editor />
+          <Editor
+            className={cn(viewer ? "border-none p-0" : null)}
+            readOnly={viewer}
+          />
 
           <FloatingToolbar>
             <FloatingToolbarButtons />
           </FloatingToolbar>
         </Plate>
-        <code>{JSON.stringify(settings, null, 4)}</code>
       </DndProvider>
     </TooltipProvider>
   );

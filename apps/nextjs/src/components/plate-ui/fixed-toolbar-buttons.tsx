@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   MARK_BOLD,
   MARK_CODE,
@@ -25,6 +25,7 @@ import { MediaToolbarButton } from "~/components/plate-ui/media-toolbar-button";
 import { MoreDropdownMenu } from "~/components/plate-ui/more-dropdown-menu";
 import { OutdentToolbarButton } from "~/components/plate-ui/outdent-toolbar-button";
 import { TableDropdownMenu } from "~/components/plate-ui/table-dropdown-menu";
+import { EditableContext } from "../editable-context";
 import { InsertDropdownMenu } from "./insert-dropdown-menu";
 import { MarkToolbarButton } from "./mark-toolbar-button";
 import { ModeDropdownMenu } from "./mode-dropdown-menu";
@@ -33,6 +34,7 @@ import { TurnIntoDropdownMenu } from "./turn-into-dropdown-menu";
 
 export function FixedToolbarButtons() {
   const readOnly = useEditorReadOnly();
+  const editable = useContext(EditableContext);
 
   return (
     <div className="w-full overflow-hidden">
@@ -119,10 +121,11 @@ export function FixedToolbarButtons() {
         )}
 
         <div className="grow" />
-
-        <ToolbarGroup noSeparator>
-          <ModeDropdownMenu />
-        </ToolbarGroup>
+        {editable ? (
+          <ToolbarGroup noSeparator>
+            <ModeDropdownMenu />
+          </ToolbarGroup>
+        ) : null}
       </div>
     </div>
   );

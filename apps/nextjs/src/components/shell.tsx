@@ -29,14 +29,15 @@ import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {
   children: React.ReactNode;
+  article_url?: string;
 }
 
-export function Shell({ children }: ShellProps) {
+export function Shell({ children, article_url }: ShellProps) {
   return (
     <HydrateClient>
       <div className="w-full">
         <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
-          <Header />
+          <Header article_url={article_url} />
         </header>
         <main className="relative w-full">{children}</main>
         <footer className="bottom-0 z-10">
@@ -47,7 +48,7 @@ export function Shell({ children }: ShellProps) {
   );
 }
 
-function Header() {
+function Header({ article_url }: { article_url?: string }) {
   return (
     <div className="container flex items-center justify-between">
       <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
@@ -60,7 +61,7 @@ function Header() {
         />
         <p>Jamarski klub Novo mesto</p>
       </Link>
-      <DesktopHeader />
+      <DesktopHeader article_url={article_url} />
       <Button className="md:hidden">
         <HamburgerMenuIcon />
       </Button>
@@ -68,30 +69,7 @@ function Header() {
   );
 }
 
-function DesktopHeaderLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <NavigationMenuItem>
-      <Link href={href} legacyBehavior passHref>
-        <NavigationMenuLink
-          className={cn(
-            navigationMenuTriggerStyle(),
-            "bg-transparent dark:bg-primary/80 dark:text-primary-foreground",
-          )}
-        >
-          {children}
-        </NavigationMenuLink>
-      </Link>
-    </NavigationMenuItem>
-  );
-}
-
-async function DesktopHeader() {
+async function DesktopHeader({ article_url }: { article_url?: string }) {
   const session = await auth();
 
   return (
@@ -124,7 +102,10 @@ async function DesktopHeader() {
         </NavigationMenuList>
       </NavigationMenu>
       <div className="flex gap-1">
-        <EditingButtons session={session ?? undefined}/>
+        <EditingButtons
+          article_url={article_url}
+          session={session ?? undefined}
+        />
         <Button
           className="dark:bg-primary/80 dark:text-primary-foreground"
           variant="ghost"
@@ -135,6 +116,29 @@ async function DesktopHeader() {
         <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
       </div>
     </div>
+  );
+}
+
+function DesktopHeaderLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <NavigationMenuItem>
+      <Link href={href} legacyBehavior passHref>
+        <NavigationMenuLink
+          className={cn(
+            navigationMenuTriggerStyle(),
+            "bg-transparent dark:bg-primary/80 dark:text-primary-foreground",
+          )}
+        >
+          {children}
+        </NavigationMenuLink>
+      </Link>
+    </NavigationMenuItem>
   );
 }
 
