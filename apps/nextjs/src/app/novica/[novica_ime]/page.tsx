@@ -1,4 +1,4 @@
-import MyEditor from "~/app/uredi/[novica_ime]/editor";
+import MyEditor from "~/app/uredi_old/[novica_ime]/editor";
 import { EditableProvider } from "~/components/editable-context";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";

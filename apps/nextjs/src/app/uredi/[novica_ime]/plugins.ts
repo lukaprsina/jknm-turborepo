@@ -12,8 +12,6 @@ import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 import Warning from "@editorjs/warning";
 
-import { upload_image_by_file, upload_image_by_url } from "./upload-image";
-
 export const EDITOR_JS_PLUGINS: Record<
   string,
   ToolConstructable | ToolSettings

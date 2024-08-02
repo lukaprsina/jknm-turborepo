@@ -7,7 +7,7 @@ import { Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 
-import { settings_store } from "~/app/uredi/[novica_ime]/settings-plugins/settings-store";
+import { settings_store } from "~/app/uredi_old/[novica_ime]/settings-plugins/settings-store";
 import { EditableContext } from "~/components/editable-context";
 import NewArticleLoader from "./new-article-loader";
 

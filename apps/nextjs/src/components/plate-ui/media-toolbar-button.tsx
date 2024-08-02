@@ -9,8 +9,8 @@ import {
   insertMedia,
 } from "@udecode/plate-media";
 
-import { uploadFile } from "~/app/uredi/[novica_ime]/cloud/uploadFiles";
-import { settings_store } from "~/app/uredi/[novica_ime]/settings-plugins/settings-store";
+import { uploadFile } from "~/app/uredi_old/[novica_ime]/cloud/uploadFiles";
+import { settings_store } from "~/app/uredi_old/[novica_ime]/settings-plugins/settings-store";
 import { Icons } from "~/components/icons";
 import { ToolbarButton } from "./toolbar";
 

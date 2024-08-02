@@ -1,158 +1,147 @@
 "use client";
 
-import type { PlateEditor, Value } from "@udecode/plate-common/server";
-import { useContext, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { Plate } from "@udecode/plate-common";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import { useCallback, useEffect, useRef } from "react";
+import EditorJS from "@editorjs/editorjs";
 
-import type { Article } from "@acme/db/schema";
-import { cn } from "@acme/ui";
+import { EDITOR_JS_PLUGINS } from "./plugins";
 
-import { EditableContext } from "~/components/editable-context";
-import { Editor } from "~/components/plate-ui/editor";
-import { FixedToolbar } from "~/components/plate-ui/fixed-toolbar";
-import { FixedToolbarButtons } from "~/components/plate-ui/fixed-toolbar-buttons";
-import { FloatingToolbar } from "~/components/plate-ui/floating-toolbar";
-import { FloatingToolbarButtons } from "~/components/plate-ui/floating-toolbar-buttons";
-import { TooltipProvider } from "~/components/plate-ui/tooltip";
-import { api } from "~/trpc/react";
-import { editor_plugins } from "./plugins";
-import { save_store } from "./save-plugin/save-store";
-import { settings_store } from "./settings-plugins/settings-store";
+export default function Page() {
+  const editorJS = useRef<EditorJS | null>(null);
 
-const INITIAL_VALUE = [
-  {
-    id: "1",
-    type: "h1",
-    children: [{ text: "Neimenovana novička" }],
-  },
-];
-
-export default function MyEditor({
-  article,
-}: {
-  article?: typeof Article.$inferSelect;
-}) {
-  const router = useRouter();
-  const editable = useContext(EditableContext);
-  const update_article = api.article.update.useMutation({
-    onSuccess: (_, variables) => {
-      settings_store.set.settings_open(false);
-      router.replace(`/uredi/${variables.url}`);
-      save_store.set.saving_text(false);
-      save_store.set.dirty(false);
-      // console.log("Article updated", variables);
-    },
-  });
-
-  const content = useMemo(
-    () =>
-      Array.isArray(article?.content) && article.content.length > 0
-        ? article.content
-        : INITIAL_VALUE,
-    [article?.content],
-  );
-
-  /* const temp_editor = useMemo(() => {
-    return createPlateEditor({
-      plugins: basic_plugins,
+  const editor_factory = useCallback(() => {
+    return new EditorJS({
+      holder: "editorjs",
+      tools: EDITOR_JS_PLUGINS,
+      data: default_value,
+      autofocus: true,
     });
   }, []);
- */
+
   useEffect(() => {
-    /* console.log(
-      "setting settings_store from useEffect",
-      article?.title,
-      article?.url,
-    ); */
-    settings_store.set.title(article?.title ?? "Neimenovana novička");
-    settings_store.set.url(article?.url ?? "");
-    settings_store.set.id(article?.id ?? "");
-  }, [article]);
-
-  const save_callback = (editor: PlateEditor) => {
-    const title = get_title_from_editor(editor.children);
-
-    if (!title) {
-      alert(
-        "Naslov ni nastavljen. Naslov mora biti v prvem odstavku in mora biti označen z H1 oznako.",
-      );
-      return;
-    }
-
-    const new_url = title.toLowerCase().replace(/\s/g, "-");
-
-    const image_urls = get_images_from_editor(editor.children);
-    settings_store.set.image_urls(image_urls);
-
-    console.log("Updating", { title, editor, new_url, image_urls });
-
-    /* const html = serializeHtml(temp_editor, {
-      nodes: editor.children,
-      dndWrapper: (props: any) => (
-        <DndProvider context={window} backend={HTML5Backend} {...props} />
-      ),
-    });
-
-    console.log({ html }); */
-
-    update_article.mutate({
-      id: settings_store.get.id(),
-      title,
-      content: editor.children,
-      // contentHtml: html,
-      url: new_url,
-    });
-  };
+    if (editorJS.current != null) return;
+    editorJS.current = editor_factory();
+  }, [editor_factory]);
 
   return (
-    <TooltipProvider>
-      <DndProvider backend={HTML5Backend}>
-        <Plate
-          readOnly={editable == "readonly"}
-          plugins={editor_plugins(save_callback)}
-          initialValue={content}
-        >
-          <FixedToolbar
-            className={cn(editable == "readonly" ? "border-none" : null)}
-          >
-            <FixedToolbarButtons />
-          </FixedToolbar>
-
-          <Editor
-            className={cn(editable == "readonly" ? "border-none p-0" : null)}
-            readOnly={editable == "readonly"}
-          />
-
-          <FloatingToolbar>
-            <FloatingToolbarButtons />
-          </FloatingToolbar>
-        </Plate>
-      </DndProvider>
-    </TooltipProvider>
+    <div className="container mb-4 mt-8 h-full outline outline-1">
+      <div id="editorjs" />
+    </div>
   );
 }
 
-function get_title_from_editor(value: Value) {
-  const possible_h1 = value[0];
-  if (!possible_h1 || possible_h1.type !== "h1") return;
-  if (
-    possible_h1.children.length !== 1 ||
-    typeof possible_h1.children[0]?.text !== "string"
-  )
-    return;
-
-  return possible_h1.children[0].text;
-}
-
-function get_images_from_editor(value: Value) {
-  const image_urls = value
-    .filter((child) => child.type === "img")
-    .map((child) => {
-      return child.url as string;
-    });
-
-  return image_urls;
-}
+const default_value = {
+  time: 1635603431943,
+  blocks: [
+    {
+      id: "sheNwCUP5A",
+      type: "header",
+      data: {
+        text: "Editor.js",
+        level: 2,
+      },
+    },
+    {
+      id: "12iM3lqzcm",
+      type: "paragraph",
+      data: {
+        text: "Hey. Meet the new Editor. On this page you can see it in action — try to edit this text.",
+      },
+    },
+    {
+      id: "fvZGuFXHmK",
+      type: "header",
+      data: {
+        text: "Key features",
+        level: 3,
+      },
+    },
+    {
+      id: "xnPuiC9Z8M",
+      type: "list",
+      data: {
+        style: "unordered",
+        items: [
+          "It is a block-styled editor",
+          "It returns clean data output in JSON",
+          "Designed to be extendable and pluggable with a simple API",
+        ],
+      },
+    },
+    {
+      id: "-MhwnSs3Dw",
+      type: "header",
+      data: {
+        text: "What does it mean «block-styled editor»",
+        level: 3,
+      },
+    },
+    {
+      id: "Ptb9oEioJn",
+      type: "paragraph",
+      data: {
+        text: 'Workspace in classic editors is made of a single contenteditable element, used to create different HTML markups. Editor.js <mark class="cdx-marker">workspace consists of separate Blocks: paragraphs, headings, images, lists, quotes, etc</mark>. Each of them is an independent contenteditable element (or more complex structure) provided by Plugin and united by Editor\'s Core.',
+      },
+    },
+    {
+      id: "-J7nt-Ksnw",
+      type: "paragraph",
+      data: {
+        text: 'There are dozens of <a href="https://github.com/editor-js">ready-to-use Blocks</a> and the <a href="https://editorjs.io/creating-a-block-tool">simple API</a> for creation any Block you need. For example, you can implement Blocks for Tweets, Instagram posts, surveys and polls, CTA-buttons and even games.',
+      },
+    },
+    {
+      id: "SzwhuyoFq6",
+      type: "header",
+      data: {
+        text: "What does it mean clean data output",
+        level: 3,
+      },
+    },
+    {
+      id: "x_p-xddPzV",
+      type: "paragraph",
+      data: {
+        text: "Classic WYSIWYG-editors produce raw HTML-markup with both content data and content appearance. On the contrary, Editor.js outputs JSON object with data of each Block. You can see an example below",
+      },
+    },
+    {
+      id: "6W5e6lkub-",
+      type: "paragraph",
+      data: {
+        text: 'Given data can be used as you want: render with HTML for <code class="inline-code">Web clients</code>, render natively for <code class="inline-code">mobile apps</code>, create markup for <code class="inline-code">Facebook Instant Articles</code> or <code class="inline-code">Google AMP</code>, generate an <code class="inline-code">audio version</code> and so on.',
+      },
+    },
+    {
+      id: "eD2kuEfvgm",
+      type: "paragraph",
+      data: {
+        text: "Clean data is useful to sanitize, validate and process on the backend.",
+      },
+    },
+    {
+      id: "N8bOHTfUCN",
+      type: "delimiter",
+      data: {},
+    },
+    {
+      id: "IpKh1dMyC6",
+      type: "paragraph",
+      data: {
+        text: "We have been working on this project more than three years. Several large media projects help us to test and debug the Editor, to make it's core more stable. At the same time we significantly improved the API. Now, it can be used to create any plugin for any task. Hope you enjoy. 😏",
+      },
+    },
+    {
+      id: "FF1iyF3VwN",
+      type: "image",
+      data: {
+        file: {
+          url: "https://codex.so/public/app/img/external/codex2x.png",
+        },
+        caption: "",
+        withBorder: false,
+        stretched: false,
+        withBackground: false,
+      },
+    },
+  ],
+};
