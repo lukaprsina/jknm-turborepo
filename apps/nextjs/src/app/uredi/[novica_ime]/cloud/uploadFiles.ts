@@ -11,6 +11,7 @@ export const uploadFile = async <V extends Value = Value>(
   file: File,
   article_url: string,
 ) => {
+  console.log("Uploading file:", file.name);
   const file_mime = mime.getType(file.name);
   if (file_mime?.includes("image")) {
     console.log("Uploading image to S3:", `${article_url}/${file.name}`);
@@ -48,13 +49,27 @@ export const uploadFile = async <V extends Value = Value>(
     });
 
     if (uploadResponse.ok) {
-      insertImage(editor, `${url}${fields.key}`);
+      // insertImage(editor, `${url}${fields.key}`);
+      console.log("Uploaded image:", `${url}${fields.key}`);
+      return {
+        success: 1,
+        file: {
+          url: `${url}${fields.key}`,
+        },
+      };
     } else {
       console.error("S3 Upload Error:", uploadResponse);
       alert("Upload failed.");
+      return {
+        success: 0,
+      };
     }
   } else {
+    console.error("Failed to get pre-signed URL.");
     alert("Failed to get pre-signed URL.");
+    return {
+      success: 0,
+    };
   }
 };
 
