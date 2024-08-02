@@ -13,6 +13,7 @@ export default function Page() {
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
       data: default_value,
+      autofocus: true,
     });
   }, []);
 

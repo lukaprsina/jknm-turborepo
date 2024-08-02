@@ -6,7 +6,7 @@ import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import { env } from "~/env";
 
-export async function GET() {
+/* export async function GET() {
   try {
     const client = new S3Client({ region: env.AWS_REGION });
     const response = await client.send(
@@ -16,7 +16,7 @@ export async function GET() {
   } catch (error: unknown) {
     return NextResponse.json({ error });
   }
-}
+} */
 
 export async function POST(request: Request) {
   const { filename, content_type } = (await request.json()) as {
