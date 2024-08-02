@@ -1,6 +1,5 @@
 import type { PlateEditor, Value } from "@udecode/plate-common/server";
 import { getPluginOptions } from "@udecode/plate-common/server";
-import { insertImage } from "@udecode/plate-media";
 import mime from "mime/lite";
 
 import type { CloudPlugin } from "./types";

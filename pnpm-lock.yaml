@@ -254,6 +254,12 @@ importers:
       '@editorjs/checklist':
         specifier: ^1.6.0
         version: 1.6.0
+      '@editorjs/code':
+        specifier: ^2.9.0
+        version: 2.9.0
+      '@editorjs/delimiter':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@editorjs/editorjs':
         specifier: ^2.30.2
         version: 2.30.2
@@ -266,15 +272,30 @@ importers:
       '@editorjs/image':
         specifier: ^2.9.3
         version: 2.9.3
+      '@editorjs/inline-code':
+        specifier: ^1.5.1
+        version: 1.5.1
       '@editorjs/link':
         specifier: ^2.6.2
         version: 2.6.2
       '@editorjs/list':
         specifier: ^1.10.0
         version: 1.10.0
+      '@editorjs/marker':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@editorjs/quote':
         specifier: ^2.6.0
         version: 2.6.0
+      '@editorjs/raw':
+        specifier: ^2.5.0
+        version: 2.5.0
+      '@editorjs/table':
+        specifier: ^2.3.0
+        version: 2.3.0
+      '@editorjs/warning':
+        specifier: ^1.4.0
+        version: 1.4.0
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
         version: 1.1.0(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -494,6 +515,9 @@ importers:
       react-dom:
         specifier: catalog:react18
         version: 18.3.1(react@18.3.1)
+      react-editor-js:
+        specifier: ^2.1.0
+        version: 2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1)
       react-lite-youtube-embed:
         specifier: ^2.4.0
         version: 2.4.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1939,6 +1963,9 @@ packages:
   '@codexteam/icons@0.0.5':
     resolution: {integrity: sha512-s6H2KXhLz2rgbMZSkRm8dsMJvyUNZsEjxobBEg9ztdrb1B2H3pEzY6iTwI4XUPJWJ3c3qRKwV4TrO3J5jUdoQA==}
 
+  '@codexteam/icons@0.0.6':
+    resolution: {integrity: sha512-L7Q5PET8PjKcBT5wp7VR+FCjwCi5PUp7rd/XjsgQ0CI5FJz0DphyHGRILMuDUdCW2MQT9NHbVr4QP31vwAkS/A==}
+
   '@codexteam/icons@0.3.2':
     resolution: {integrity: sha512-P1ep2fHoy0tv4wx85eic+uee5plDnZQ1Qa6gDfv7eHPkCXorMtVqJhzMb75o1izogh6G7380PqmFDXV3bW3Pig==}
 
@@ -1948,6 +1975,12 @@ packages:
 
   '@editorjs/checklist@1.6.0':
     resolution: {integrity: sha512-hRNP36DInr73mSK3noHBQeoQb7DA12ANfqTXufEkTgQzx+k4mRJ0HdeGukTIR4JbwjHJ9ecUBnnQqIEGnxCFEg==}
+
+  '@editorjs/code@2.9.0':
+    resolution: {integrity: sha512-QNOWxF29j6mYl/gM5HJzeGOt3s4laoZCUbuRqj6RkIvLBWMU+ASwjckEiouA61hcYUOMfpw4vQjzhsfC7xm/vA==}
+
+  '@editorjs/delimiter@1.4.0':
+    resolution: {integrity: sha512-i1Wm3UQsVisM7Fh9focJ1a4kX2l7IxO3zrEd+GmYoPVaNwxb/63GLNbGfCCGZBuvUyzeUDnc8cdhD1QQGwUZIg==}
 
   '@editorjs/editorjs@2.30.2':
     resolution: {integrity: sha512-JjtUDs2/aHTEjNZzEf/2cugpIli1+aNeU8mloOd5USbVxv2vC02HTMpv7Vc1UyB7dIuc45JaYSJwgnBZp9duhA==}
@@ -1961,14 +1994,32 @@ packages:
   '@editorjs/image@2.9.3':
     resolution: {integrity: sha512-hBOHuqvL/ovjrns+xLuBh/b3kqABDlLxlByWnSuKnE31O351NDrg9AXrB1yYo0yZerw5V591rP0US3PEzp7CzQ==}
 
+  '@editorjs/inline-code@1.5.1':
+    resolution: {integrity: sha512-XvKpqw9y1bOYgyuVUHGDuu7KlNWCYIXD5uU1Lpc4s4LJ8VN4TjWFGKJ3sS+LR7zzasWe8hu2ffR1JC6MHIS0EQ==}
+
   '@editorjs/link@2.6.2':
     resolution: {integrity: sha512-3cPx6M4ZvwDDvsi0E0fvMR3rvveAV/C0GRo1JLeZJ9cG9QgyoNolj4eu5Eqx3/r1XTC/he54qYEIZ/Dc4Lr4Ow==}
 
   '@editorjs/list@1.10.0':
     resolution: {integrity: sha512-zXCHaNcIscpefnteBOS3x+98f/qBgEVsv+OvtKoTDZipMNqck2uVG+X2qMQr8xcwtJrj9ySX54lUac9FDlAHnA==}
 
+  '@editorjs/marker@1.4.0':
+    resolution: {integrity: sha512-5ipEXfL44jTTRzgNp/p/YjMO7jT08S5z4V8qA3FFJTfdhKgQyM3mvP1zpdYKw47ZZpVWMCncvk5Nto3BxihEtg==}
+
+  '@editorjs/paragraph@2.11.6':
+    resolution: {integrity: sha512-i9B50Ylvh+0ZzUGWIba09PfUXsA00Y//zFZMwqsyaXXKxMluSIJ6ADFJbbK0zaV9Ijx49Xocrlg+CEPRqATk9w==}
+
   '@editorjs/quote@2.6.0':
     resolution: {integrity: sha512-8DiCMBT4n4UDV5bgzvfRH26HmL6YWddGC4+twvjhR+PzX0gwrnY8nFifvro79EeSqxwRtFjjlGnu5I0VTfw5aQ==}
+
+  '@editorjs/raw@2.5.0':
+    resolution: {integrity: sha512-ZOYKgR/sutOXHQ4uaWg8KzZ6yFJZCMTndezlN257GGsQ3Sa3ERcK9wZHKgAMNXaDhdKx9fDuojxRRcYvz6l9aQ==}
+
+  '@editorjs/table@2.3.0':
+    resolution: {integrity: sha512-/dKE6A5FkukX/FpvIyQGsewwXglZk8YbXpEp9vkB6Ec4ETLeGJMxObCcYqbXqVod+IU/a1tFH+j3lsD8ASD41g==}
+
+  '@editorjs/warning@1.4.0':
+    resolution: {integrity: sha512-JMYm3hrmN4/S6aHBHzKsJab9+8AJRPaPh9wDGE6QrVF3dj2fCo/DZcc0MaT5TN4YI5Hu4GKBH52wOKFGOyAuoA==}
 
   '@egjs/hammerjs@2.0.17':
     resolution: {integrity: sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==}
@@ -3759,6 +3810,26 @@ packages:
 
   '@react-dnd/shallowequal@4.0.2':
     resolution: {integrity: sha512-/RVXdLvJxLg4QKvMoM5WlwNR9ViO9z8B/qPcc+C0Sa/teJY7QG7kJ441DwzOjMYEY7GmU4dj5EcGHIkKZiQZCA==}
+
+  '@react-editor-js/client@2.1.0':
+    resolution: {integrity: sha512-X/OwqY2KKUUVIy24zvubHTI4qhiVIWMxGlU/Bc6tkf9gcsWgQjPvn75DwrQ5SIGBOYpSBcHY01JX0RRtJHRumw==}
+    peerDependencies:
+      '@editorjs/editorjs': '*'
+      '@editorjs/paragraph': '*'
+      react: '*'
+
+  '@react-editor-js/core@2.1.0':
+    resolution: {integrity: sha512-6h98D5g2RatdCDQRW/+N+eiMtjoq0n1n02m8oA7FrlEzEaOUyV+J+rmtmRS8OexLVOiNeWaSPDpVJ3MNiVLq8Q==}
+    peerDependencies:
+      '@editorjs/editorjs': '*'
+      react: '*'
+
+  '@react-editor-js/server@2.1.0':
+    resolution: {integrity: sha512-RnTbCmzCHbjcjPNKhr9FaehItHgAZyd47Lq+iIGynFqWSsrwGy46LgOXSvb50DYbwDyT0GtxaXBIk6aiFki1Dg==}
+    peerDependencies:
+      '@editorjs/editorjs': '*'
+      '@editorjs/paragraph': '*'
+      react: '*'
 
   '@react-native-community/cli-clean@13.6.9':
     resolution: {integrity: sha512-7Dj5+4p9JggxuVNOjPbduZBAP1SUgNhLKVw5noBUzT/3ZpUZkDM+RCSwyoyg8xKWoE4OrdUAXwAFlMcFDPKykA==}
@@ -8943,6 +9014,9 @@ packages:
     peerDependencies:
       react: ^18.3.1
 
+  react-editor-js@2.1.0:
+    resolution: {integrity: sha512-unI9D2pTH/2gBenc6LgCXJm8iqnrzB71CHgfjQmaB+lGR0Njx+ZXydgUQm1VofMmvF6vcCNVDE1Eb47zQbm14g==}
+
   react-fast-compare@3.2.2:
     resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
 
@@ -12188,6 +12262,8 @@ snapshots:
 
   '@codexteam/icons@0.0.5': {}
 
+  '@codexteam/icons@0.0.6': {}
+
   '@codexteam/icons@0.3.2': {}
 
   '@cspotcode/source-map-support@0.8.1':
@@ -12197,6 +12273,14 @@ snapshots:
   '@editorjs/checklist@1.6.0':
     dependencies:
       '@codexteam/icons': 0.3.2
+
+  '@editorjs/code@2.9.0':
+    dependencies:
+      '@codexteam/icons': 0.0.5
+
+  '@editorjs/delimiter@1.4.0':
+    dependencies:
+      '@codexteam/icons': 0.0.5
 
   '@editorjs/editorjs@2.30.2': {}
 
@@ -12213,6 +12297,10 @@ snapshots:
     dependencies:
       '@codexteam/icons': 0.3.2
 
+  '@editorjs/inline-code@1.5.1':
+    dependencies:
+      '@codexteam/icons': 0.3.2
+
   '@editorjs/link@2.6.2':
     dependencies:
       '@babel/runtime': 7.24.7
@@ -12222,9 +12310,29 @@ snapshots:
     dependencies:
       '@codexteam/icons': 0.0.4
 
+  '@editorjs/marker@1.4.0':
+    dependencies:
+      '@codexteam/icons': 0.0.5
+
+  '@editorjs/paragraph@2.11.6':
+    dependencies:
+      '@codexteam/icons': 0.0.4
+
   '@editorjs/quote@2.6.0':
     dependencies:
       '@codexteam/icons': 0.0.5
+
+  '@editorjs/raw@2.5.0':
+    dependencies:
+      '@codexteam/icons': 0.0.4
+
+  '@editorjs/table@2.3.0':
+    dependencies:
+      '@codexteam/icons': 0.0.6
+
+  '@editorjs/warning@1.4.0':
+    dependencies:
+      '@codexteam/icons': 0.0.4
 
   '@egjs/hammerjs@2.0.17':
     dependencies:
@@ -14048,6 +14156,25 @@ snapshots:
   '@react-dnd/invariant@4.0.2': {}
 
   '@react-dnd/shallowequal@4.0.2': {}
+
+  '@react-editor-js/client@2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1)':
+    dependencies:
+      '@editorjs/editorjs': 2.30.2
+      '@editorjs/paragraph': 2.11.6
+      '@react-editor-js/core': 2.1.0(@editorjs/editorjs@2.30.2)(react@18.3.1)
+      react: 18.3.1
+
+  '@react-editor-js/core@2.1.0(@editorjs/editorjs@2.30.2)(react@18.3.1)':
+    dependencies:
+      '@editorjs/editorjs': 2.30.2
+      react: 18.3.1
+
+  '@react-editor-js/server@2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1)':
+    dependencies:
+      '@editorjs/editorjs': 2.30.2
+      '@editorjs/paragraph': 2.11.6
+      '@react-editor-js/core': 2.1.0(@editorjs/editorjs@2.30.2)(react@18.3.1)
+      react: 18.3.1
 
   '@react-native-community/cli-clean@13.6.9':
     dependencies:
@@ -20292,6 +20419,16 @@ snapshots:
       loose-envify: 1.4.0
       react: 18.3.1
       scheduler: 0.23.2
+
+  react-editor-js@2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1):
+    dependencies:
+      '@react-editor-js/client': 2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1)
+      '@react-editor-js/core': 2.1.0(@editorjs/editorjs@2.30.2)(react@18.3.1)
+      '@react-editor-js/server': 2.1.0(@editorjs/editorjs@2.30.2)(@editorjs/paragraph@2.11.6)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@editorjs/editorjs'
+      - '@editorjs/paragraph'
+      - react
 
   react-fast-compare@3.2.2: {}
 
