@@ -1,14 +1,13 @@
 "use client";
 
-import type { Value } from "@udecode/plate-common/server";
+import type { PlateEditor, Value } from "@udecode/plate-common/server";
 import { useContext, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Plate } from "@udecode/plate-common";
-import { PlateEditor } from "@udecode/plate-common/server";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-import { Article } from "@acme/db/schema";
+import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 
 import { EditableContext } from "~/components/editable-context";
@@ -50,8 +49,8 @@ export default function MyEditor({
 
   const content = useMemo(
     () =>
-      Array.isArray(article?.content) && article?.content.length > 0
-        ? article?.content
+      Array.isArray(article?.content) && article.content.length > 0
+        ? article.content
         : INITIAL_VALUE,
     [article?.content],
   );
@@ -68,9 +67,9 @@ export default function MyEditor({
       article?.title,
       article?.url,
     ); */
-    settings_store.set.title(article?.title || "Neimenovana novička");
-    settings_store.set.url(article?.url || "");
-    settings_store.set.id(article?.id || "");
+    settings_store.set.title(article?.title ?? "Neimenovana novička");
+    settings_store.set.url(article?.url ?? "");
+    settings_store.set.id(article?.id ?? "");
   }, [article]);
 
   const save_callback = (editor: PlateEditor) => {

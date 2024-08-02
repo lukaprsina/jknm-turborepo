@@ -11,8 +11,6 @@ import { getPluginOptions, useEditorRef } from "@udecode/plate-common";
 import { isHotkey } from "@udecode/plate-common/server";
 import { createPluginFactory } from "@udecode/plate-core";
 
-import { api } from "~/trpc/react";
-import { settings_store } from "../settings-plugins/settings-store";
 import { save_store } from "./save-store";
 
 export const KEY_SAVE = "save";
@@ -29,7 +27,7 @@ export interface SavePlugin {
 
 export const onKeyDownSave =
   <V extends Value = Value, E extends PlateEditor<V> = PlateEditor<V>>(
-    editor: E,
+    _: E,
     { options }: WithPlatePlugin<SavePlugin, V, E>,
   ): KeyboardHandlerReturnType =>
   (event) => {
@@ -77,7 +75,7 @@ export const createSavePlugin = createPluginFactory<SavePlugin>({
 
       save_callback(editor);
       save_store.set.saving(false);
-    }, [saving]);
+    }, [saving, editor, save_callback]);
 
     useEffect(() => {
       if (!autosave_on_before_unload) return;

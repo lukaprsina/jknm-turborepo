@@ -43,7 +43,10 @@ import {
   PlateLeaf,
   someNode,
 } from "@udecode/plate-common";
-import { PlateElement } from "@udecode/plate-common/server";
+import {
+  createDeserializeHtmlPlugin,
+  PlateElement,
+} from "@udecode/plate-common/server";
 import { createDndPlugin } from "@udecode/plate-dnd";
 import { createEmojiPlugin } from "@udecode/plate-emoji";
 import {
@@ -156,6 +159,7 @@ import { TabbableElement } from "../../../components/tabbable-element";
 import { autoformatPlugin } from "./autoformat/autoformatPlugin";
 import { createCloudPlugin } from "./cloud/createCloudPlugin";
 import { uploadFile } from "./cloud/uploadFiles";
+import { createImportExportPlugin } from "./import-export-plugin/import-export-plugin";
 import { createSavePlugin } from "./save-plugin/save-plugin";
 
 const resetBlockTypesCommonRule = {
@@ -322,6 +326,7 @@ const editor_plugins_array = (save_callback: (editor: PlateEditor) => void) => [
   createDeserializeDocxPlugin(),
   createDeserializeCsvPlugin(),
   createDeserializeMdPlugin(),
+  createDeserializeHtmlPlugin(),
 
   // My stuff
   createTrailingBlockPlugin({ options: { type: ELEMENT_PARAGRAPH } }),
@@ -335,7 +340,7 @@ const editor_plugins_array = (save_callback: (editor: PlateEditor) => void) => [
       upload_file_callback: uploadFile,
     },
   }),
-
+  createImportExportPlugin(),
   createTabbablePlugin({
     options: {
       query: (editor) => {

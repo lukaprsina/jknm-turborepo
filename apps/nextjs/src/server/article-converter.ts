@@ -4,8 +4,6 @@ import fs from "node:fs";
 import { finished } from "node:stream/promises";
 import { parse } from "csv-parse";
 
-export const name = "article-converter";
-
 interface CSVType {
   title: string;
   content: string;
@@ -13,27 +11,18 @@ interface CSVType {
   updatedAt: string;
 }
 
-async function main() {
-  const cwd = new URL(".", import.meta.url).pathname.slice(1);
-  console.log({ cwd });
-
+export async function read_articles() {
   const csvData: CSVType[] = [];
 
   await finished(
     fs
-      .createReadStream(`${cwd}../assets/Objave.txt`)
+      .createReadStream(`./assets/Objave.txt`)
       .pipe(parse({ delimiter: "," }))
       .on("data", function (csvrow: string[]) {
-        if (
-          typeof csvrow[2] == "undefined" ||
-          !csvrow[4] ||
-          !csvrow[6] ||
-          !csvrow[8] ||
-          !csvrow[15]
-        )
-          throw new Error("Missing data");
-
-        if (parseInt(csvrow[2]) !== 1) return;
+        if (typeof csvrow[2] == "undefined" || parseInt(csvrow[2]) !== 1)
+          return;
+        if (!csvrow[4] || !csvrow[6] || !csvrow[8] || !csvrow[15])
+          throw new Error("Missing data: " + JSON.stringify(csvrow, null, 2));
 
         csvData.push({
           title: csvrow[4],
@@ -46,12 +35,3 @@ async function main() {
 
   console.log(csvData.slice(0, 3));
 }
-
-await main()
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  })
-  .then(() => {
-    process.exit(0);
-  });

@@ -13,6 +13,10 @@ import { MARK_BG_COLOR, MARK_COLOR } from "@udecode/plate-font";
 import { ListStyleType } from "@udecode/plate-indent-list";
 import { ELEMENT_IMAGE } from "@udecode/plate-media";
 
+import {
+  ExportToolbarButton,
+  ImportToolbarButton,
+} from "~/app/uredi/[novica_ime]/import-export-plugin/import-export-toolbar-button";
 import { SaveToolbarButton } from "~/app/uredi/[novica_ime]/save-plugin/save-toolbar-button";
 import { SettingsToolbarButton } from "~/app/uredi/[novica_ime]/settings-plugins/settings-toolbar-button";
 import { Icons, iconVariants } from "~/components/icons";
@@ -120,6 +124,10 @@ export function FixedToolbarButtons() {
         {editable == "editable" ? (
           <ToolbarGroup noSeparator>
             <SaveToolbarButton />
+
+            <ImportToolbarButton />
+
+            <ExportToolbarButton />
 
             <SettingsToolbarButton />
 
