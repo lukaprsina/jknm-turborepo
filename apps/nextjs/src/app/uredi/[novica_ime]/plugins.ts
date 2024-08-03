@@ -28,7 +28,7 @@ export const EDITOR_JS_PLUGINS: Record<
   marker: Marker,
   list: {
     class: List,
-    inlineToolbar: true,
+    // inlineToolbar: true,
     config: {
       defaultStyle: "unordered",
     },

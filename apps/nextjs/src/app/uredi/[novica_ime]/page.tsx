@@ -20,6 +20,7 @@ import {
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
+import { article_title_to_url } from "./article-title-to-url";
 
 const Editor = dynamic(() => import("./editor"), {
   ssr: false,
@@ -104,8 +105,4 @@ function ArticleBreadcrumb({ novica_ime }: { novica_ime: string }) {
       </BreadcrumbList>
     </Breadcrumb>
   );
-}
-
-export function article_title_to_url(title: string) {
-  return title.toLowerCase().replace(/\s+/g, "-");
 }

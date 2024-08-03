@@ -1,7 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
+import DragDrop from "editorjs-drag-drop";
+import edjsHTML from "editorjs-html";
+import Undo from "editorjs-undo";
 import { SaveIcon, XIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
@@ -20,7 +23,11 @@ import { Button } from "@acme/ui/button";
 import { ToastAction } from "@acme/ui/toast";
 import { useToast } from "@acme/ui/use-toast";
 
+import { api } from "~/trpc/react";
+import { article_title_to_url } from "./article-title-to-url";
 import { EDITOR_JS_PLUGINS } from "./plugins";
+
+const edjsParser = edjsHTML();
 
 export default function MyEditor({
   article,
@@ -30,7 +37,11 @@ export default function MyEditor({
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | null>(null);
 
-  const content = article?.content ?? default_value;
+  const content = useMemo(() => article?.content ?? default_value, [article]);
+
+  useEffect(() => {
+    console.log({ content });
+  }, [content]);
 
   const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({
@@ -39,6 +50,8 @@ export default function MyEditor({
       data: content,
       autofocus: true,
       onReady: () => {
+        new Undo({ editor: editorJS.current });
+        new DragDrop(editorJS.current);
         forceUpdate();
       },
     });
@@ -55,14 +68,21 @@ export default function MyEditor({
 
   return (
     <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full outline outline-1">
-      <MyToolbar editor={editorJS.current ?? undefined} />
+      <MyToolbar article={article} editor={editorJS.current ?? undefined} />
       <div id="editorjs" />
     </div>
   );
 }
 
-function MyToolbar({ editor }: { editor?: EditorJS }) {
+function MyToolbar({
+  editor,
+  article,
+}: {
+  editor?: EditorJS;
+  article?: typeof Article.$inferSelect;
+}) {
   const { toast } = useToast();
+  const article_update = api.article.update.useMutation();
   if (!editor) return null;
 
   return (
@@ -72,13 +92,39 @@ function MyToolbar({ editor }: { editor?: EditorJS }) {
         size="icon"
         onClick={async () => {
           const editor_content = await editor.save();
-          // editor_content.blocks
-          toast({
-            title: "Naslov ni nastavljen",
-            description: "Prva vrstica mora biti H1 naslov.",
-            action: (
-              <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
-            ),
+          const first_block = editor_content.blocks[0];
+          let title: string | undefined = undefined;
+
+          if (first_block?.type === "header") {
+            const first_header = first_block.data as {
+              text: string;
+              level: number;
+            };
+            if (first_header.level === 1) {
+              title = first_header.text.trim();
+            }
+          }
+
+          if (!title) {
+            toast({
+              title: "Naslov ni nastavljen",
+              description: "Prva vrstica mora biti H1 naslov.",
+              action: (
+                <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
+              ),
+            });
+
+            return;
+          }
+
+          const content_html_array = edjsParser.parse(editor_content);
+          console.log({ content_html_array });
+          article_update.mutate({
+            id: article?.id,
+            title,
+            url: article_title_to_url(title),
+            content: editor_content,
+            contentHtml: content_html_array.join("\n"),
           });
         }}
       >
