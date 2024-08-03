@@ -1,3 +1,4 @@
+import type { OutputData } from "@editorjs/editorjs";
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
@@ -93,17 +94,6 @@ export const SessionRelations = relations(Session, ({ one }) => ({
   user: one(User, { fields: [Session.userId], references: [User.id] }),
 }));
 
-export interface ArticleBlockType {
-  id: string;
-  type: string;
-  data: object;
-}
-export interface ArticleContentType {
-  time?: number;
-  blocks: ArticleBlockType[];
-  version?: string;
-}
-
 // My schema below
 export const Article = pgTable("article", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -116,8 +106,8 @@ export const Article = pgTable("article", {
     withTimezone: true,
   }).$onUpdateFn(() => sql`now()`), */
   contentHtml: text("content_html").default(""),
-  content: json("content").$type<ArticleContentType>(),
-  draftContent: json("draft_content").$type<ArticleContentType>(),
+  content: json("content").$type<OutputData>(),
+  draftContent: json("draft_content").$type<OutputData>(),
   previewImage: varchar("preview_image", { length: 255 }),
 });
 

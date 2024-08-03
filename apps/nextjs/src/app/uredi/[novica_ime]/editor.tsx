@@ -18,6 +18,7 @@ import {
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
 import { ToastAction } from "@acme/ui/toast";
+import { useToast } from "@acme/ui/use-toast";
 
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
@@ -61,7 +62,7 @@ export default function MyEditor({
 }
 
 function MyToolbar({ editor }: { editor?: EditorJS }) {
-  // const { toast } = useToast();
+  const { toast } = useToast();
   if (!editor) return null;
 
   return (
@@ -69,15 +70,16 @@ function MyToolbar({ editor }: { editor?: EditorJS }) {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => {
-          // editor.save().then(console.log);
-          /* toast({
+        onClick={async () => {
+          const editor_content = await editor.save();
+          // editor_content.blocks
+          toast({
             title: "Naslov ni nastavljen",
             description: "Prva vrstica mora biti H1 naslov.",
             action: (
               <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
             ),
-          }); */
+          });
         }}
       >
         <SaveIcon />
@@ -90,7 +92,7 @@ function MyToolbar({ editor }: { editor?: EditorJS }) {
 function ClearButton({ editor }: { editor?: EditorJS }) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger asChild>
         <Button variant="ghost" size="icon">
           <XIcon />
         </Button>
