@@ -290,6 +290,9 @@ importers:
       '@editorjs/nested-list':
         specifier: ^1.4.3
         version: 1.4.3
+      '@editorjs/paragraph':
+        specifier: ^2.11.6
+        version: 2.11.6
       '@editorjs/quote':
         specifier: ^2.6.0
         version: 2.6.0

@@ -9,6 +9,7 @@ import Image from "@editorjs/image";
 import InlineCode from "@editorjs/inline-code";
 import List from "@editorjs/list";
 import Marker from "@editorjs/marker";
+import Paragraph from "@editorjs/paragraph";
 import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 import Warning from "@editorjs/warning";
@@ -17,6 +18,7 @@ export const EDITOR_JS_PLUGINS: Record<
   string,
   ToolConstructable | ToolSettings
 > = {
+  paragraph: Paragraph,
   embed: Embed,
   table: {
     class: Table,

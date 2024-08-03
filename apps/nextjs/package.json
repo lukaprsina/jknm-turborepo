@@ -35,6 +35,7 @@
     "@editorjs/list": "^1.10.0",
     "@editorjs/marker": "^1.4.0",
     "@editorjs/nested-list": "^1.4.3",
+    "@editorjs/paragraph": "^2.11.6",
     "@editorjs/quote": "^2.6.0",
     "@editorjs/raw": "^2.5.0",
     "@editorjs/table": "^2.3.0",

@@ -20,7 +20,7 @@ export default async function NovicaPage({
   return (
     <EditableProvider editable="readonly">
       <Shell article_url={decodeURIComponent(novica_ime)}>
-        <div className="container h-full min-h-screen pt-8">
+        <div className="container h-full min-h-screen pt-16">
           <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
             {article_by_url?.contentHtml ? (
               <div

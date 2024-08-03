@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 import DragDrop from "editorjs-drag-drop";
 import edjsHTML from "editorjs-html";
@@ -43,15 +44,22 @@ export default function MyEditor({
   }, [content]);
 
   const editor_factory = useCallback(() => {
+    console.warn("editor_factory");
+
     const temp_editor = new EditorJS({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
       data: content,
       autofocus: true,
       onReady: () => {
-        new Undo({ editor: editorJS.current });
-        new DragDrop(editorJS.current);
-        forceUpdate();
+        setTimeout(() => {
+          new Undo({ editor: editorJS.current });
+          new DragDrop(editorJS.current);
+        }, 500);
+
+        setTimeout(() => {
+          forceUpdate();
+        }, 1000);
       },
     });
 
@@ -75,95 +83,106 @@ export default function MyEditor({
 
 function MyToolbar({
   editor,
-  // article,
+  article,
 }: {
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
 }) {
-  /* const { toast } = useToast();
-  const article_update = api.article.update.useMutation(); */
   if (!editor) return null;
 
   return (
     <div className="flex w-full justify-end space-x-4 p-4">
-      <Button
-        variant="ghost"
-        size="icon"
-        /* onClick={async () => {
-          const editor_content = await editor.save();
-
-          const { title, error } = get_heading_from_editor(editor_content);
-
-          if (error === "NO_HEADING") {
-            toast({
-              title: "Naslov ni nastavljen",
-              description: "Prva vrstica mora biti H1 naslov.",
-              action: (
-                <Button
-                  onClick={() => {
-                    editor.blocks.insert(
-                      "header",
-                      {
-                        type: "header",
-                        data: { text: "Naslov", level: 1 },
-                      },
-                      undefined,
-                      0,
-                      true,
-                      false,
-                    );
-                    // toast.dismiss();
-                  }}
-                >
-                  Dodaj naslov
-                </Button>
-              ),
-            });
-            return;
-          } else if (error === "WRONG_HEADING_LEVEL") {
-            toast({
-              title: "Naslov ni pravilne ravni",
-              description: "Prva vrstica mora biti H1 naslov.",
-              action: (
-                <Button
-                  onClick={() => {
-                    editor.blocks.insert(
-                      "header",
-                      {
-                        type: "header",
-                        data: { text: "Naslov", level: 1 },
-                      },
-                      undefined,
-                      0,
-                      true,
-                      false,
-                    );
-                  }}
-                >
-                  Dodaj naslov
-                </Button>
-              ),
-            });
-            return;
-          }
-
-          if (!title) return;
-
-          const content_html_array = edjsParser.parse(editor_content);
-
-          article_update.mutate({
-            id: article?.id,
-            title,
-            url: article_title_to_url(title),
-            content: editor_content,
-            contentHtml: content_html_array.join("\n"),
-          });
-        }} */
-      >
-        <SaveIcon />
-      </Button>
+      <SaveButton editor={editor} article={article} />
       <ClearButton editor={editor} />
     </div>
+  );
+}
+
+function SaveButton({
+  editor,
+  article,
+}: {
+  editor: EditorJS;
+  article?: typeof Article.$inferSelect;
+}) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const article_update = api.article.update.useMutation({
+    onSuccess: (_, variables) => {
+      router.replace(`/uredi/${variables.url}`);
+    },
+  });
+
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={async () => {
+        const editor_content = await editor.save();
+
+        const { title, error } = get_heading_from_editor(editor_content);
+
+        if (error === "NO_HEADING") {
+          toast({
+            title: "Naslov ni nastavljen",
+            description: "Prva vrstica mora biti H1 naslov.",
+            action: (
+              <Button
+                onClick={() => {
+                  editor.blocks.insert(
+                    "header",
+                    { text: "Neimenovana novica", level: 1 },
+                    undefined,
+                    0,
+                    true,
+                    false,
+                  );
+                }}
+              >
+                Dodaj naslov
+              </Button>
+            ),
+          });
+          return;
+        } else if (error === "WRONG_HEADING_LEVEL") {
+          toast({
+            title: "Naslov ni pravilne ravni",
+            description: "Prva vrstica mora biti H1 naslov.",
+            action: (
+              <Button
+                onClick={() => {
+                  editor.blocks.insert(
+                    "header",
+                    { text: title ?? "Neimenovana novica", level: 1 },
+                    undefined,
+                    0,
+                    true,
+                    true,
+                  );
+                }}
+              >
+                Popravi naslov
+              </Button>
+            ),
+          });
+          return;
+        }
+
+        if (!title) return;
+
+        const content_html_array = edjsParser.parse(editor_content);
+
+        article_update.mutate({
+          id: article?.id,
+          title,
+          url: article_title_to_url(title),
+          content: editor_content,
+          contentHtml: content_html_array.join("\n"),
+        });
+      }}
+    >
+      <SaveIcon />
+    </Button>
   );
 }
 
