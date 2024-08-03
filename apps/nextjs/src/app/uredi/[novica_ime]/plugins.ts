@@ -1,4 +1,5 @@
 import type { ToolConstructable, ToolSettings } from "@editorjs/editorjs";
+import AttachesTool from "@editorjs/attaches";
 import CheckList from "@editorjs/checklist";
 import Code from "@editorjs/code";
 import Delimiter from "@editorjs/delimiter";
@@ -17,7 +18,13 @@ export const EDITOR_JS_PLUGINS: Record<
   ToolConstructable | ToolSettings
 > = {
   embed: Embed,
-  table: Table,
+  table: {
+    class: Table,
+    // inlineToolbar: true,
+    config: {
+      withHeadings: true,
+    },
+  },
   marker: Marker,
   list: {
     class: List,
@@ -29,6 +36,12 @@ export const EDITOR_JS_PLUGINS: Record<
   warning: Warning,
   code: Code,
   // linkTool: LinkTool,
+  attaches: {
+    class: AttachesTool,
+    config: {
+      endpoint: "/api/upload_file",
+    },
+  },
   image: {
     class: Image,
     config: {

@@ -1,7 +1,6 @@
 "use client";
 
-import { ForwardRefExoticComponent, RefAttributes } from "react";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,

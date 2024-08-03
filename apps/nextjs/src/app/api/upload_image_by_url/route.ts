@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server";
 import mime from "mime/lite";
 
-import { upload_image } from "~/server/upload-image";
+import { upload_file_to_s3 } from "~/server/upload-file-to-s3";
 
 export async function POST(request: Request) {
   const request_json = (await request.json()) as { url?: string };
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     return;
   }
 
-  const image_url = await upload_image(file);
+  const image_url = await upload_file_to_s3(file);
 
   if (image_url) {
     return NextResponse.json({

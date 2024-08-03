@@ -5,7 +5,7 @@ import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import { env } from "~/env";
 
-export async function upload_image(file: File) {
+export async function upload_file_to_s3(file: File) {
   const client = new S3Client({ region: env.AWS_REGION });
   const { url, fields } = await createPresignedPost(client, {
     Bucket: env.AWS_BUCKET_NAME,
