@@ -1,37 +1,55 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
 import { SaveIcon, XIcon } from "lucide-react";
 
+import type { Article } from "@acme/db/schema";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
+import { ToastAction } from "@acme/ui/toast";
 
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
-export default function MyEditor() {
+export default function MyEditor({
+  article,
+}: {
+  article?: typeof Article.$inferSelect;
+}) {
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | null>(null);
 
-  const editor_factory = useCallback(async () => {
+  const content = article?.content ?? default_value;
+
+  const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
-      data: default_value,
+      data: content,
       autofocus: true,
+      onReady: () => {
+        forceUpdate();
+      },
     });
-    await temp_editor.isReady;
-    return temp_editor;
-  }, []);
 
-  // ...
+    return temp_editor;
+  }, [content]);
 
   useEffect(() => {
     if (editorJS.current != null) return;
-    const initializeEditor = async () => {
-      const editor = await editor_factory();
-      editorJS.current = editor;
-    };
 
-    void initializeEditor();
+    const temp_editor = editor_factory();
+    editorJS.current = temp_editor;
   }, [editor_factory]);
 
   return (
@@ -43,24 +61,57 @@ export default function MyEditor() {
 }
 
 function MyToolbar({ editor }: { editor?: EditorJS }) {
+  // const { toast } = useToast();
   if (!editor) return null;
 
   return (
-    <div className="flex w-full justify-end space-x-4">
+    <div className="flex w-full justify-end space-x-4 p-4">
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => editor.save().then(console.log)}
+        onClick={() => {
+          // editor.save().then(console.log);
+          /* toast({
+            title: "Naslov ni nastavljen",
+            description: "Prva vrstica mora biti H1 naslov.",
+            action: (
+              <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
+            ),
+          }); */
+        }}
       >
         <SaveIcon />
       </Button>
-      <Button variant="ghost" size="icon" onClick={() => editor.clear()}>
-        <XIcon />
-      </Button>
+      <ClearButton editor={editor} />
     </div>
   );
 }
 
+function ClearButton({ editor }: { editor?: EditorJS }) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger>
+        <Button variant="ghost" size="icon">
+          <XIcon />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Izbriši vsebino</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogDescription>
+          Ste prepričani, da želite izbrisati vsebino?
+        </AlertDialogDescription>
+        <AlertDialogFooter>
+          <AlertDialogAction onClick={() => editor?.clear()}>
+            Izbriši vse
+          </AlertDialogAction>
+          <AlertDialogCancel>Prekliči</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 const default_value = {
   time: 1635603431943,
   blocks: [

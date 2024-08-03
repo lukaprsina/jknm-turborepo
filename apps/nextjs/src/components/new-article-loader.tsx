@@ -14,7 +14,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
 import { api } from "~/trpc/react";
 
-export default function NewArticleLoader(props: ButtonProps) {
+export default function NewArticleLoader({
+  title,
+  url,
+  ...props
+}: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
   const create_article = api.article.create.useMutation({
     onSuccess: (_, variables) => {
@@ -28,11 +32,24 @@ export default function NewArticleLoader(props: ButtonProps) {
         <Button
           {...props}
           onClick={() => {
-            const article_url = `nova-novica-${Date.now()}`;
+            const article_title = title ?? "Nova novica";
+            const article_url = url ?? `nova-novica-${Date.now()}`;
 
             create_article.mutate({
-              title: "Nova novica",
+              title: article_title,
               url: article_url,
+              content: {
+                blocks: [
+                  {
+                    id: "sheNwCUP5A",
+                    type: "header",
+                    data: {
+                      text: article_title,
+                      level: 1,
+                    },
+                  },
+                ],
+              },
             });
           }}
         />

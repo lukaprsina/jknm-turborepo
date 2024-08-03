@@ -1,4 +1,3 @@
-import { TDescendant, TElement, Value } from "@udecode/plate-common/server";
 import { relations, sql } from "drizzle-orm";
 import {
   boolean,
@@ -94,6 +93,17 @@ export const SessionRelations = relations(Session, ({ one }) => ({
   user: one(User, { fields: [Session.userId], references: [User.id] }),
 }));
 
+export interface ArticleBlockType {
+  id: string;
+  type: string;
+  data: object;
+}
+export interface ArticleContentType {
+  time?: number;
+  blocks: ArticleBlockType[];
+  version?: string;
+}
+
 // My schema below
 export const Article = pgTable("article", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -106,10 +116,17 @@ export const Article = pgTable("article", {
     withTimezone: true,
   }).$onUpdateFn(() => sql`now()`), */
   contentHtml: text("content_html").default(""),
-  content: json("content").$type<Value>().default([]),
-  draftContent: json("draft_content").$type<Value>().default([]),
+  content: json("content").$type<ArticleContentType>(),
+  draftContent: json("draft_content").$type<ArticleContentType>(),
   previewImage: varchar("preview_image", { length: 255 }),
-  imageSizes: json("image_sizes"),
+});
+
+const content_zod = z.object({
+  time: z.number().optional(),
+  blocks: z.array(
+    z.object({ id: z.string(), type: z.string(), data: z.record(z.any()) }),
+  ),
+  version: z.string().optional(),
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
@@ -118,52 +135,26 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   published: z.boolean().optional(),
   // publishedAt: z.date().optional(),
   contentHtml: z.string(),
+  content: content_zod,
+  draftContent: content_zod,
   previewImage: z.string().max(255),
-  imageSizes: z
-    .record(
-      z.string(),
-      z.object({
-        width: z.number(),
-        height: z.number(),
-      }),
-    )
-    .optional(),
 }).omit({
   id: true,
   // updatedAt: true,
-  content: true,
-  draftContent: true,
 });
 
 export const UpdateArticleSchema = createInsertSchema(Article, {
-  id: z.string().uuid(),
+  id: z.string().min(1),
   title: z.string().max(255),
   url: z.string().max(255),
   published: z.boolean().optional(),
   // publishedAt: z.date().optional(),
   contentHtml: z.string(),
-  /* content: z
-    .array(
-      z.object({
-        children: z.array(z.any()),
-        type: z.string(),
-      }),
-    )
-    .optional(), */
-  content: z.array(z.any()).optional(),
+  content: content_zod,
+  draftContent: content_zod,
   previewImage: z.string().max(255),
-  imageSizes: z
-    .record(
-      z.string(),
-      z.object({
-        width: z.number(),
-        height: z.number(),
-      }),
-    )
-    .optional(),
 }).omit({
   // updatedAt: true,
-  draftContent: true,
 });
 
 export const CreditedPeople = pgTable("credited_people", {

@@ -32,8 +32,9 @@ interface EditorPageProps {
 }
 
 export default async function EditorPage({
-  params: { novica_ime },
+  params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
+  const novica_ime = decodeURIComponent(novica_ime_raw);
   const article_by_url = await api.article.byUrl({
     url: decodeURIComponent(novica_ime),
   });
@@ -43,7 +44,7 @@ export default async function EditorPage({
       <div className="container mb-4 mt-8 h-full min-h-screen gap-72">
         <ArticleBreadcrumb novica_ime={novica_ime} />
         {article_by_url ? (
-          <Editor />
+          <Editor article={article_by_url} />
         ) : (
           <CreateNewArticle novica_ime={novica_ime} />
         )}
@@ -73,7 +74,11 @@ function CreateNewArticle({ novica_ime }: { novica_ime: string }) {
             <Button asChild variant="secondary">
               <a href="/">Domov</a>
             </Button>
-            <NewArticleLoader children="Ustvari novico" />
+            <NewArticleLoader
+              title={novica_ime}
+              url={article_title_to_url(novica_ime)}
+              children="Ustvari novico"
+            />
           </CardFooter>
         </Card>
       </div>
@@ -99,4 +104,8 @@ function ArticleBreadcrumb({ novica_ime }: { novica_ime: string }) {
       </BreadcrumbList>
     </Breadcrumb>
   );
+}
+
+export function article_title_to_url(title: string) {
+  return title.toLowerCase().replace(/\s+/g, "-");
 }
