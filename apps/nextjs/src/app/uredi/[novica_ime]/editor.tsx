@@ -20,11 +20,10 @@ import {
   AlertDialogTrigger,
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
-import { ToastAction } from "@acme/ui/toast";
 import { useToast } from "@acme/ui/use-toast";
 
 import { api } from "~/trpc/react";
-import { article_title_to_url } from "./article-title-to-url";
+import { article_title_to_url } from "./editor-utils";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
 const edjsParser = edjsHTML();
@@ -91,34 +90,7 @@ function MyToolbar({
         variant="ghost"
         size="icon"
         onClick={async () => {
-          const editor_content = await editor.save();
-          const first_block = editor_content.blocks[0];
-          let title: string | undefined = undefined;
-
-          if (first_block?.type === "header") {
-            const first_header = first_block.data as {
-              text: string;
-              level: number;
-            };
-            if (first_header.level === 1) {
-              title = first_header.text.trim();
-            }
-          }
-
-          if (!title) {
-            toast({
-              title: "Naslov ni nastavljen",
-              description: "Prva vrstica mora biti H1 naslov.",
-              action: (
-                <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
-              ),
-            });
-
-            return;
-          }
-
           const content_html_array = edjsParser.parse(editor_content);
-          console.log({ content_html_array });
           article_update.mutate({
             id: article?.id,
             title,
@@ -160,6 +132,7 @@ function ClearButton({ editor }: { editor?: EditorJS }) {
     </AlertDialog>
   );
 }
+
 const default_value = {
   time: 1635603431943,
   blocks: [

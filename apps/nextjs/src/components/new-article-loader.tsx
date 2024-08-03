@@ -54,7 +54,7 @@ export default function NewArticleLoader({
           }}
         />
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-background">
+      <PopoverContent className="w-80">
         <Card>
           <CardHeader>
             <CardTitle>Ustvarjamo novo novico.</CardTitle>

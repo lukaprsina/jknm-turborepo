@@ -51,7 +51,12 @@ export const EDITOR_JS_PLUGINS: Record<
       },
     },
   },
-  header: Header,
+  header: {
+    class: Header,
+    config: {
+      defaultLevel: 2,
+    },
+  },
   quote: Quote,
   checklist: CheckList,
   delimiter: Delimiter,

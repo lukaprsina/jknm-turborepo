@@ -20,7 +20,7 @@ import {
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
-import { article_title_to_url } from "./article-title-to-url";
+import { article_title_to_url } from "./editor-utils";
 
 const Editor = dynamic(() => import("./editor"), {
   ssr: false,
