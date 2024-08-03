@@ -23,7 +23,7 @@ import { Button } from "@acme/ui/button";
 import { useToast } from "@acme/ui/use-toast";
 
 import { api } from "~/trpc/react";
-import { article_title_to_url } from "./editor-utils";
+import { article_title_to_url, get_heading_from_editor } from "./editor-utils";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
 const edjsParser = edjsHTML();
@@ -75,13 +75,13 @@ export default function MyEditor({
 
 function MyToolbar({
   editor,
-  article,
+  // article,
 }: {
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
 }) {
-  const { toast } = useToast();
-  const article_update = api.article.update.useMutation();
+  /* const { toast } = useToast();
+  const article_update = api.article.update.useMutation(); */
   if (!editor) return null;
 
   return (
@@ -89,8 +89,68 @@ function MyToolbar({
       <Button
         variant="ghost"
         size="icon"
-        onClick={async () => {
+        /* onClick={async () => {
+          const editor_content = await editor.save();
+
+          const { title, error } = get_heading_from_editor(editor_content);
+
+          if (error === "NO_HEADING") {
+            toast({
+              title: "Naslov ni nastavljen",
+              description: "Prva vrstica mora biti H1 naslov.",
+              action: (
+                <Button
+                  onClick={() => {
+                    editor.blocks.insert(
+                      "header",
+                      {
+                        type: "header",
+                        data: { text: "Naslov", level: 1 },
+                      },
+                      undefined,
+                      0,
+                      true,
+                      false,
+                    );
+                    // toast.dismiss();
+                  }}
+                >
+                  Dodaj naslov
+                </Button>
+              ),
+            });
+            return;
+          } else if (error === "WRONG_HEADING_LEVEL") {
+            toast({
+              title: "Naslov ni pravilne ravni",
+              description: "Prva vrstica mora biti H1 naslov.",
+              action: (
+                <Button
+                  onClick={() => {
+                    editor.blocks.insert(
+                      "header",
+                      {
+                        type: "header",
+                        data: { text: "Naslov", level: 1 },
+                      },
+                      undefined,
+                      0,
+                      true,
+                      false,
+                    );
+                  }}
+                >
+                  Dodaj naslov
+                </Button>
+              ),
+            });
+            return;
+          }
+
+          if (!title) return;
+
           const content_html_array = edjsParser.parse(editor_content);
+
           article_update.mutate({
             id: article?.id,
             title,
@@ -98,7 +158,7 @@ function MyToolbar({
             content: editor_content,
             contentHtml: content_html_array.join("\n"),
           });
-        }}
+        }} */
       >
         <SaveIcon />
       </Button>

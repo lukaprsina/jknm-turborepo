@@ -1,20 +1,26 @@
-import EditorJS from "@editorjs/editorjs";
+import type { OutputData } from "@editorjs/editorjs";
 
-import type { Toast, ToasterToast } from "@acme/ui/use-toast";
-import { ToastAction } from "@acme/ui/toast";
+/* import type { Toast, ToasterToast } from "@acme/ui/use-toast";
+import { ToastAction } from "@acme/ui/toast"; */
 
 export function article_title_to_url(title: string) {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
 
-type ToastType = ({ ...props }: Toast) => {
+/* type ToastType = ({ ...props }: Toast) => {
   id: string;
   dismiss: () => void;
   update: (props: ToasterToast) => void;
-};
+}; */
 
-export async function testing(editor: EditorJS, toast: ToastType) {
-  const editor_content = await editor.save();
+interface HeadingReturnType {
+  title?: string;
+  error?: "NO_HEADING" | "WRONG_HEADING_LEVEL";
+}
+
+export function get_heading_from_editor(
+  editor_content: OutputData /* , toast: ToastType */,
+): HeadingReturnType {
   const first_block = editor_content.blocks[0];
   let title: string | undefined = undefined;
 
@@ -25,28 +31,11 @@ export async function testing(editor: EditorJS, toast: ToastType) {
     };
     if (first_header.level === 1) {
       title = first_header.text.trim();
+      return { title };
     } else {
-      /* toast({
-                title: "Naslov ni nivo H1",
-                description: "Prva vrstica mora biti H1 naslov.",
-                action: (
-                  <ToastAction altText="Spremeni naslov v H1">
-                    Spremeni naslov v H1
-                  </ToastAction>
-                ),
-              }); */
-
-      return;
+      return { error: "WRONG_HEADING_LEVEL" };
     }
   } else {
-    /* toast({
-              title: "Naslov ni nastavljen",
-              description: "Prva vrstica mora biti H1 naslov.",
-              action: (
-                <ToastAction altText="Dodaj naslov">Dodaj naslov</ToastAction>
-              ),
-            }); */
-
-    return;
+    return { error: "NO_HEADING" };
   }
 }
