@@ -1,10 +1,11 @@
 "use client";
 
-import type { Control } from "react-hook-form";
-import type { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from "@acme/ui/button";
 import {
+  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -14,30 +15,44 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 
-import type { form_schema } from "./settings-button";
+export const form_schema = z.object({
+  username: z.string().min(2, {
+    message: "Username must be at least 2 characters.",
+  }),
+});
 
-export function SettingsForm({
-  form_control,
-}: {
-  form_control: Control<z.infer<typeof form_schema>>;
-}) {
+export function SettingsForm({ footer }: { footer: React.ReactNode }) {
+  const form = useForm<z.infer<typeof form_schema>>({
+    resolver: zodResolver(form_schema),
+    defaultValues: {
+      username: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof form_schema>) {
+    console.log(values);
+  }
   return (
-    <>
-      <FormField
-        control={form_control}
-        name="username"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Username</FormLabel>
-            <FormControl>
-              <Input placeholder="shadcn" {...field} />
-            </FormControl>
-            <FormDescription>This is your public display name.</FormDescription>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <Button type="submit">Submit</Button>
-    </>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Username</FormLabel>
+              <FormControl>
+                <Input placeholder="shadcn" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is your public display name.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {footer}
+      </form>
+    </Form>
   );
 }

@@ -1,8 +1,5 @@
 import type EditorJS from "@editorjs/editorjs";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Settings2Icon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -24,47 +21,23 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@acme/ui/drawer";
-import { Form } from "@acme/ui/form";
 
 import { SettingsForm } from "./settings-form";
 
-export const form_schema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
-
 export function SettingsButton({ editor }: { editor: EditorJS }) {
-  const form = useForm<z.infer<typeof form_schema>>({
-    resolver: zodResolver(form_schema),
-    defaultValues: {
-      username: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof form_schema>) {
-    console.log(values, editor.blocks);
-  }
-
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="hidden md:block">
-          <SettingsDialog>
-            <SettingsForm form_control={form.control} />
-          </SettingsDialog>
-        </div>
-        <div className="block md:hidden">
-          <SettingsDrawer>
-            <SettingsForm form_control={form.control} />
-          </SettingsDrawer>
-        </div>
-      </form>
-    </Form>
+    <>
+      <div className="hidden md:block">
+        <SettingsDialog />
+      </div>
+      <div className="block md:hidden">
+        <SettingsDrawer />
+      </div>
+    </>
   );
 }
 
-function SettingsDialog({ children }: { children: React.ReactNode }) {
+function SettingsDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -79,16 +52,19 @@ function SettingsDialog({ children }: { children: React.ReactNode }) {
             Make changes to your profile here. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
-        {children}
-        <DialogFooter>
-          <Button type="submit">Save changes</Button>
-        </DialogFooter>
+        <SettingsForm
+          footer={
+            <DialogFooter>
+              <Button type="submit">Save changes</Button>
+            </DialogFooter>
+          }
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
-function SettingsDrawer({ children }: { children: React.ReactNode }) {
+function SettingsDrawer() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -102,13 +78,16 @@ function SettingsDrawer({ children }: { children: React.ReactNode }) {
             <DrawerTitle>Move Goal</DrawerTitle>
             <DrawerDescription>Set your daily activity goal.</DrawerDescription>
           </DrawerHeader>
-          {children}
-          <DrawerFooter>
-            <Button>Submit</Button>
-            <DrawerClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DrawerClose>
-          </DrawerFooter>
+          <SettingsForm
+            footer={
+              <DrawerFooter>
+                <Button>Submit</Button>
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            }
+          />
         </div>
       </DrawerContent>
     </Drawer>
