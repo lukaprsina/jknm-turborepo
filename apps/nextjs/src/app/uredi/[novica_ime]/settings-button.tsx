@@ -13,6 +13,7 @@ import {
 } from "@acme/ui/dialog";
 
 import {
+  article_title_to_url,
   get_heading_from_editor,
   get_image_urls_from_editor as get_image_data_from_editor,
 } from "./editor-utils";
@@ -45,6 +46,8 @@ export function SettingsDialog({
         <Button
           onClick={async () => {
             const editor_content = await editor.save();
+            settings_store.set.editor_content(editor_content);
+
             const image_data = get_image_data_from_editor(editor_content);
             settings_store.set.image_data(image_data);
 
@@ -55,6 +58,7 @@ export function SettingsDialog({
             }
 
             settings_store.set.title(title);
+            settings_store.set.url(article_title_to_url(title));
           }}
           variant="ghost"
           size="icon"

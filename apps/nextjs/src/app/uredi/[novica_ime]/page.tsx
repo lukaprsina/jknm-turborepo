@@ -36,7 +36,7 @@ export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
   const novica_ime = decodeURIComponent(novica_ime_raw);
-  const article_by_url = await api.article.byUrl({
+  const article_by_url = await api.article.byUrlProtected({
     url: decodeURIComponent(novica_ime),
   });
 

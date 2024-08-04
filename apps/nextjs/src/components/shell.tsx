@@ -1,14 +1,9 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  HamburgerMenuIcon,
-  MagnifyingGlassIcon,
-  Pencil1Icon,
-  PlusIcon,
-} from "@radix-ui/react-icons";
+import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
-import { auth, signOut } from "@acme/auth";
+import { auth } from "@acme/auth";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import {
@@ -172,7 +167,7 @@ async function Footer() {
   const session = await auth();
 
   return (
-    <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
+    <div className="container mb-8 flex flex-col items-start justify-between gap-4 md:flex-row">
       <p>
         Footer Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui
         ducimus ipsa, distinctio quia, tempore sapiente esse aut omnis hic earum
@@ -183,10 +178,11 @@ async function Footer() {
           <Link href="/prijava">Prijava</Link>
         </Button>
       ) : (
-        <form>
-          <Button variant="link" formAction={sign_out}>
-            Odjava
+        <form className="flex gap-6">
+          <Button variant="secondary" asChild>
+            <Link href="/admin">Vse novice</Link>
           </Button>
+          <Button formAction={sign_out}>Odjava</Button>
         </form>
       )}
     </div>

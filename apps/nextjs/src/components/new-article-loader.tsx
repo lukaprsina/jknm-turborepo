@@ -27,7 +27,7 @@ export default function NewArticleLoader({
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.previewImage ?? null);
 
-      router.push(`/uredi/${variables.url}`);
+      router.replace(`/uredi/${variables.url}`);
     },
   });
 

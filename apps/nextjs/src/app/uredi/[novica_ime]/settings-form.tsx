@@ -4,6 +4,7 @@ import type EditorJS from "@editorjs/editorjs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import edjsHTML from "editorjs-html";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -38,7 +39,7 @@ export const form_schema = z.object({
 });
 
 export function SettingsForm({
-  editor,
+  /* editor, */
   article,
 }: {
   editor: EditorJS;
@@ -52,7 +53,14 @@ export function SettingsForm({
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.previewImage ?? null);
 
-      router.replace(`/uredi/${variables.url}`);
+      if (variables.url !== article.url)
+        router.replace(`/uredi/${variables.url}`);
+    },
+  });
+
+  const article_delete = api.article.delete.useMutation({
+    onSuccess: () => {
+      router.replace(`/`);
     },
   });
 
@@ -72,18 +80,53 @@ export function SettingsForm({
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
       previewImage: values.preview_image ?? settings_store.get.preview_image(),
-      // content: article.content,
-      draftContent: article.draftContent,
+      draftContent: settings_store.get.editor_content(),
       updatedAt: new Date(),
     });
   }
 
-  function onDelete(values: z.infer<typeof form_schema>) {
-    console.log(values);
+  function onUnpublish(values: z.infer<typeof form_schema>) {
+    article_update.mutate({
+      id: article.id,
+      published: false,
+      title: values.title ?? settings_store.get.title(),
+      url: values.url ?? settings_store.get.url(),
+      previewImage: values.preview_image ?? settings_store.get.preview_image(),
+      draftContent: settings_store.get.editor_content(),
+      updatedAt: new Date(),
+    });
+  }
+
+  function onDelete(_: z.infer<typeof form_schema>) {
+    if (!article.id) {
+      console.error("Article ID is missing.");
+      return;
+    }
+
+    article_delete.mutate(article.id);
   }
 
   function onPublish(values: z.infer<typeof form_schema>) {
-    console.log(values);
+    const editor_content = settings_store.get.editor_content();
+    if (!editor_content) {
+      console.error("Editor content is missing.");
+      return;
+    }
+
+    const edjsParser = edjsHTML();
+    const content_html_array = edjsParser.parse(editor_content);
+
+    article_update.mutate({
+      id: article.id,
+      published: true,
+      title: values.title ?? settings_store.get.title(),
+      url: values.url ?? settings_store.get.url(),
+      previewImage: values.preview_image ?? settings_store.get.preview_image(),
+      content: settings_store.get.editor_content(),
+      contentHtml: content_html_array.join("\n"),
+      draftContent: settings_store.get.editor_content(),
+      updatedAt: new Date(),
+    });
   }
 
   return (
@@ -156,14 +199,30 @@ export function SettingsForm({
           />
         </div>
         <div className="mt-6 flex flex-col gap-4">
-          <Button onClick={form.handleSubmit(onPublish)} variant="secondary">
+          <Button
+            type="submit"
+            onClick={form.handleSubmit(onPublish)}
+            variant="secondary"
+          >
             Objavi spremembe
           </Button>
-          <Button onClick={form.handleSubmit(onDelete)} variant="secondary">
+          {article.published ? (
+            <Button
+              onClick={form.handleSubmit(onUnpublish)}
+              variant="secondary"
+            >
+              Skrij novičko
+            </Button>
+          ) : null}
+          <Button
+            type="submit"
+            onClick={form.handleSubmit(onDelete)}
+            variant="secondary"
+          >
             Zbriši novičko
           </Button>
           <hr />
-          <Button onClick={form.handleSubmit(onDraftSave)}>
+          <Button type="submit" onClick={form.handleSubmit(onDraftSave)}>
             Shrani osnutek
           </Button>
         </div>

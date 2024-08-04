@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 // @ts-expect-error no types
 import DragDrop from "editorjs-drag-drop";
-import edjsHTML from "editorjs-html";
 // @ts-expect-error no types
 import Undo from "editorjs-undo";
 import { SaveIcon, XIcon } from "lucide-react";
@@ -32,8 +31,6 @@ import { EDITOR_JS_PLUGINS } from "./plugins";
 import { SettingsDialog } from "./settings-button";
 import { settings_store } from "./settings-store";
 
-const edjsParser = edjsHTML();
-
 export default function MyEditor({
   article,
 }: {
@@ -42,7 +39,10 @@ export default function MyEditor({
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | null>(null);
 
-  const content = useMemo(() => article?.content ?? default_value, [article]);
+  const content = useMemo(
+    () => article?.draftContent ?? default_value,
+    [article],
+  );
 
   useEffect(() => {
     console.log({ content });
@@ -119,7 +119,8 @@ function SaveButton({
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.previewImage ?? null);
 
-      router.replace(`/uredi/${variables.url}`);
+      if (variables.url !== article.url)
+        router.replace(`/uredi/${variables.url}`);
     },
   });
 
@@ -129,6 +130,7 @@ function SaveButton({
       size="icon"
       onClick={async () => {
         const editor_content = await editor.save();
+        settings_store.set.editor_content(editor_content);
 
         const { title, error } = get_heading_from_editor(editor_content);
 
@@ -178,14 +180,14 @@ function SaveButton({
 
         if (!title) return;
 
-        // const content_html_array = edjsParser.parse(editor_content);
+        settings_store.set.title(title);
+        settings_store.set.url(article_title_to_url(title));
 
         article_update.mutate({
           id: article.id,
           title,
           url: article_title_to_url(title),
           draftContent: editor_content,
-          // contentHtml: content_html_array.join("\n"),
           previewImage: settings_store.get.preview_image(),
           updatedAt: new Date(),
         });

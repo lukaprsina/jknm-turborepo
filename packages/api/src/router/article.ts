@@ -1,7 +1,7 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { eq } from "@acme/db";
+import { and, desc, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -11,10 +11,19 @@ import {
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
-  all: publicProcedure.query(({ ctx }) => {
+  all: protectedProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
-      // orderBy: desc(Article.publishedAt),
+      orderBy: desc(Article.createdAt),
+      limit: 10,
+    });
+  }),
+
+  allPublished: publicProcedure.query(({ ctx }) => {
+    // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
+    return ctx.db.query.Article.findMany({
+      where: eq(Article.published, true),
+      orderBy: desc(Article.createdAt),
       limit: 10,
     });
   }),
@@ -28,7 +37,7 @@ export const articleRouter = {
       //   .where(eq(schema.post.id, input.id));
 
       return ctx.db.query.Article.findFirst({
-        where: eq(Article.id, input.id),
+        where: and(eq(Article.id, input.id), eq(Article.published, true)),
       });
     }),
 
@@ -40,6 +49,14 @@ export const articleRouter = {
       //   .from(schema.post)
       //   .where(eq(schema.post.id, input.id));
 
+      return ctx.db.query.Article.findFirst({
+        where: and(eq(Article.url, input.url), eq(Article.published, true)),
+      });
+    }),
+
+  byUrlProtected: protectedProcedure
+    .input(z.object({ url: z.string() }))
+    .query(({ ctx, input }) => {
       return ctx.db.query.Article.findFirst({
         where: eq(Article.url, input.url),
       });
