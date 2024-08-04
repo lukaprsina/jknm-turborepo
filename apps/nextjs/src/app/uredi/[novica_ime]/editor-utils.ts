@@ -10,7 +10,7 @@ interface HeadingReturnType {
 }
 
 export function get_heading_from_editor(
-  editor_content: OutputData /* , toast: ToastType */,
+  editor_content: OutputData,
 ): HeadingReturnType {
   const first_block = editor_content.blocks[0];
 
@@ -29,4 +29,25 @@ export function get_heading_from_editor(
   } else {
     return { error: "NO_HEADING" };
   }
+}
+
+export interface ImageData {
+  url: string;
+  width: number;
+  height: number;
+}
+
+export function get_image_urls_from_editor(
+  editor_content: OutputData,
+): ImageData[] {
+  const images: ImageData[] = [];
+
+  for (const block of editor_content.blocks) {
+    if (block.type === "image") {
+      const image_data = block.data as { file: ImageData };
+      images.push(image_data.file);
+    }
+  }
+
+  return images;
 }

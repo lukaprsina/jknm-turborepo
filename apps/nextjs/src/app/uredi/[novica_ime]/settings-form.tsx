@@ -1,12 +1,10 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import type { Control } from "react-hook-form";
+import type { z } from "zod";
 
 import { Button } from "@acme/ui/button";
 import {
-  Form,
   FormControl,
   FormDescription,
   FormField,
@@ -16,45 +14,30 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 
-const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Username must be at least 2 characters.",
-  }),
-});
+import type { form_schema } from "./settings-button";
 
-export function SettingsForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
-
+export function SettingsForm({
+  form_control,
+}: {
+  form_control: Control<z.infer<typeof form_schema>>;
+}) {
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="shadcn" {...field} />
-              </FormControl>
-              <FormDescription>
-                This is your public display name.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
-      </form>
-    </Form>
+    <>
+      <FormField
+        control={form_control}
+        name="username"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Username</FormLabel>
+            <FormControl>
+              <Input placeholder="shadcn" {...field} />
+            </FormControl>
+            <FormDescription>This is your public display name.</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <Button type="submit">Submit</Button>
+    </>
   );
 }
