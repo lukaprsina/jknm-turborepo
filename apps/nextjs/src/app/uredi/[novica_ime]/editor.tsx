@@ -26,6 +26,7 @@ import { useToast } from "@acme/ui/use-toast";
 import { api } from "~/trpc/react";
 import { article_title_to_url, get_heading_from_editor } from "./editor-utils";
 import { EDITOR_JS_PLUGINS } from "./plugins";
+import { SettingsButton } from "./settings-button";
 
 const edjsParser = edjsHTML();
 
@@ -93,6 +94,7 @@ function MyToolbar({
   return (
     <div className="flex w-full justify-end space-x-4 p-4">
       <SaveButton editor={editor} article={article} />
+      <SettingsButton editor={editor} />
       <ClearButton editor={editor} />
     </div>
   );
