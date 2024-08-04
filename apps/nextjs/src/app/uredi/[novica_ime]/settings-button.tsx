@@ -1,30 +1,25 @@
 import type EditorJS from "@editorjs/editorjs";
 import { Settings2Icon } from "lucide-react";
 
+import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
+
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@acme/ui/drawer";
-
+  get_heading_from_editor,
+  get_image_urls_from_editor as get_image_data_from_editor,
+} from "./editor-utils";
 import { SettingsForm } from "./settings-form";
+import { settings_store } from "./settings-store";
 
-export function SettingsButton({ editor }: { editor: EditorJS }) {
+/* export function SettingsButton({ editor }: { editor: EditorJS }) {
   return (
     <>
       <div className="hidden md:block">
@@ -35,36 +30,53 @@ export function SettingsButton({ editor }: { editor: EditorJS }) {
       </div>
     </>
   );
-}
+} */
 
-function SettingsDialog() {
+export function SettingsDialog({
+  editor,
+  article,
+}: {
+  editor: EditorJS;
+  article: typeof Article.$inferInsert;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button
+          onClick={async () => {
+            const editor_content = await editor.save();
+            const image_data = get_image_data_from_editor(editor_content);
+            settings_store.set.image_data(image_data);
+
+            const { title, error } = get_heading_from_editor(editor_content);
+            if (!title || error) {
+              console.error("title not found");
+              return;
+            }
+
+            settings_store.set.title(title);
+          }}
+          variant="ghost"
+          size="icon"
+        >
           <Settings2Icon />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Uredi novičko</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Spremeni naslov, določi naslovno slike, objavi ali shrani kot
+            osnutek.
           </DialogDescription>
         </DialogHeader>
-        <SettingsForm
-          footer={
-            <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter>
-          }
-        />
+        <SettingsForm article={article} />
       </DialogContent>
     </Dialog>
   );
 }
 
-function SettingsDrawer() {
+/* function SettingsDrawer() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -92,4 +104,4 @@ function SettingsDrawer() {
       </DrawerContent>
     </Drawer>
   );
-}
+} */
