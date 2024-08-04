@@ -11,18 +11,17 @@ import {
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
-  all: protectedProcedure.query(({ ctx }) => {
+  all: publicProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
+      where: eq(Article.published, true),
       orderBy: desc(Article.createdAt),
       limit: 10,
     });
   }),
 
-  allPublished: publicProcedure.query(({ ctx }) => {
-    // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
+  allProtected: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.Article.findMany({
-      where: eq(Article.published, true),
       orderBy: desc(Article.createdAt),
       limit: 10,
     });

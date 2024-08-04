@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 
+import { auth } from "@acme/auth";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -36,9 +37,15 @@ export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
   const novica_ime = decodeURIComponent(novica_ime_raw);
-  const article_by_url = await api.article.byUrlProtected({
-    url: decodeURIComponent(novica_ime),
-  });
+  const session = await auth();
+
+  const article_by_url = session
+    ? await api.article.byUrlProtected({
+        url: novica_ime,
+      })
+    : await api.article.byUrl({
+        url: novica_ime,
+      });
 
   return (
     <Shell>

@@ -178,10 +178,7 @@ async function Footer() {
           <Link href="/prijava">Prijava</Link>
         </Button>
       ) : (
-        <form className="flex gap-6">
-          <Button variant="secondary" asChild>
-            <Link href="/admin">Vse novice</Link>
-          </Button>
+        <form>
           <Button formAction={sign_out}>Odjava</Button>
         </form>
       )}

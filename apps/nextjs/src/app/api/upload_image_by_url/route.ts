@@ -22,16 +22,15 @@ export async function POST(request: Request) {
     mime_type = mime.getType(title) ?? "image/*";
   }
 
-  console.log({ response, title, mime_type });
+  // console.log({ response, title, mime_type });
 
   const blob = await response.blob();
   const file = new File([blob], title, { type: mime_type });
 
-  if (mime_type.includes("image")) {
-    console.log("Uploading image to S3:", `${file.name}`);
-  } else {
-    console.log(mime_type);
-    alert("Podprte so samo slike.");
+  const file_mime = mime.getType(file.name);
+
+  if (!file_mime?.includes("image")) {
+    console.warn("Wrong MIME type", file_mime);
     return;
   }
 

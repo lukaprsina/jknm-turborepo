@@ -1,0 +1,2 @@
+ko si prijavljen, shrani content_draft_html
+zraven naslovov pokaži badge DRAFT

@@ -1,3 +1,4 @@
+import { auth } from "@acme/auth";
 import { Card, CardHeader } from "@acme/ui/card";
 
 import { EditableProvider } from "~/components/editable-context";
@@ -11,15 +12,22 @@ interface NovicaProps {
 }
 
 export default async function NovicaPage({
-  params: { novica_ime },
+  params: { novica_ime: novica_ime_raw },
 }: NovicaProps) {
-  const article_by_url = await api.article.byUrl({
-    url: decodeURIComponent(novica_ime),
-  });
+  const novica_ime = decodeURIComponent(novica_ime_raw);
+  const session = await auth();
+
+  const article_by_url = session
+    ? await api.article.byUrlProtected({
+        url: novica_ime,
+      })
+    : await api.article.byUrl({
+        url: novica_ime,
+      });
 
   return (
     <EditableProvider editable="readonly">
-      <Shell article_url={decodeURIComponent(novica_ime)}>
+      <Shell article_url={novica_ime}>
         <div className="container h-full min-h-screen pt-16">
           <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
             {article_by_url?.contentHtml ? (

@@ -1,6 +1,7 @@
 "use client";
 
 import type EditorJS from "@editorjs/editorjs";
+import type { OutputBlockData } from "@editorjs/editorjs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +27,32 @@ import { Input } from "@acme/ui/input";
 
 import { api } from "~/trpc/react";
 import { settings_store } from "./settings-store";
+
+/* 
+{
+    "type" : "image",
+    "data" : {
+        "file": {
+            "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
+        },
+        "caption" : "Roadster // tesla.com",
+        "withBorder" : false,
+        "withBackground" : false,
+        "stretched" : true
+    }
+}
+     */
+
+const edjsParser = edjsHTML({
+  image: (block: OutputBlockData) => {
+    const image_data = block.data as { file: { url: string }; caption: string };
+
+    return `<figure>
+  <img src="${image_data.file.url}"/>
+  <figcaption>${image_data.caption}</figcaption>
+  </figure>`;
+  },
+});
 
 export const form_schema = z.object({
   /* TODO: message to all zod fields
@@ -113,7 +140,6 @@ export function SettingsForm({
       return;
     }
 
-    const edjsParser = edjsHTML();
     const content_html_array = edjsParser.parse(editor_content);
 
     article_update.mutate({

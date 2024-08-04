@@ -44,13 +44,7 @@ export default function MyEditor({
     [article],
   );
 
-  useEffect(() => {
-    console.log({ content });
-  }, [content]);
-
   const editor_factory = useCallback(() => {
-    console.warn("editor_factory");
-
     const temp_editor = new EditorJS({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,

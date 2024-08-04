@@ -8,9 +8,9 @@ import { upload_file_to_s3 } from "~/server/upload-file-to-s3";
 
 export async function POST(request: Request) {
   const form_data = await request.formData();
-  form_data.forEach((value, key) => {
+  /* form_data.forEach((value, key) => {
     console.log(key, value);
-  });
+  }); */
 
   const file = form_data.get("image");
   if (!(file instanceof File)) return;
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   if (file_mime?.includes("image")) {
     console.log("Uploading image to S3:", `${file.name}`);
   } else {
-    console.log("Wrong MIME type", file_mime);
+    console.warn("Wrong MIME type", file_mime);
     return;
   }
 

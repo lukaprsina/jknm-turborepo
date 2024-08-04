@@ -53,7 +53,7 @@ export function SettingsDialog({
 
             const { title, error } = get_heading_from_editor(editor_content);
             if (!title || error) {
-              console.error("title not found");
+              console.error("Title not found.");
               return;
             }
 

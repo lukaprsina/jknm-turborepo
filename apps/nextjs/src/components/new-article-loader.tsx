@@ -40,22 +40,26 @@ export default function NewArticleLoader({
             const article_title = title ?? "Nova novica";
             const article_url = url ?? `nova-novica-${Date.now()}`;
 
+            const template = {
+              blocks: [
+                {
+                  id: "sheNwCUP5A",
+                  type: "header",
+                  data: {
+                    text: article_title,
+                    level: 1,
+                  },
+                },
+              ],
+            };
+
             article_create.mutate({
               title: article_title,
               url: article_url,
               previewImage: "",
-              draftContent: {
-                blocks: [
-                  {
-                    id: "sheNwCUP5A",
-                    type: "header",
-                    data: {
-                      text: article_title,
-                      level: 1,
-                    },
-                  },
-                ],
-              },
+              contentHtml: "<h1>Nova novica</h1>",
+              content: template,
+              draftContent: template,
             });
           }}
         />
