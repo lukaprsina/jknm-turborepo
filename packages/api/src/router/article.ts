@@ -51,7 +51,7 @@ export const articleRouter = {
       return ctx.db.insert(Article).values(input);
     }),
 
-  update: protectedProcedure
+  save: protectedProcedure
     .input(UpdateArticleSchema)
     .mutation(({ ctx, input }) => {
       if (!input.id) return;

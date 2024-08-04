@@ -1,6 +1,8 @@
 "use client";
 
+import type EditorJS from "@editorjs/editorjs";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -21,38 +23,59 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 
+import { api } from "~/trpc/react";
+import { settings_store } from "./settings-store";
+
 export const form_schema = z.object({
   /* TODO: message to all zod fields
   username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }), */
-  title: z.string().min(2),
-  url: z.string().min(2),
-  published_at: z.date().optional(),
-  updated_at: z.date().optional(),
-  image_url: z.string(),
+  title: z.string().min(2).optional(),
+  url: z.string().min(2).optional(),
+  created_at: z.date().optional(),
+  preview_image: z.string().nullable(),
 });
 
 export function SettingsForm({
+  editor,
   article,
 }: {
+  editor: EditorJS;
   article: typeof Article.$inferInsert;
 }) {
   const [override, setOverride] = useState<boolean>(false);
+  const router = useRouter();
+  const article_update = api.article.save.useMutation({
+    onSuccess: (_, variables) => {
+      settings_store.set.title(variables.title);
+      settings_store.set.url(variables.url);
+      settings_store.set.preview_image(variables.previewImage ?? null);
+
+      router.replace(`/uredi/${variables.url}`);
+    },
+  });
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      title: article.title,
-      url: article.url,
-      published_at: new Date(),
-      updated_at: new Date(),
-      image_url: "https://example.com/image.jpg",
+      title: settings_store.get.title(),
+      url: settings_store.get.url(),
+      preview_image: settings_store.get.preview_image() ?? null,
+      created_at: article.createdAt,
     },
   });
 
   function onDraftSave(values: z.infer<typeof form_schema>) {
-    console.log(values);
+    article_update.mutate({
+      id: article.id,
+      title: values.title ?? settings_store.get.title(),
+      url: values.url ?? settings_store.get.url(),
+      previewImage: values.preview_image ?? settings_store.get.preview_image(),
+      // content: article.content,
+      draftContent: article.draftContent,
+      updatedAt: new Date(),
+    });
   }
 
   function onDelete(values: z.infer<typeof form_schema>) {
@@ -120,26 +143,10 @@ export function SettingsForm({
           <FormField
             disabled={!override}
             control={form.control}
-            name="published_at"
+            name="created_at"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>Čas objave</FormLabel>
-                <FormControl>
-                  <DateTimePicker {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={!override}
-            control={form.control}
-            name="updated_at"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex flex-col">
-                  Zadnja posodobitev
-                </FormLabel>
                 <FormControl>
                   <DateTimePicker {...field} />
                 </FormControl>

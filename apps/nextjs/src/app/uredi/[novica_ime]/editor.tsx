@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 "use client";
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
+// @ts-expect-error no types
 import DragDrop from "editorjs-drag-drop";
 import edjsHTML from "editorjs-html";
+// @ts-expect-error no types
 import Undo from "editorjs-undo";
 import { SaveIcon, XIcon } from "lucide-react";
 
@@ -27,6 +30,7 @@ import { api } from "~/trpc/react";
 import { article_title_to_url, get_heading_from_editor } from "./editor-utils";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 import { SettingsDialog } from "./settings-button";
+import { settings_store } from "./settings-store";
 
 const edjsParser = edjsHTML();
 
@@ -89,7 +93,7 @@ function MyToolbar({
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
 }) {
-  if (!editor) return null;
+  if (!editor || !article) return null;
 
   return (
     <div className="flex w-full justify-end space-x-4 p-4">
@@ -105,12 +109,16 @@ function SaveButton({
   article,
 }: {
   editor: EditorJS;
-  article?: typeof Article.$inferSelect;
+  article: typeof Article.$inferSelect;
 }) {
   const { toast } = useToast();
   const router = useRouter();
-  const article_update = api.article.update.useMutation({
+  const article_update = api.article.save.useMutation({
     onSuccess: (_, variables) => {
+      settings_store.set.title(variables.title);
+      settings_store.set.url(variables.url);
+      settings_store.set.preview_image(variables.previewImage ?? null);
+
       router.replace(`/uredi/${variables.url}`);
     },
   });
@@ -145,7 +153,6 @@ function SaveButton({
               </Button>
             ),
           });
-          return;
         } else if (error === "WRONG_HEADING_LEVEL") {
           toast({
             title: "Naslov ni pravilne ravni",
@@ -167,19 +174,20 @@ function SaveButton({
               </Button>
             ),
           });
-          return;
         }
 
         if (!title) return;
 
-        const content_html_array = edjsParser.parse(editor_content);
+        // const content_html_array = edjsParser.parse(editor_content);
 
         article_update.mutate({
-          id: article?.id,
+          id: article.id,
           title,
           url: article_title_to_url(title),
-          content: editor_content,
-          contentHtml: content_html_array.join("\n"),
+          draftContent: editor_content,
+          // contentHtml: content_html_array.join("\n"),
+          previewImage: settings_store.get.preview_image(),
+          updatedAt: new Date(),
         });
       }}
     >

@@ -114,7 +114,7 @@ export const Article = pgTable("article", {
   updatedAt: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
+  }) /* .$onUpdateFn(() => sql`now()`) */ /* .notNull() */,
   contentHtml: text("content_html").default(""),
   content: json("content").$type<ArticleContentType>(),
   draftContent: json("draft_content").$type<ArticleContentType>(),
@@ -134,13 +134,8 @@ const content_zod = z.object({
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
-  title: z.string().min(2).max(255),
-  url: z.string().min(2).max(255),
-  published: z.boolean().optional(),
-  contentHtml: z.string(),
   content: content_zod,
   draftContent: content_zod,
-  previewImage: z.string().max(255),
 }).omit({
   id: true,
   createdAt: true,
@@ -148,17 +143,11 @@ export const CreateArticleSchema = createInsertSchema(Article, {
 });
 
 export const UpdateArticleSchema = createInsertSchema(Article, {
-  id: z.string().min(1),
-  title: z.string().min(2).max(255),
-  url: z.string().min(2).max(255),
-  published: z.boolean().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-  contentHtml: z.string(),
   content: content_zod,
   draftContent: content_zod,
-  previewImage: z.string().max(255),
-}).omit({});
+}).omit({
+  createdAt: true,
+});
 
 export const CreditedPeople = pgTable("credited_people", {
   id: uuid("id").notNull().primaryKey(),

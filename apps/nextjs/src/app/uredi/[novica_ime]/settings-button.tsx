@@ -70,7 +70,7 @@ export function SettingsDialog({
             osnutek.
           </DialogDescription>
         </DialogHeader>
-        <SettingsForm article={article} />
+        <SettingsForm article={article} editor={editor} />
       </DialogContent>
     </Dialog>
   );

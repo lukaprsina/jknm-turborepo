@@ -12,6 +12,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
+import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
 import { api } from "~/trpc/react";
 
 export default function NewArticleLoader({
@@ -20,8 +21,12 @@ export default function NewArticleLoader({
   ...props
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
-  const create_article = api.article.create.useMutation({
+  const article_create = api.article.create.useMutation({
     onSuccess: (_, variables) => {
+      settings_store.set.title(variables.title);
+      settings_store.set.url(variables.url);
+      settings_store.set.preview_image(variables.previewImage ?? null);
+
       router.push(`/uredi/${variables.url}`);
     },
   });
@@ -35,10 +40,11 @@ export default function NewArticleLoader({
             const article_title = title ?? "Nova novica";
             const article_url = url ?? `nova-novica-${Date.now()}`;
 
-            create_article.mutate({
+            article_create.mutate({
               title: article_title,
               url: article_url,
-              content: {
+              previewImage: "",
+              draftContent: {
                 blocks: [
                   {
                     id: "sheNwCUP5A",
