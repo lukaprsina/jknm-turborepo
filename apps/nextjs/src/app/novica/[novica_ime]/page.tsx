@@ -30,9 +30,11 @@ export default async function NovicaPage({
       <Shell article_url={novica_ime}>
         <div className="container h-full min-h-screen pt-16">
           <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
-            {article_by_url?.contentHtml ? (
+            {article_by_url?.content_html ? (
               <div
-                dangerouslySetInnerHTML={{ __html: article_by_url.contentHtml }}
+                dangerouslySetInnerHTML={{
+                  __html: article_by_url.content_html,
+                }}
               />
             ) : (
               <Card>

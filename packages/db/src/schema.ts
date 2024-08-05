@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -12,26 +12,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-
-export const Post = pgTable("post", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  title: varchar("name", { length: 256 }).notNull(),
-  content: text("content").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", {
-    mode: "date",
-    withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
-});
-
-export const CreatePostSchema = createInsertSchema(Post, {
-  title: z.string().max(256),
-  content: z.string().max(256),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
 
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -110,15 +90,16 @@ export const Article = pgTable("article", {
   title: varchar("title", { length: 255 }).notNull(),
   url: varchar("url", { length: 255 }).notNull().unique(),
   published: boolean("published").default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt", {
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updatedAt", {
     mode: "date",
     withTimezone: true,
   }) /* .$onUpdateFn(() => sql`now()`) */ /* .notNull() */,
-  contentHtml: text("content_html").default(""),
   content: json("content").$type<ArticleContentType>(),
-  draftContent: json("draft_content").$type<ArticleContentType>(),
-  previewImage: varchar("preview_image", { length: 255 }),
+  content_html: text("content_html").default(""),
+  draft_content: json("draft_content").$type<ArticleContentType>(),
+  draft_content_html: text("content_html").default(""),
+  preview_image: varchar("preview_image", { length: 255 }),
 });
 
 const content_zod = z.object({
@@ -135,18 +116,18 @@ const content_zod = z.object({
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   content: content_zod,
-  draftContent: content_zod,
+  draft_content: content_zod,
 }).omit({
   id: true,
-  createdAt: true,
-  updatedAt: true,
+  created_at: true,
+  updated_at: true,
 });
 
 export const UpdateArticleSchema = createInsertSchema(Article, {
   content: content_zod,
-  draftContent: content_zod,
+  draft_content: content_zod,
 }).omit({
-  createdAt: true,
+  created_at: true,
 });
 
 export const CreditedPeople = pgTable("credited_people", {

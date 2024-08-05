@@ -15,14 +15,14 @@ export const articleRouter = {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
       where: eq(Article.published, true),
-      orderBy: desc(Article.createdAt),
+      orderBy: desc(Article.created_at),
       limit: 10,
     });
   }),
 
   allProtected: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.Article.findMany({
-      orderBy: desc(Article.createdAt),
+      orderBy: desc(Article.created_at),
       limit: 10,
     });
   }),

@@ -19,6 +19,7 @@ import { ThemeToggle } from "@acme/ui/theme";
 import logo from "~/../assets/logo.png";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
+import { ShowDraftsCheckbox, ShowDraftsProvider } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
@@ -30,15 +31,17 @@ interface ShellProps {
 export function Shell({ children, article_url }: ShellProps) {
   return (
     <HydrateClient>
-      <div className="w-full">
-        <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
-          <Header article_url={article_url} />
-        </header>
-        <main className="relative w-full">{children}</main>
-        <footer className="bottom-0 z-10">
-          <Footer />
-        </footer>
-      </div>
+      <ShowDraftsProvider>
+        <div className="w-full">
+          <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
+            <Header article_url={article_url} />
+          </header>
+          <main className="relative w-full">{children}</main>
+          <footer className="bottom-0 z-10">
+            <Footer />
+          </footer>
+        </div>
+      </ShowDraftsProvider>
     </HydrateClient>
   );
 }
@@ -109,6 +112,7 @@ async function DesktopHeader({ article_url }: { article_url?: string }) {
           <MagnifyingGlassIcon />
         </Button>
         <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+        <ShowDraftsCheckbox />
       </div>
     </div>
   );

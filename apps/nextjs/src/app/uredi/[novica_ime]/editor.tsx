@@ -40,7 +40,7 @@ export default function MyEditor({
   const editorJS = useRef<EditorJS | null>(null);
 
   const content = useMemo(
-    () => article?.draftContent ?? default_value,
+    () => article?.draft_content ?? default_value,
     [article],
   );
 
@@ -111,7 +111,7 @@ function SaveButton({
     onSuccess: (_, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.previewImage ?? null);
+      settings_store.set.preview_image(variables.preview_image ?? null);
 
       if (variables.url !== article.url)
         router.replace(`/uredi/${variables.url}`);
@@ -181,9 +181,9 @@ function SaveButton({
           id: article.id,
           title,
           url: article_title_to_url(title),
-          draftContent: editor_content,
-          previewImage: settings_store.get.preview_image(),
-          updatedAt: new Date(),
+          draft_content: editor_content,
+          preview_image: settings_store.get.preview_image(),
+          updated_at: new Date(),
         });
       }}
     >

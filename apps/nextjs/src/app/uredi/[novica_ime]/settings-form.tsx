@@ -28,21 +28,6 @@ import { Input } from "@acme/ui/input";
 import { api } from "~/trpc/react";
 import { settings_store } from "./settings-store";
 
-/* 
-{
-    "type" : "image",
-    "data" : {
-        "file": {
-            "url" : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
-        },
-        "caption" : "Roadster // tesla.com",
-        "withBorder" : false,
-        "withBackground" : false,
-        "stretched" : true
-    }
-}
-     */
-
 const edjsParser = edjsHTML({
   image: (block: OutputBlockData) => {
     const image_data = block.data as { file: { url: string }; caption: string };
@@ -78,7 +63,7 @@ export function SettingsForm({
     onSuccess: (_, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.previewImage ?? null);
+      settings_store.set.preview_image(variables.preview_image ?? null);
 
       if (variables.url !== article.url)
         router.replace(`/uredi/${variables.url}`);
@@ -97,7 +82,7 @@ export function SettingsForm({
       title: settings_store.get.title(),
       url: settings_store.get.url(),
       preview_image: settings_store.get.preview_image() ?? null,
-      created_at: article.createdAt,
+      created_at: article.created_at,
     },
   });
 
@@ -106,9 +91,9 @@ export function SettingsForm({
       id: article.id,
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
-      previewImage: values.preview_image ?? settings_store.get.preview_image(),
-      draftContent: settings_store.get.editor_content(),
-      updatedAt: new Date(),
+      preview_image: values.preview_image ?? settings_store.get.preview_image(),
+      draft_content: settings_store.get.editor_content(),
+      updated_at: new Date(),
     });
   }
 
@@ -118,9 +103,9 @@ export function SettingsForm({
       published: false,
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
-      previewImage: values.preview_image ?? settings_store.get.preview_image(),
-      draftContent: settings_store.get.editor_content(),
-      updatedAt: new Date(),
+      preview_image: values.preview_image ?? settings_store.get.preview_image(),
+      draft_content: settings_store.get.editor_content(),
+      updated_at: new Date(),
     });
   }
 
@@ -147,11 +132,11 @@ export function SettingsForm({
       published: true,
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
-      previewImage: values.preview_image ?? settings_store.get.preview_image(),
+      preview_image: values.preview_image ?? settings_store.get.preview_image(),
       content: settings_store.get.editor_content(),
-      contentHtml: content_html_array.join("\n"),
-      draftContent: settings_store.get.editor_content(),
-      updatedAt: new Date(),
+      content_html: content_html_array.join("\n"),
+      draft_content: settings_store.get.editor_content(),
+      updated_at: new Date(),
     });
   }
 
