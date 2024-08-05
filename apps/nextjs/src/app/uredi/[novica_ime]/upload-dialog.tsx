@@ -1,10 +1,7 @@
 "use client";
 
-import type EditorJS from "@editorjs/editorjs";
-import { useRouter } from "next/navigation";
 import { ArrowUpToLineIcon } from "lucide-react";
 
-import type { Article } from "@acme/db/schema";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,55 +15,17 @@ import {
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
 
-import { api } from "~/trpc/react";
-import { edjsParser } from "./editor-utils";
-import { settings_store } from "./settings-store";
+import type { SaveCallbackType } from "./editor";
 
 export function UploadDialog({
-  editor,
-  article,
+  save_callback,
 }: {
-  editor: EditorJS;
-  article: typeof Article.$inferInsert;
+  save_callback: SaveCallbackType;
 }) {
-  const router = useRouter();
-  const article_update = api.article.save.useMutation({
-    onSuccess: (_, variables) => {
-      settings_store.set.title(variables.title);
-      settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? null);
-      /* setSaving(false);
-      setDirty(false); */
-
-      if (variables.url !== article.url)
-        router.replace(`/uredi/${variables.url}`);
-    },
-  });
-
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button
-          onClick={async () => {
-            const content = await editor.save();
-            const html = edjsParser.parse(content).join("\n");
-
-            article_update.mutate({
-              id: article.id,
-              published: true,
-              title: settings_store.get.title(),
-              url: settings_store.get.url(),
-              preview_image: settings_store.get.preview_image(),
-              draft_content: content,
-              draft_content_html: html,
-              content: content,
-              content_html: html,
-              updated_at: new Date(),
-            });
-          }}
-          size="icon"
-          variant="ghost"
-        >
+        <Button size="icon" variant="ghost">
           <ArrowUpToLineIcon />
         </Button>
       </AlertDialogTrigger>
@@ -80,7 +39,16 @@ export function UploadDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction
+            onClick={() =>
+              save_callback({
+                variables: { published: true },
+                update: { draft: true, content: true },
+              })
+            }
+          >
+            Continue
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

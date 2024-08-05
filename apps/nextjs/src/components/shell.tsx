@@ -109,7 +109,7 @@ async function DesktopHeader({ article_url }: { article_url?: string }) {
           variant="ghost"
           size="icon"
         >
-          <SearchIcon size={20} />
+          <SearchIcon size={18} />
         </Button>
         <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
         <ShowDraftsCheckbox />

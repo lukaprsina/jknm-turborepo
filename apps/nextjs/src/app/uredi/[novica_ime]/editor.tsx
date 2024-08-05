@@ -116,6 +116,13 @@ export default function MyEditor({
   );
 }
 
+export interface SaveCallbackProps {
+  variables?: Partial<typeof Article.$inferInsert>;
+  update?: Partial<{ draft: boolean; content: boolean }> | false;
+}
+
+export type SaveCallbackType = (props: SaveCallbackProps) => Promise<void>;
+
 function MyToolbar({
   editor,
   article,
@@ -152,84 +159,100 @@ function MyToolbar({
     };
   });
 
-  const save_callback = useCallback(async () => {
-    if (!editor || !article) return;
-    setSaving(true);
-    const editor_content = await editor.save();
+  const save_callback = useCallback(
+    async ({ variables, update: update_options }: SaveCallbackProps) => {
+      if (!editor || !article) return;
 
-    const { title, error } = get_heading_from_editor(editor_content);
+      setSaving(true);
+      const editor_content = await editor.save();
 
-    if (error === "NO_HEADING") {
-      toast({
-        title: "Naslov ni nastavljen",
-        description: "Prva vrstica mora biti H1 naslov.",
-        action: (
-          <Button
-            onClick={() => {
-              editor.blocks.insert(
-                "header",
-                { text: "Neimenovana novica", level: 1 },
-                undefined,
-                0,
-                true,
-                false,
-              );
-            }}
-          >
-            Dodaj naslov
-          </Button>
-        ),
+      const { title, error } = get_heading_from_editor(editor_content);
+
+      if (error === "NO_HEADING") {
+        toast({
+          title: "Naslov ni nastavljen",
+          description: "Prva vrstica mora biti H1 naslov.",
+          action: (
+            <Button
+              onClick={() => {
+                editor.blocks.insert(
+                  "header",
+                  { text: "Neimenovana novica", level: 1 },
+                  undefined,
+                  0,
+                  true,
+                  false,
+                );
+              }}
+            >
+              Dodaj naslov
+            </Button>
+          ),
+        });
+      } else if (error === "WRONG_HEADING_LEVEL") {
+        toast({
+          title: "Naslov ni pravilne ravni",
+          description: "Prva vrstica mora biti H1 naslov.",
+          action: (
+            <Button
+              onClick={() => {
+                editor.blocks.insert(
+                  "header",
+                  { text: title ?? "Neimenovana novica", level: 1 },
+                  undefined,
+                  0,
+                  true,
+                  true,
+                );
+              }}
+            >
+              Popravi naslov
+            </Button>
+          ),
+        });
+      }
+
+      if (!title) return;
+
+      settings_store.set.title(title);
+      settings_store.set.url(article_title_to_url(title));
+
+      const content = await editor.save();
+      const html = edjsParser.parse(content);
+      if (!update_options) return;
+
+      article_update.mutate({
+        id: article.id,
+        title,
+        url: article_title_to_url(title),
+        draft_content: update_options.draft
+          ? editor_content
+          : article.draft_content,
+        draft_content_html: update_options.draft
+          ? html.join("\n")
+          : article.draft_content_html,
+        content: update_options.content ? editor_content : article.content,
+        content_html: update_options.content
+          ? html.join("\n")
+          : article.content_html,
+        preview_image: settings_store.get.preview_image(),
+        updated_at: new Date(),
+        ...variables,
       });
-    } else if (error === "WRONG_HEADING_LEVEL") {
-      toast({
-        title: "Naslov ni pravilne ravni",
-        description: "Prva vrstica mora biti H1 naslov.",
-        action: (
-          <Button
-            onClick={() => {
-              editor.blocks.insert(
-                "header",
-                { text: title ?? "Neimenovana novica", level: 1 },
-                undefined,
-                0,
-                true,
-                true,
-              );
-            }}
-          >
-            Popravi naslov
-          </Button>
-        ),
-      });
-    }
-
-    if (!title) return;
-
-    settings_store.set.title(title);
-    settings_store.set.url(article_title_to_url(title));
-
-    const content = await editor.save();
-    const html = edjsParser.parse(content);
-
-    article_update.mutate({
-      id: article.id,
-      title,
-      url: article_title_to_url(title),
-      draft_content: editor_content,
-      draft_content_html: html.join("\n"),
-      preview_image: settings_store.get.preview_image(),
-      updated_at: new Date(),
-    });
-  }, [article, article_update, editor, toast]);
+    },
+    [article, article_update, editor, toast],
+  );
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === "s" && event.ctrlKey) {
-        event.preventDefault();
-        void save_callback();
-      }
+      if (!editor || !article) return;
+
+      if (event.key !== "s" || !event.ctrlKey) return;
+
+      event.preventDefault();
+      void save_callback({ update: { draft: true } });
     },
-    [save_callback],
+    [save_callback, article, editor],
   );
 
   if (!editor || !article) return null;
@@ -248,12 +271,16 @@ function MyToolbar({
           <p hidden={!saving} className="h-full pt-3">
             Saving...
           </p>
-          <Button variant="ghost" size="icon" onClick={save_callback}>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => save_callback({ update: { draft: true } })}
+          >
             <SaveIcon />
           </Button>
         </div>
-        <UploadDialog editor={editor} article={article} />
-        <SettingsDialog editor={editor} article={article} />
+        <UploadDialog save_callback={save_callback} />
+        <SettingsDialog article={article} save_callback={save_callback} />
         <ClearButton editor={editor} />
       </div>
     </div>

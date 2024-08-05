@@ -49,7 +49,7 @@ export interface ImageData {
   height: number;
 }
 
-export function get_image_urls_from_editor(
+export function get_image_data_from_editor(
   editor_content: OutputData,
 ): ImageData[] {
   const images: ImageData[] = [];

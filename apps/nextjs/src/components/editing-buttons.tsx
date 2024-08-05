@@ -31,7 +31,7 @@ export default function EditingButtons({
               asChild
             >
               <Link href={`/uredi/${article_url}`}>
-                <PencilIcon size={24} />
+                <PencilIcon size={20} />
               </Link>
             </Button>
           ) : null}

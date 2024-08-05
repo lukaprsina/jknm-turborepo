@@ -1,4 +1,3 @@
-import type EditorJS from "@editorjs/editorjs";
 import { Settings2Icon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
@@ -12,40 +11,21 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
-import {
-  article_title_to_url,
-  get_heading_from_editor,
-  get_image_urls_from_editor as get_image_data_from_editor,
-} from "./editor-utils";
+import type { SaveCallbackType } from "./editor";
 import { SettingsForm } from "./settings-form";
-import { settings_store } from "./settings-store";
 
 export function SettingsDialog({
-  editor,
   article,
+  save_callback,
 }: {
-  editor: EditorJS;
   article: typeof Article.$inferInsert;
+  save_callback: SaveCallbackType;
 }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          onClick={async () => {
-            const editor_content = await editor.save();
-
-            const image_data = get_image_data_from_editor(editor_content);
-            settings_store.set.image_data(image_data);
-
-            const { title, error } = get_heading_from_editor(editor_content);
-            if (!title || error) {
-              console.error("Title not found.");
-              return;
-            }
-
-            settings_store.set.title(title);
-            settings_store.set.url(article_title_to_url(title));
-          }}
+          onClick={() => save_callback({ update: false })}
           variant="ghost"
           size="icon"
         >
@@ -60,7 +40,7 @@ export function SettingsDialog({
             osnutek.
           </DialogDescription>
         </DialogHeader>
-        <SettingsForm article={article} editor={editor} />
+        <SettingsForm article={article} save_callback={save_callback} />
       </DialogContent>
     </Dialog>
   );

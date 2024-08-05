@@ -1,7 +1,6 @@
 "use client";
 
-import type EditorJS from "@editorjs/editorjs";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,8 +22,8 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 
+import type { SaveCallbackType } from "./editor";
 import { api } from "~/trpc/react";
-import { edjsParser } from "./editor-utils";
 import { settings_store } from "./settings-store";
 
 export const form_schema = z.object({
@@ -39,36 +38,20 @@ export const form_schema = z.object({
 });
 
 export function SettingsForm({
-  editor,
   article,
+  save_callback,
 }: {
-  editor: EditorJS;
   article: typeof Article.$inferInsert;
+  save_callback: SaveCallbackType;
 }) {
   const [override, setOverride] = useState<boolean>(false);
   const router = useRouter();
-  const article_update = api.article.save.useMutation({
-    onSuccess: (_, variables) => {
-      settings_store.set.title(variables.title);
-      settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? null);
-
-      if (variables.url !== article.url)
-        router.replace(`/uredi/${variables.url}`);
-    },
-  });
 
   const article_delete = api.article.delete.useMutation({
     onSuccess: () => {
       router.replace(`/`);
     },
   });
-
-  const editor_out = useMemo(async () => {
-    const content = await editor.save();
-    const html = edjsParser.parse(content);
-    return { html: html.join("\n"), content };
-  }, [editor]);
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
@@ -81,31 +64,23 @@ export function SettingsForm({
   });
 
   async function onDraftSave(values: z.infer<typeof form_schema>) {
-    const awaited_out = await editor_out;
-
-    article_update.mutate({
-      id: article.id,
-      title: values.title ?? settings_store.get.title(),
-      url: values.url ?? settings_store.get.url(),
-      preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      draft_content: awaited_out.content,
-      draft_content_html: awaited_out.html,
-      updated_at: new Date(),
+    await save_callback({
+      variables: values,
+      update: { draft: true },
     });
   }
 
   async function onUnpublish(values: z.infer<typeof form_schema>) {
-    const awaited_out = await editor_out;
+    await save_callback({
+      variables: { published: false, ...values },
+      update: { draft: true, content: true },
+    });
+  }
 
-    article_update.mutate({
-      id: article.id,
-      published: false,
-      title: values.title ?? settings_store.get.title(),
-      url: values.url ?? settings_store.get.url(),
-      preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      draft_content: awaited_out.content,
-      draft_content_html: awaited_out.html,
-      updated_at: new Date(),
+  async function onPublish(values: z.infer<typeof form_schema>) {
+    await save_callback({
+      variables: { published: true, ...values },
+      update: { draft: true, content: true },
     });
   }
 
@@ -116,23 +91,6 @@ export function SettingsForm({
     }
 
     article_delete.mutate(article.id);
-  }
-
-  async function onPublish(values: z.infer<typeof form_schema>) {
-    const awaited_out = await editor_out;
-
-    article_update.mutate({
-      id: article.id,
-      published: true,
-      title: values.title ?? settings_store.get.title(),
-      url: values.url ?? settings_store.get.url(),
-      preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      draft_content: awaited_out.content,
-      draft_content_html: awaited_out.html,
-      content: awaited_out.content,
-      content_html: awaited_out.html,
-      updated_at: new Date(),
-    });
   }
 
   return (
