@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
-type ArticleCardProps = {
+interface ArticleCardProps {
   title: string;
   url: string;
   image_url?: string;

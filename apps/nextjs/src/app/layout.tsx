@@ -52,14 +52,8 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TooltipProvider
-            disableHoverableContent
-            delayDuration={500}
-            skipDelayDuration={0}
-          >
-            <TRPCReactProvider>{props.children}</TRPCReactProvider>
-            <Toaster />
-          </TooltipProvider>
+          <TRPCReactProvider>{props.children}</TRPCReactProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>
