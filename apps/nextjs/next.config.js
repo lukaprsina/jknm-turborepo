@@ -14,6 +14,12 @@ const config = {
         port: "",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 

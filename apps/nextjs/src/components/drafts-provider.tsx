@@ -2,6 +2,7 @@
 
 import React, { createContext, useState } from "react";
 
+import { cn } from "@acme/ui";
 import { Badge } from "@acme/ui/badge";
 
 interface ShowDraftsContextProps {
@@ -10,7 +11,7 @@ interface ShowDraftsContextProps {
 }
 
 export const ShowDraftsContext = createContext<ShowDraftsContextProps>({
-  showDrafts: false,
+  showDrafts: true,
   setShowDrafts: () => {
     alert("You forgot to wrap your component in a provider");
   },
@@ -19,21 +20,9 @@ export const ShowDraftsContext = createContext<ShowDraftsContextProps>({
 export function ShowDraftsCheckbox() {
   const { showDrafts, setShowDrafts } = React.useContext(ShowDraftsContext);
 
-  /* return (
-    <Badge className="flex items-center space-x-2">
-      <Checkbox id="show_drafts" />
-      <label
-        htmlFor="show_drafts"
-        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-      >
-        Osnutki
-      </label>
-    </Badge>
-  ); */
-
   return (
     <Badge
-      className="cursor-pointer"
+      className={cn("cursor-pointer", !showDrafts ? "text-background" : "")}
       variant={showDrafts ? "secondary" : "outline"}
       onClick={() => setShowDrafts(!showDrafts)}
     >
@@ -47,7 +36,7 @@ export function ShowDraftsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [showDrafts, setShowDrafts] = useState(false);
+  const [showDrafts, setShowDrafts] = useState(true);
 
   return (
     <ShowDraftsContext.Provider value={{ showDrafts, setShowDrafts }}>

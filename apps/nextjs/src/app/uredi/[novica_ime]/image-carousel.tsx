@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 
-import type { CarouselProps } from "@acme/ui/carousel";
+import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
 import {
   Carousel,
@@ -15,20 +15,15 @@ import {
 import { settings_store } from "./settings-store";
 
 interface ImageCarouselProps {
-  onImageUrlChange(value: string): void;
-  imageUrl: string;
+  onImageUrlChange: (value: string) => void;
+  imageUrl?: string;
 }
 
 const ImageCarousel = React.forwardRef<
-  ImageCarouselProps & React.RefAttributes<HTMLDivElement>,
+  HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & ImageCarouselProps
 >(({ onImageUrlChange, imageUrl, ...props }, ref) => {
   const image_data = settings_store.use.image_data();
-
-  useEffect(() => {
-    console.log(image_data);
-    onImageUrlChange("testing");
-  }, [image_data, onImageUrlChange]);
 
   return (
     <Carousel
@@ -42,14 +37,17 @@ const ImageCarousel = React.forwardRef<
       <CarouselContent>
         {image_data.map((image, index) => (
           <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-            <div className="p-1">
-              <Card>
-                <CardContent className="flex aspect-square items-center justify-center p-6">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.url} alt="Nekaj" />
-                </CardContent>
-              </Card>
-            </div>
+            <Card
+              className={cn(imageUrl === image.url ? "bg-slate-600" : null)}
+              onClick={() => {
+                onImageUrlChange(image.url);
+              }}
+            >
+              <CardContent className="flex aspect-square items-center justify-center p-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image.url} />
+              </CardContent>
+            </Card>
           </CarouselItem>
         ))}
       </CarouselContent>

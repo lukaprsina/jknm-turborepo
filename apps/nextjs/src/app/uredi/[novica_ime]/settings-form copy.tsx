@@ -1,15 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import type { Article } from "@acme/db/schema";
-import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
-import { Checkbox } from "@acme/ui/checkbox";
 import { DateTimePicker } from "@acme/ui/date-time-picker";
 import {
   Form,
@@ -20,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@acme/ui/form";
-import { Input } from "@acme/ui/input";
 
 import type { SaveCallbackType } from "./editor";
 import { api } from "~/trpc/react";
@@ -45,7 +41,6 @@ export function SettingsForm({
   article: typeof Article.$inferInsert;
   save_callback: SaveCallbackType;
 }) {
-  const [override, setOverride] = useState<boolean>(false);
   const router = useRouter();
 
   const article_delete = api.article.delete.useMutation({
@@ -116,59 +111,8 @@ export function SettingsForm({
             </FormItem>
           )}
         />
-        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-          <FormControl>
-            <Checkbox
-              checked={override}
-              onCheckedChange={(checked) => setOverride(checked === true)}
-            />
-          </FormControl>
-          <div className="space-y-1 leading-none">
-            <FormLabel>Omogoči popravljanje polj.</FormLabel>
-            <FormDescription>
-              Obkljukajte, da lahko ročno nastavite spodnja polja.
-            </FormDescription>
-          </div>
-        </FormItem>
-        <div
-          className={cn(
-            "space-y-6 rounded-md p-4 outline outline-1 outline-muted",
-            override || "bg-muted",
-          )}
-        >
+        <div className="space-y-6 rounded-md outline-muted">
           <FormField
-            disabled={!override}
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Naslov</FormLabel>
-                <FormControl>
-                  <Input placeholder={article.title} {...field} />
-                </FormControl>
-                <FormDescription>
-                  Če želite spremeniti naslov, to raje naredite v članku.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={!override}
-            control={form.control}
-            name="url"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>URL</FormLabel>
-                <FormControl>
-                  <Input placeholder={article.url} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            disabled={!override}
             control={form.control}
             name="created_at"
             render={({ field }) => (

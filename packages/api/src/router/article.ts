@@ -64,7 +64,6 @@ export const articleRouter = {
   create: protectedProcedure
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
-      console.log("create input", input);
       return ctx.db.insert(Article).values(input);
     }),
 
@@ -72,7 +71,6 @@ export const articleRouter = {
     .input(UpdateArticleSchema)
     .mutation(({ ctx, input }) => {
       if (!input.id) return;
-      console.log("save input", input);
       return ctx.db.update(Article).set(input).where(eq(Article.id, input.id));
     }),
 
