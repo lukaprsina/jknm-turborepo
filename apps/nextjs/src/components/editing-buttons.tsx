@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import Link from "next/link";
-import { Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
+import { PencilIcon, PlusIcon } from "lucide-react";
 
 import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
@@ -31,7 +31,7 @@ export default function EditingButtons({
               asChild
             >
               <Link href={`/uredi/${article_url}`}>
-                <Pencil1Icon />
+                <PencilIcon size={24} />
               </Link>
             </Button>
           ) : null}
@@ -39,7 +39,7 @@ export default function EditingButtons({
             className="dark:bg-primary/80 dark:text-primary-foreground"
             variant="ghost"
             size="icon"
-            children={<PlusIcon />}
+            children={<PlusIcon size={24} />}
           />
         </>
       ) : null}

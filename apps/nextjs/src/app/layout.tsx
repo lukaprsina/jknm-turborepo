@@ -10,7 +10,6 @@ import { TRPCReactProvider } from "~/trpc/react";
 
 import "~/app/globals.css";
 
-import { TooltipProvider } from "~/components/plate-ui/tooltip";
 import { env } from "~/env";
 
 export const metadata: Metadata = {

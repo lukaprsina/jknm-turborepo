@@ -1,8 +1,20 @@
-import type { OutputData } from "@editorjs/editorjs";
+import type { OutputBlockData, OutputData } from "@editorjs/editorjs";
+import edjsHTML from "editorjs-html";
 
 export function article_title_to_url(title: string) {
   return title.toLowerCase().replace(/\s+/g, "-");
 }
+
+export const edjsParser = edjsHTML({
+  image: (block: OutputBlockData) => {
+    const image_data = block.data as { file: { url: string }; caption: string };
+
+    return `<figure>
+  <img src="${image_data.file.url}"/>
+  <figcaption>${image_data.caption}</figcaption>
+  </figure>`;
+  },
+});
 
 interface HeadingReturnType {
   title?: string;

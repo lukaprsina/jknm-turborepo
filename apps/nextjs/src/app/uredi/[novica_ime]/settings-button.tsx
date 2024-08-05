@@ -20,19 +20,6 @@ import {
 import { SettingsForm } from "./settings-form";
 import { settings_store } from "./settings-store";
 
-/* export function SettingsButton({ editor }: { editor: EditorJS }) {
-  return (
-    <>
-      <div className="hidden md:block">
-        <SettingsDialog />
-      </div>
-      <div className="block md:hidden">
-        <SettingsDrawer />
-      </div>
-    </>
-  );
-} */
-
 export function SettingsDialog({
   editor,
   article,
@@ -46,7 +33,6 @@ export function SettingsDialog({
         <Button
           onClick={async () => {
             const editor_content = await editor.save();
-            settings_store.set.editor_content(editor_content);
 
             const image_data = get_image_data_from_editor(editor_content);
             settings_store.set.image_data(image_data);
@@ -79,33 +65,3 @@ export function SettingsDialog({
     </Dialog>
   );
 }
-
-/* function SettingsDrawer() {
-  return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Settings2Icon />
-        </Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <div className="mx-auto w-full max-w-sm">
-          <DrawerHeader>
-            <DrawerTitle>Move Goal</DrawerTitle>
-            <DrawerDescription>Set your daily activity goal.</DrawerDescription>
-          </DrawerHeader>
-          <SettingsForm
-            footer={
-              <DrawerFooter>
-                <Button>Submit</Button>
-                <DrawerClose asChild>
-                  <Button variant="outline">Cancel</Button>
-                </DrawerClose>
-              </DrawerFooter>
-            }
-          />
-        </div>
-      </DrawerContent>
-    </Drawer>
-  );
-} */

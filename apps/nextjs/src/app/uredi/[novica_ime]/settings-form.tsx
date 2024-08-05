@@ -1,11 +1,9 @@
 "use client";
 
 import type EditorJS from "@editorjs/editorjs";
-import type { OutputBlockData } from "@editorjs/editorjs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import edjsHTML from "editorjs-html";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -26,18 +24,8 @@ import {
 import { Input } from "@acme/ui/input";
 
 import { api } from "~/trpc/react";
+import { edjsParser } from "./editor-utils";
 import { settings_store } from "./settings-store";
-
-const edjsParser = edjsHTML({
-  image: (block: OutputBlockData) => {
-    const image_data = block.data as { file: { url: string }; caption: string };
-
-    return `<figure>
-  <img src="${image_data.file.url}"/>
-  <figcaption>${image_data.caption}</figcaption>
-  </figure>`;
-  },
-});
 
 export const form_schema = z.object({
   /* TODO: message to all zod fields
@@ -51,7 +39,7 @@ export const form_schema = z.object({
 });
 
 export function SettingsForm({
-  /* editor, */
+  editor,
   article,
 }: {
   editor: EditorJS;
@@ -76,6 +64,12 @@ export function SettingsForm({
     },
   });
 
+  const editor_out = useMemo(async () => {
+    const content = await editor.save();
+    const html = edjsParser.parse(content);
+    return { html: html.join("\n"), content };
+  }, [editor]);
+
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
@@ -86,25 +80,31 @@ export function SettingsForm({
     },
   });
 
-  function onDraftSave(values: z.infer<typeof form_schema>) {
+  async function onDraftSave(values: z.infer<typeof form_schema>) {
+    const awaited_out = await editor_out;
+
     article_update.mutate({
       id: article.id,
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
       preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      draft_content: settings_store.get.editor_content(),
+      draft_content: awaited_out.content,
+      draft_content_html: awaited_out.html,
       updated_at: new Date(),
     });
   }
 
-  function onUnpublish(values: z.infer<typeof form_schema>) {
+  async function onUnpublish(values: z.infer<typeof form_schema>) {
+    const awaited_out = await editor_out;
+
     article_update.mutate({
       id: article.id,
       published: false,
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
       preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      draft_content: settings_store.get.editor_content(),
+      draft_content: awaited_out.content,
+      draft_content_html: awaited_out.html,
       updated_at: new Date(),
     });
   }
@@ -118,14 +118,8 @@ export function SettingsForm({
     article_delete.mutate(article.id);
   }
 
-  function onPublish(values: z.infer<typeof form_schema>) {
-    const editor_content = settings_store.get.editor_content();
-    if (!editor_content) {
-      console.error("Editor content is missing.");
-      return;
-    }
-
-    const content_html_array = edjsParser.parse(editor_content);
+  async function onPublish(values: z.infer<typeof form_schema>) {
+    const awaited_out = await editor_out;
 
     article_update.mutate({
       id: article.id,
@@ -133,9 +127,10 @@ export function SettingsForm({
       title: values.title ?? settings_store.get.title(),
       url: values.url ?? settings_store.get.url(),
       preview_image: values.preview_image ?? settings_store.get.preview_image(),
-      content: settings_store.get.editor_content(),
-      content_html: content_html_array.join("\n"),
-      draft_content: settings_store.get.editor_content(),
+      draft_content: awaited_out.content,
+      draft_content_html: awaited_out.html,
+      content: awaited_out.content,
+      content_html: awaited_out.html,
       updated_at: new Date(),
     });
   }

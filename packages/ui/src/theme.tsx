@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { MoonIcon, SunIcon } from "@radix-ui/react-icons";
+import { MoonIcon, SunIcon } from "lucide-react";
 import { ThemeProvider, useTheme } from "next-themes";
 
 import { cn } from ".";
@@ -28,8 +28,14 @@ function ThemeToggle({
           className={cn(className)}
           {...props}
         >
-          <SunIcon className="size-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <MoonIcon className="absolute size-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <SunIcon
+            size={24}
+            className="size-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+          />
+          <MoonIcon
+            size={24}
+            className="absolute size-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+          />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>

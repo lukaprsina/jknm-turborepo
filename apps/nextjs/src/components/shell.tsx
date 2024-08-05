@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { HamburgerMenuIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { MenuIcon, SearchIcon } from "lucide-react";
 
 import { auth } from "@acme/auth";
 import { cn } from "@acme/ui";
@@ -61,7 +61,7 @@ function Header({ article_url }: { article_url?: string }) {
       </Link>
       <DesktopHeader article_url={article_url} />
       <Button className="md:hidden">
-        <HamburgerMenuIcon />
+        <MenuIcon />
       </Button>
     </div>
   );
@@ -109,7 +109,7 @@ async function DesktopHeader({ article_url }: { article_url?: string }) {
           variant="ghost"
           size="icon"
         >
-          <MagnifyingGlassIcon />
+          <SearchIcon size={20} />
         </Button>
         <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
         <ShowDraftsCheckbox />

@@ -25,7 +25,7 @@ export default function NewArticleLoader({
     onSuccess: (_, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.previewImage ?? null);
+      settings_store.set.preview_image(variables.preview_image ?? null);
 
       router.replace(`/uredi/${variables.url}`);
     },
@@ -56,10 +56,9 @@ export default function NewArticleLoader({
             article_create.mutate({
               title: article_title,
               url: article_url,
-              previewImage: "",
-              contentHtml: "<h1>Nova novica</h1>",
-              content: template,
-              draftContent: template,
+              preview_image: "",
+              draft_content_html: "<h1>Nova novica</h1>",
+              draft_content: template,
             });
           }}
         />

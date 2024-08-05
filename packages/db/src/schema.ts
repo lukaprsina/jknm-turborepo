@@ -102,17 +102,19 @@ export const Article = pgTable("article", {
   preview_image: varchar("preview_image", { length: 255 }),
 });
 
-const content_zod = z.object({
-  time: z.number().optional(),
-  blocks: z.array(
-    z.object({
-      id: z.string().optional(),
-      type: z.string(),
-      data: z.record(z.any()),
-    }),
-  ),
-  version: z.string().optional(),
-});
+const content_zod = z
+  .object({
+    time: z.number().optional(),
+    blocks: z.array(
+      z.object({
+        id: z.string().optional(),
+        type: z.string(),
+        data: z.record(z.any()),
+      }),
+    ),
+    version: z.string().optional(),
+  })
+  .optional();
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   content: content_zod,
