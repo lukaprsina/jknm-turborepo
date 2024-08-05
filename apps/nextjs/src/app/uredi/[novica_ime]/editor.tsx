@@ -38,6 +38,7 @@ import {
   article_title_to_url,
   edjsParser,
   get_heading_from_editor,
+  get_image_data_from_editor,
 } from "./editor-utils";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 import { SettingsDialog } from "./settings-button";
@@ -143,11 +144,16 @@ function MyToolbar({
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.preview_image ?? null);
-      setSaving(false);
       setDirty(false);
 
       if (variables.url !== article?.url)
         router.replace(`/uredi/${variables.url}`);
+    },
+    onError: (error) => {
+      console.error("article_update error", error);
+    },
+    onSettled: () => {
+      setSaving(false);
     },
   });
 
@@ -160,11 +166,15 @@ function MyToolbar({
   });
 
   const save_callback = useCallback(
-    async ({ variables, update: update_options }: SaveCallbackProps) => {
+    async ({ variables, update }: SaveCallbackProps) => {
       if (!editor || !article) return;
 
-      setSaving(true);
+      if (update) setSaving(true);
       const editor_content = await editor.save();
+
+      const image_data = get_image_data_from_editor(editor_content);
+      console.log(image_data);
+      settings_store.set.image_data(image_data);
 
       const { title, error } = get_heading_from_editor(editor_content);
 
@@ -219,25 +229,30 @@ function MyToolbar({
 
       const content = await editor.save();
       const html = edjsParser.parse(content);
-      if (!update_options) return;
+
+      if (!update) return;
+
+      const filtered_values = variables
+        ? Object.fromEntries(
+            Object.entries(variables).filter(
+              ([, value]) => typeof value !== "undefined",
+            ),
+          )
+        : undefined;
 
       article_update.mutate({
         id: article.id,
         title,
         url: article_title_to_url(title),
-        draft_content: update_options.draft
-          ? editor_content
-          : article.draft_content,
-        draft_content_html: update_options.draft
+        draft_content: update.draft ? editor_content : article.draft_content,
+        draft_content_html: update.draft
           ? html.join("\n")
           : article.draft_content_html,
-        content: update_options.content ? editor_content : article.content,
-        content_html: update_options.content
-          ? html.join("\n")
-          : article.content_html,
+        content: update.content ? editor_content : article.content,
+        content_html: update.content ? html.join("\n") : article.content_html,
         preview_image: settings_store.get.preview_image(),
         updated_at: new Date(),
-        ...variables,
+        ...filtered_values,
       });
     },
     [article, article_update, editor, toast],

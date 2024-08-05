@@ -71,7 +71,7 @@ async function DesktopHeader({ article_url }: { article_url?: string }) {
   const session = await auth();
 
   return (
-    <div className="flex gap-6">
+    <div className="hidden gap-6 xl:flex">
       <NavigationMenu>
         <NavigationMenuList>
           <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>

@@ -24,6 +24,7 @@ import { Input } from "@acme/ui/input";
 
 import type { SaveCallbackType } from "./editor";
 import { api } from "~/trpc/react";
+import { ImageCarousel } from "./image-carousel";
 import { settings_store } from "./settings-store";
 
 export const form_schema = z.object({
@@ -96,6 +97,22 @@ export function SettingsForm({
   return (
     <Form {...form}>
       <form className="space-y-4">
+        <FormField
+          control={form.control}
+          name="preview_image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Naslovna slika</FormLabel>
+              <FormDescription>
+                Izberite naslovno sliko za novičko.
+              </FormDescription>
+              <FormControl>
+                <ImageCarousel {...field} a={field.onChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
           <FormControl>
             <Checkbox
@@ -181,7 +198,7 @@ export function SettingsForm({
           <Button
             type="submit"
             onClick={form.handleSubmit(onDelete)}
-            variant="secondary"
+            variant="destructive"
           >
             Zbriši novičko
           </Button>

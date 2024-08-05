@@ -1,9 +1,10 @@
 "use client";
 
+import type { Locale } from "date-fns/locale";
 import * as React from "react";
 import { useImperativeHandle, useRef } from "react";
 import { add, format } from "date-fns";
-import { enUS, Locale } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -12,9 +13,9 @@ import {
 } from "lucide-react";
 import { DayPicker } from "react-day-picker";
 
+import type { CalendarProps } from "@acme/ui/calendar";
 import { cn } from "@acme/ui";
 import { Button, buttonVariants } from "@acme/ui/button";
-import { CalendarProps } from "@acme/ui/calendar";
 import { Input } from "@acme/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@acme/ui/popover";
 import {
@@ -47,7 +48,11 @@ function isValidMinuteOrSecond(value: string) {
   return /^[0-5][0-9]$/.test(value);
 }
 
-type GetValidNumberConfig = { max: number; min?: number; loop?: boolean };
+interface GetValidNumberConfig {
+  max: number;
+  min?: number;
+  loop?: boolean;
+}
 
 function getValidNumber(
   value: string,
@@ -84,11 +89,11 @@ function getValidMinuteOrSecond(value: string) {
   return getValidNumber(value, { max: 59 });
 }
 
-type GetValidArrowNumberConfig = {
+interface GetValidArrowNumberConfig {
   min: number;
   max: number;
   step: number;
-};
+}
 
 function getValidArrowNumber(
   value: string,
@@ -173,9 +178,10 @@ function getDateByType(date: Date | null, type: TimePickerType) {
       return getValidMinuteOrSecond(String(date.getSeconds()));
     case "hours":
       return getValidHour(String(date.getHours()));
-    case "12hours":
+    case "12hours": {
       const hours = display12HourValue(date.getHours());
       return getValid12Hour(String(hours));
+    }
     default:
       return "00";
   }
@@ -208,11 +214,10 @@ function convert12HourTo24Hour(hour: number, period: Period) {
     } else {
       return hour;
     }
-  } else if (period === "AM") {
+  } else {
     if (hour === 12) return 0;
     return hour;
   }
-  return hour;
 }
 
 /**
@@ -251,10 +256,13 @@ function Calendar({
   yearRange = 50,
   ...props
 }: CalendarProps & { yearRange?: number }) {
-  const MONTHS = React.useMemo(() => genMonths(props.locale || enUS), []);
+  const MONTHS = React.useMemo(
+    () => genMonths(props.locale ?? enUS),
+    [props.locale],
+  );
   const YEARS = React.useMemo(
-    () => genYears(props.locale || enUS, yearRange),
-    [],
+    () => genYears(props.locale ?? enUS, yearRange),
+    [props.locale, yearRange],
   );
 
   return (
@@ -297,8 +305,8 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
+        IconRight: () => <ChevronRight className="h-4 w-4" />,
         CaptionLabel: ({ displayMonth }) => {
           return (
             <div className="inline-flex gap-2">
@@ -514,13 +522,13 @@ const TimePickerInput = React.forwardRef<
     return (
       <Input
         ref={ref}
-        id={id || picker}
-        name={name || picker}
+        id={id ?? picker}
+        name={name ?? picker}
         className={cn(
           "w-[48px] text-center font-mono text-base tabular-nums caret-transparent focus:bg-accent focus:text-accent-foreground [&::-webkit-inner-spin-button]:appearance-none",
           className,
         )}
-        value={value || calculatedValue}
+        value={value ?? calculatedValue}
         onChange={(e) => {
           e.preventDefault();
           onChange?.(e);
@@ -625,7 +633,7 @@ const TimePicker = React.forwardRef<TimePickerRef, TimePickerProps>(
               date={date}
               onDateChange={(date) => {
                 onChange?.(date);
-                if (date && date?.getHours() >= 12) {
+                if (date && date.getHours() >= 12) {
                   setPeriod("PM");
                 } else {
                   setPeriod("AM");
@@ -716,6 +724,7 @@ const DateTimePicker = React.forwardRef<DateTimePickerRef, DateTimePickerProps>(
     useImperativeHandle(
       ref,
       () => ({
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         ...buttonRef.current!,
         value,
       }),
