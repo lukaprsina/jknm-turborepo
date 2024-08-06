@@ -5,6 +5,7 @@ import {
   json,
   pgTable,
   primaryKey,
+  serial,
   text,
   timestamp,
   uuid,
@@ -86,9 +87,9 @@ export interface ArticleContentType {
 
 // My schema below
 export const Article = pgTable("article", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  id: serial("id").primaryKey(),
   title: varchar("title", { length: 255 }).notNull(),
-  url: varchar("url", { length: 255 }).notNull().unique(),
+  url: varchar("url", { length: 255 }).notNull(),
   published: boolean("published").default(false),
   created_at: timestamp("created_at").defaultNow().notNull(),
   updated_at: timestamp("updatedAt", {
@@ -120,7 +121,6 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   content: content_zod,
   draft_content: content_zod,
 }).omit({
-  id: true,
   created_at: true,
   updated_at: true,
 });

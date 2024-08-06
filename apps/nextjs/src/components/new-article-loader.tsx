@@ -27,7 +27,7 @@ export default function NewArticleLoader({
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.preview_image ?? null);
 
-      router.replace(`/uredi/${variables.url}`);
+      router.replace(`/uredi/${variables.url}-${variables.id}`);
     },
   });
 
@@ -38,7 +38,7 @@ export default function NewArticleLoader({
           {...props}
           onClick={() => {
             const article_title = title ?? "Nova novica";
-            const article_url = url ?? `nova-novica-${Date.now()}`;
+            const article_url = url ?? `nova-novica`;
 
             const template = {
               blocks: [

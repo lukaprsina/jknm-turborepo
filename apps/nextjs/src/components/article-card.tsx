@@ -10,11 +10,10 @@ export function FeaturedArticleCard({
 }: {
   article: typeof Article.$inferSelect;
 }) {
-  console.log(article.title, article.content_html);
   return (
     <Link
-      href={`/novica/${article.url}`}
-      className="col-span-1 overflow-hidden rounded-md shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
+      href={`/novica/${article.url}-${article.id}`}
+      className="col-span-1 overflow-hidden rounded-md no-underline shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
     >
       <Card className="h-full">
         {article.preview_image && (
@@ -57,8 +56,8 @@ export function ArticleCard({
 }) {
   return (
     <Link
-      href={`/novica/${article.url}`}
-      className="overflow-hidden rounded-md bg-card shadow-lg transition-transform hover:scale-[1.01]"
+      href={`/novica/${article.url}-${article.id}`}
+      className="overflow-hidden rounded-md bg-card no-underline shadow-lg transition-transform hover:scale-[1.01]"
     >
       <Card className="h-full">
         {article.preview_image && (

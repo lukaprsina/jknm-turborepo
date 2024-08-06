@@ -36,15 +36,32 @@ interface EditorPageProps {
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
-  const novica_ime = decodeURIComponent(novica_ime_raw);
   const session = await auth();
 
+  const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
+  const novica_id_string = novica_parts[novica_parts.length - 1];
+  const novica_ime = novica_parts.slice(0, -1).join("-");
+
+  if (!novica_id_string) {
+    return (
+      <Shell>
+        <Card>
+          <CardHeader>
+            <CardTitle>Novica ne obstaja</CardTitle>
+          </CardHeader>
+        </Card>
+      </Shell>
+    );
+  }
+
+  const novica_id = parseInt(novica_id_string);
+
   const article_by_url = session
-    ? await api.article.byUrlProtected({
-        url: novica_ime,
+    ? await api.article.byIdProtected({
+        id: novica_id,
       })
-    : await api.article.byUrl({
-        url: novica_ime,
+    : await api.article.byId({
+        id: novica_id,
       });
 
   return (

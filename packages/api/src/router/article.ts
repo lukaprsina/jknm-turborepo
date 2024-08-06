@@ -28,7 +28,7 @@ export const articleRouter = {
   }),
 
   byId: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.number() }))
     .query(({ ctx, input }) => {
       // return ctx.db
       //   .select()
@@ -40,7 +40,20 @@ export const articleRouter = {
       });
     }),
 
-  byUrl: publicProcedure
+  byIdProtected: protectedProcedure
+    .input(z.object({ id: z.number() }))
+    .query(({ ctx, input }) => {
+      // return ctx.db
+      //   .select()
+      //   .from(schema.post)
+      //   .where(eq(schema.post.id, input.id));
+
+      return ctx.db.query.Article.findFirst({
+        where: eq(Article.id, input.id),
+      });
+    }),
+
+  /* byUrl: publicProcedure
     .input(z.object({ url: z.string() }))
     .query(({ ctx, input }) => {
       // return ctx.db
@@ -59,7 +72,7 @@ export const articleRouter = {
       return ctx.db.query.Article.findFirst({
         where: eq(Article.url, input.url),
       });
-    }),
+    }), */
 
   create: protectedProcedure
     .input(CreateArticleSchema)
@@ -74,7 +87,7 @@ export const articleRouter = {
       return ctx.db.update(Article).set(input).where(eq(Article.id, input.id));
     }),
 
-  delete: protectedProcedure.input(z.string()).mutation(({ ctx, input }) => {
+  delete: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {
     return ctx.db.delete(Article).where(eq(Article.id, input));
   }),
 } satisfies TRPCRouterRecord;
