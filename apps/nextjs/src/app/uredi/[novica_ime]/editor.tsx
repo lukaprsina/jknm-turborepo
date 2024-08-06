@@ -40,6 +40,7 @@ import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "./editor-utils";
+import FakePaste from "./fake-paste";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 import { SettingsDialog } from "./settings-button";
 import { settings_store } from "./settings-store";
@@ -69,6 +70,7 @@ export default function MyEditor({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
       data: content,
+      inlineToolbar: ["link", "marker", "bold", "italic"],
       autofocus: true,
       onReady: () => {
         setTimeout(() => {
@@ -281,6 +283,7 @@ function MyToolbar({
     <div className="flex w-full items-baseline justify-between p-4">
       <div>{dirty ? <p>Ni shranjeno</p> : null}</div>
       <div className="flex">
+        <FakePaste />
         <SaveButton saving={saving} save_callback={save_callback} />
         <UploadDialog save_callback={save_callback} />
         <SettingsDialog article={article} save_callback={save_callback} />

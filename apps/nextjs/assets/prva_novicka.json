@@ -1,0 +1,90 @@
+{
+  "time": 1722964858419,
+  "blocks": [
+    {
+      "id": "RIiS8fPtEj",
+      "type": "header",
+      "data": {
+        "text": "O netopirjih iz nekaj izbranih Dolenjskih jam",
+        "level": 1
+      }
+    },
+    {
+      "id": "QU9y7m0pjp",
+      "type": "paragraph",
+      "data": {
+        "text": "31.7.2024"
+      }
+    },
+    {
+      "id": "OFOSko0eSa",
+      "type": "paragraph",
+      "data": {
+        "text": "V novi številki revije&nbsp;Natura Sloveniae&nbsp;je izšel prispevek o netopirjih iz izbranih Dolenjskih jam, ki sva jih s Teom Delićem namensko obiskala v zadnjih letih. Objavljen prispevek prinaša še malo dodatne slave Čaganki, predvsem pa pomembne podatke o prezimujočih skupinah velikih podkovnjakov."
+      }
+    },
+    {
+      "id": "lAYONUhsDS",
+      "type": "paragraph",
+      "data": {
+        "text": "Mnoga prezimovališča velikega podkovnjaka (Rhinolophus ferrumequinum) so v Sloveniji dobro poznana in vključena v shemo državnega monitoringa izbranih ciljnih vrst netopirjev. Kljub razmeroma dobri raziskanosti pa smo z načrtnim pregledom treh globokih jam na Dolenjskem (Čaganka, Kaščica, Topli vrh 5) za netopirje pridobili nove podatke o velikih prezimujočih skupinah velikih podkovnjakov. Iz vseh treh jam so jamarji že v preteklosti poročali o opažanju večjega števila netopirjev. Poleg navedenih jam smo pregledali tudi jamo Roupa na planoti Banjščice, ki je novo odkrito prezimovališče za to vrsto."
+      }
+    },
+    {
+      "id": "b6mfswk8O0",
+      "type": "paragraph",
+      "data": {
+        "text": "Veliko število prezimujočih tako velikih (161–255) kot malih podkovnjakov (43–363) je bilo opaženo v vseh štirih jamah. Večina velikih podkovnjakov je visela v skupinah, skupno največ 240 živali v jami Čaganka. Poleg navedenih vrst iz družine podkovnjakov smo našli tudi posamezne netopirje vrste navadni/ostrouhi netopir (Myotis myotis/Myotis blythii) v Kaščici, netopirja iz rodu malih netopirjev (Pipistrellus) v Roupi in poznega netopirja (Eptesicus serotinus), širokouhega netopirja (Barbastella barbastellus) ter dva gladkonosa netopirja (Vespertilionidae) v Čaganki."
+      }
+    },
+    {
+      "id": "aazmm7fmf1",
+      "type": "image",
+      "data": {
+        "caption": "",
+        "withBorder": false,
+        "withBackground": false,
+        "stretched": false,
+        "file": {
+          "url": "https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/nova-novica-630/Zamolo.jpg"
+        }
+      }
+    },
+    {
+      "id": "giZzBKwl-O",
+      "type": "paragraph",
+      "data": {
+        "text": "Skupina velikih podkovnjakov na začetku južnega rova v Čaganki. Foto Aja Zamolo, 19.2.2023"
+      }
+    },
+    {
+      "id": "Ie4JrdIQCW",
+      "type": "paragraph",
+      "data": {
+        "text": "Nadaljnje tarčne raziskave globokih jam (jam z več vertikalnimi deli, ki zahtevajo uporabo vrvne tehnike in so zato težje dostopne) za netopirje, predvsem tiste, iz katerih so jamarji že poročali o netopirjih, lahko predstavljajo pomemben doprinos ne le k poznavanju razširjenosti, temveč tudi prispevajo podatke o številu in letni dinamiki posameznih vrst. S prispevkom želimo poudariti pomen tovrstnih podatkov in pozvati k posredovanju opažanj tako s strani biologov kot tudi jamarjev."
+      }
+    },
+    {
+      "id": "NPk6INafUC",
+      "type": "paragraph",
+      "data": {
+        "text": "Hvala vsem še enkrat za izkazano zanimanje, sodelovanje in pomoč. Naprošam vas, da prispevek posredujete vsem, ki bi jih utegnilo zanimati in zaradi katerih se sploh ve za netopirje v omenjenih ali še neraziskanih jamah. Prispevek naj bo tudi za vzpodbudo, da se še kdaj pošlje kak biološki podatek – prav vsak doprinese k boljšemu poznavanju."
+      }
+    },
+    {
+      "id": "wmX3QjALxQ",
+      "type": "paragraph",
+      "data": {
+        "text": "Vsebina prispevka je prosto dostopna na povezavi:&nbsp;https://journals.uni-lj.si/NaturaSloveniae/article/view/17946."
+      }
+    },
+    {
+      "id": "BhU5YU1rYO",
+      "type": "paragraph",
+      "data": {
+        "text": "Aja ZamoloDZRJ Ljubljana"
+      }
+    }
+  ],
+  "version": "2.30.2"
+}
