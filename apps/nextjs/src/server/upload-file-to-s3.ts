@@ -5,11 +5,12 @@ import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import { env } from "~/env";
 
-export async function upload_file_to_s3(file: File) {
+export async function upload_file_to_s3(directory: string, file: File) {
   const client = new S3Client({ region: env.AWS_REGION });
+
   const { url, fields } = await createPresignedPost(client, {
     Bucket: env.AWS_BUCKET_NAME,
-    Key: file.name, //uuidv4(),
+    Key: `${directory}/${file.name}`, //uuidv4(),
     Conditions: [
       ["content-length-range", 0, 5 * 10485760], // up to 10 MB
       ["starts-with", "$Content-Type", file.type],

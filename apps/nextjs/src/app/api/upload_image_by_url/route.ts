@@ -22,19 +22,26 @@ export async function POST(request: Request) {
     mime_type = mime.getType(title) ?? "image/*";
   }
 
-  // console.log({ response, title, mime_type });
-
   const blob = await response.blob();
   const file = new File([blob], title, { type: mime_type });
 
-  const file_mime = mime.getType(file.name);
+  const referer = request.headers.get("Referer");
 
+  const novica_url = referer?.split("/").slice(-1)[0];
+
+  if (!novica_url) {
+    return NextResponse.json({
+      success: 0,
+    });
+  }
+
+  const file_mime = mime.getType(file.name);
   if (!file_mime?.includes("image")) {
     console.warn("Wrong MIME type", file_mime);
     return;
   }
 
-  const image_url = await upload_file_to_s3(file);
+  const image_url = await upload_file_to_s3(novica_url, file);
 
   if (image_url) {
     return NextResponse.json({
