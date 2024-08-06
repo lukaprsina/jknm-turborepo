@@ -83,6 +83,7 @@ async function DesktopHeader({
     <div className="hidden gap-6 xl:flex">
       <NavigationMenu>
         <NavigationMenuList>
+          <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
           <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
           <DesktopHeaderLink href="/raziskovanje">
             Raziskovanje
@@ -105,7 +106,6 @@ async function DesktopHeader({
               </ul>
             </NavigationMenuContent>
           </NavigationMenuItem>
-          <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
         </NavigationMenuList>
       </NavigationMenu>
       <div className="flex gap-1">

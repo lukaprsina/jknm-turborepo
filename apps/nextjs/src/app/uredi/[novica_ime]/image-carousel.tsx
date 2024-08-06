@@ -64,10 +64,25 @@ const ImageCarousel = React.forwardRef<
               const form_data = new FormData();
               form_data.append("image", event.target.files[0]);
 
-              await fetch("/api/upload_image_by_file", {
+              const response = await fetch("/api/upload_image_by_file", {
                 method: "POST",
                 body: form_data,
               });
+
+              const image_json = (await response.json()) as {
+                success: number;
+                file: {
+                  url: string;
+                  width: number;
+                  height: number;
+                };
+              };
+
+              // TODO: ko se shrani, se image_data prepiše iz articla
+              if (!image_json.success) return;
+              settings_store.set.image_data([...image_data, image_json.file]);
+
+              onImageUrlChange(image_json.file.url);
             }}
             id="fileid"
             type="file"
