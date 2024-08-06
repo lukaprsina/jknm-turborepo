@@ -14,9 +14,9 @@ export function FeaturedArticleCard({
   return (
     <Link
       href={`/novica/${article.url}`}
-      className="col-span-1 overflow-hidden rounded-lg shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
+      className="col-span-1 overflow-hidden rounded-md shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
     >
-      <Card>
+      <Card className="h-full">
         {article.preview_image && (
           <AspectRatio ratio={16 / 9} className="rounded-md">
             <Image
@@ -27,13 +27,14 @@ export function FeaturedArticleCard({
             />
           </AspectRatio>
         )}
-        <div className="p-4 md:p-6">
+        <div>
           <CardHeader>
             <CardTitle>{article.title}</CardTitle>
           </CardHeader>
           {article.content_html ? (
-            <CardContent className="prose lg:prose-xl dark:prose-invert line-clamp-2 overflow-y-hidden">
+            <CardContent>
               <div
+                className="line-clamp-2 h-full overflow-y-hidden"
                 dangerouslySetInnerHTML={{
                   __html: article.content_html
                     .split("\n")
@@ -57,26 +58,27 @@ export function ArticleCard({
   return (
     <Link
       href={`/novica/${article.url}`}
-      className="overflow-hidden rounded-lg bg-card shadow-lg transition-transform hover:scale-[1.01]"
+      className="overflow-hidden rounded-md bg-card shadow-lg transition-transform hover:scale-[1.01]"
     >
-      <Card>
+      <Card className="h-full">
         {article.preview_image && (
           <AspectRatio ratio={16 / 9} className="rounded-md">
             <Image
               src={article.preview_image}
-              alt="Photo by Drew Beamer"
+              alt=""
               fill
               className="rounded-md object-cover"
             />
           </AspectRatio>
         )}
-        <div className="lg:p12 p-6 md:p-8">
+        <div>
           <CardHeader>
             <CardTitle>{article.title}</CardTitle>
           </CardHeader>
           {article.content_html ? (
-            <CardContent className="prose lg:prose-xl dark:prose-invert line-clamp-1 overflow-y-hidden">
+            <CardContent>
               <div
+                className="line-clamp-2 h-full overflow-y-hidden"
                 dangerouslySetInnerHTML={{
                   __html: article.content_html
                     .split("\n")
