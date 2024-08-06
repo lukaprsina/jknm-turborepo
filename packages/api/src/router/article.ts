@@ -77,14 +77,18 @@ export const articleRouter = {
   create: protectedProcedure
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.db.insert(Article).values(input);
+      return ctx.db.insert(Article).values(input).returning({ id: Article.id });
     }),
 
   save: protectedProcedure
     .input(UpdateArticleSchema)
     .mutation(({ ctx, input }) => {
       if (!input.id) return;
-      return ctx.db.update(Article).set(input).where(eq(Article.id, input.id));
+      return ctx.db
+        .update(Article)
+        .set(input)
+        .where(eq(Article.id, input.id))
+        .returning({ id: Article.id });
     }),
 
   delete: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {

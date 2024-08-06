@@ -29,8 +29,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@acme/ui/alert-dialog";
-import { Badge } from "@acme/ui/badge";
 import { Button } from "@acme/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 import { useToast } from "@acme/ui/use-toast";
 
 import { api } from "~/trpc/react";
@@ -140,14 +140,19 @@ function MyToolbar({
   const { toast } = useToast();
 
   const article_update = api.article.save.useMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.preview_image ?? null);
       setDirty(false);
 
+      if (!data?.[0]?.id) {
+        console.log("No article ID returned", data);
+        return;
+      }
+
       if (variables.url !== article?.url)
-        router.replace(`/uredi/${variables.url}`);
+        router.replace(`/uredi/${variables.url}-${data[0]?.id}`);
     },
     onError: (error) => {
       console.error("article_update error", error);
@@ -273,19 +278,32 @@ function MyToolbar({
   if (!editor || !article) return null;
 
   return (
-    <div className="flex w-full items-center justify-between p-4">
-      <div>
-        {dirty ? (
-          <Badge className="cursor-pointer" variant="outline">
-            Ni shranjeno
-          </Badge>
-        ) : null}
-      </div>
+    <div className="flex w-full items-baseline justify-between p-4">
+      <div>{dirty ? <p>Ni shranjeno</p> : null}</div>
       <div className="flex">
-        <div className="not-prose flex gap-1 text-sm">
-          <p hidden={!saving} className="h-full pt-3">
-            Saving...
-          </p>
+        <SaveButton saving={saving} save_callback={save_callback} />
+        <UploadDialog save_callback={save_callback} />
+        <SettingsDialog article={article} save_callback={save_callback} />
+        <ClearButton article={article} save_callback={save_callback} />
+      </div>
+    </div>
+  );
+}
+
+function SaveButton({
+  saving,
+  save_callback,
+}: {
+  saving: boolean;
+  save_callback: SaveCallbackType;
+}) {
+  return (
+    <div className="not-prose flex gap-1 text-sm">
+      <p hidden={!saving} className="h-full pt-3">
+        Shranujem...
+      </p>
+      <Tooltip>
+        <TooltipTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
@@ -293,33 +311,56 @@ function MyToolbar({
           >
             <SaveIcon />
           </Button>
-        </div>
-        <UploadDialog save_callback={save_callback} />
-        <SettingsDialog article={article} save_callback={save_callback} />
-        <ClearButton editor={editor} />
-      </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Shrani</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   );
 }
 
-function ClearButton({ editor }: { editor?: EditorJS }) {
+function ClearButton({
+  save_callback,
+  article,
+}: {
+  save_callback: SaveCallbackType;
+  article: typeof Article.$inferSelect;
+}) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <XIcon />
-        </Button>
-      </AlertDialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <XIcon />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Ponastavi osnutek</p>
+        </TooltipContent>
+      </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Izbriši vsebino</AlertDialogTitle>
+          <AlertDialogTitle>Ponastavi osnutek</AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogDescription>
-          Ste prepričani, da želite izbrisati vsebino?
+          Ste prepričani, da želite ponastaviti osnutek na objavljeno različico
+          novičke?
         </AlertDialogDescription>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={() => editor?.clear()}>
-            Izbriši vse
+          <AlertDialogAction
+            onClick={() =>
+              save_callback({
+                variables: {
+                  draft_content: article.content,
+                  draft_content_html: article.content_html,
+                },
+              })
+            }
+          >
+            Ponastavi osnutek
           </AlertDialogAction>
           <AlertDialogCancel>Prekliči</AlertDialogCancel>
         </AlertDialogFooter>

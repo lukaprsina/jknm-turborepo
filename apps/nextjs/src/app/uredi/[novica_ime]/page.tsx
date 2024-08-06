@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 
+import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import {
   Breadcrumb,
@@ -67,9 +68,11 @@ export default async function EditorPage({
   return (
     <Shell>
       <div className="container mb-4 mt-8 h-full min-h-screen gap-72">
-        <ArticleBreadcrumb novica_ime={novica_ime} />
         {article_by_url ? (
-          <Editor article={article_by_url} />
+          <>
+            <ArticleBreadcrumb article={article_by_url} />
+            <Editor article={article_by_url} />
+          </>
         ) : (
           <CreateNewArticle novica_ime={novica_ime} />
         )}
@@ -111,7 +114,11 @@ function CreateNewArticle({ novica_ime }: { novica_ime: string }) {
   );
 }
 
-function ArticleBreadcrumb({ novica_ime }: { novica_ime: string }) {
+function ArticleBreadcrumb({
+  article,
+}: {
+  article: typeof Article.$inferSelect;
+}) {
   return (
     <Breadcrumb className="pb-4">
       <BreadcrumbList>
@@ -122,8 +129,8 @@ function ArticleBreadcrumb({ novica_ime }: { novica_ime: string }) {
         <BreadcrumbItem>Uredi</BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/novica/${novica_ime}`}>
-            {novica_ime}
+          <BreadcrumbLink href={`/novica/${article.url}-${article.id}`}>
+            {article.title}
           </BreadcrumbLink>
         </BreadcrumbItem>
       </BreadcrumbList>

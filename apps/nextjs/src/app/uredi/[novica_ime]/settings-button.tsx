@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import type { SaveCallbackType } from "./editor";
 import { SettingsForm } from "./settings-form";
@@ -23,18 +24,25 @@ export function SettingsDialog({
 }) {
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          onClick={() => save_callback({ update: false })}
-          variant="ghost"
-          size="icon"
-        >
-          <Settings2Icon />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button
+              onClick={() => save_callback({ update: false })}
+              variant="ghost"
+              size="icon"
+            >
+              <Settings2Icon />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Nastvitve novičke</p>
+        </TooltipContent>
+      </Tooltip>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Uredi novičko</DialogTitle>
+          <DialogTitle>Nastvitve novičke</DialogTitle>
           <DialogDescription>
             Spremeni naslov, določi naslovno slike, objavi ali shrani kot
             osnutek.

@@ -5,6 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import { cn } from "@acme/ui";
 import { ThemeProvider } from "@acme/ui/theme";
 import { Toaster } from "@acme/ui/toaster";
+import { TooltipProvider } from "@acme/ui/tooltip";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
@@ -50,10 +51,12 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>{props.children}</TRPCReactProvider>
-          <Toaster />
-        </ThemeProvider>
+        <TooltipProvider>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TRPCReactProvider>{props.children}</TRPCReactProvider>
+            <Toaster />
+          </ThemeProvider>
+        </TooltipProvider>
       </body>
     </html>
   );

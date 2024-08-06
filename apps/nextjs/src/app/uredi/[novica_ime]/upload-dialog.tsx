@@ -14,6 +14,7 @@ import {
   AlertDialogTrigger,
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import type { SaveCallbackType } from "./editor";
 
@@ -24,17 +25,23 @@ export function UploadDialog({
 }) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button size="icon" variant="ghost">
-          <ArrowUpToLineIcon />
-        </Button>
-      </AlertDialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <AlertDialogTrigger asChild>
+            <Button size="icon" variant="ghost">
+              <ArrowUpToLineIcon />
+            </Button>
+          </AlertDialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Shrani in objavi</p>
+        </TooltipContent>
+      </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>Shrani in objavi</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            Ste prepričani, da želite objaviti osnutek?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

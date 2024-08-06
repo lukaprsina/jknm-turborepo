@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MenuIcon, SearchIcon } from "lucide-react";
 
+import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
@@ -25,16 +26,16 @@ import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {
   children: React.ReactNode;
-  article_url?: string;
+  article?: typeof Article.$inferSelect;
 }
 
-export function Shell({ children, article_url }: ShellProps) {
+export function Shell({ children, article }: ShellProps) {
   return (
     <HydrateClient>
       <ShowDraftsProvider>
         <div className="w-full">
           <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
-            <Header article_url={article_url} />
+            <Header article={article} />
           </header>
           <main className="relative w-full">{children}</main>
           <footer className="bottom-0 z-10">
@@ -46,7 +47,11 @@ export function Shell({ children, article_url }: ShellProps) {
   );
 }
 
-function Header({ article_url }: { article_url?: string }) {
+function Header({
+  article: article,
+}: {
+  article?: typeof Article.$inferSelect;
+}) {
   return (
     <div className="container flex items-center justify-between">
       <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
@@ -59,7 +64,7 @@ function Header({ article_url }: { article_url?: string }) {
         />
         <p>Jamarski klub Novo mesto</p>
       </Link>
-      <DesktopHeader article_url={article_url} />
+      <DesktopHeader article={article} />
       <Button className="md:hidden">
         <MenuIcon />
       </Button>
@@ -67,7 +72,11 @@ function Header({ article_url }: { article_url?: string }) {
   );
 }
 
-async function DesktopHeader({ article_url }: { article_url?: string }) {
+async function DesktopHeader({
+  article,
+}: {
+  article?: typeof Article.$inferSelect;
+}) {
   const session = await auth();
 
   return (
@@ -100,10 +109,7 @@ async function DesktopHeader({ article_url }: { article_url?: string }) {
         </NavigationMenuList>
       </NavigationMenu>
       <div className="flex gap-1">
-        <EditingButtons
-          article_url={article_url}
-          session={session ?? undefined}
-        />
+        <EditingButtons article={article} session={session ?? undefined} />
         <Button
           className="dark:bg-primary/80 dark:text-primary-foreground"
           variant="ghost"

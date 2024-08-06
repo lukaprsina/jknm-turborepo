@@ -5,20 +5,20 @@ import React, { createContext, useState } from "react";
 import { cn } from "@acme/ui";
 import { Badge } from "@acme/ui/badge";
 
-interface ShowDraftsContextProps {
-  showDrafts: boolean;
-  setShowDrafts: React.Dispatch<React.SetStateAction<boolean>>;
-}
+type ShowDraftsContextProps = [
+  showDrafts: boolean,
+  setShowDrafts: React.Dispatch<React.SetStateAction<boolean>>,
+];
 
-export const ShowDraftsContext = createContext<ShowDraftsContextProps>({
-  showDrafts: true,
-  setShowDrafts: () => {
+export const ShowDraftsContext = createContext<ShowDraftsContextProps>([
+  true,
+  () => {
     alert("You forgot to wrap your component in a provider");
   },
-});
+]);
 
 export function ShowDraftsCheckbox() {
-  const { showDrafts, setShowDrafts } = React.useContext(ShowDraftsContext);
+  const [showDrafts, setShowDrafts] = React.useContext(ShowDraftsContext);
 
   return (
     <Badge
@@ -39,7 +39,7 @@ export function ShowDraftsProvider({
   const [showDrafts, setShowDrafts] = useState(true);
 
   return (
-    <ShowDraftsContext.Provider value={{ showDrafts, setShowDrafts }}>
+    <ShowDraftsContext.Provider value={[showDrafts, setShowDrafts]}>
       {children}
     </ShowDraftsContext.Provider>
   );

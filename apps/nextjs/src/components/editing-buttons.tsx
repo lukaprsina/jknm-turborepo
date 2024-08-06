@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PencilIcon, PlusIcon } from "lucide-react";
 
 import type { Session } from "@acme/auth";
+import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 
 import { EditableContext } from "~/components/editable-context";
@@ -12,37 +13,37 @@ import NewArticleLoader from "./new-article-loader";
 
 export default function EditingButtons({
   session,
-  article_url,
+  article: article,
 }: {
   session?: Session;
-  article_url?: string;
+  article?: typeof Article.$inferSelect;
 }) {
   const editable = useContext(EditableContext);
 
+  if (!session?.user) return null;
+
   return (
     <>
-      {session?.user ? (
-        <>
-          {editable == "readonly" ? (
-            <Button
-              className="dark:bg-primary/80 dark:text-primary-foreground"
-              variant="ghost"
-              size="icon"
-              asChild
-            >
-              <Link href={`/uredi/${article_url}`}>
-                <PencilIcon size={20} />
-              </Link>
-            </Button>
+      {editable == "readonly" ? (
+        <Button
+          className="dark:bg-primary/80 dark:text-primary-foreground"
+          variant="ghost"
+          size="icon"
+          asChild
+        >
+          {article ? (
+            <Link href={`/uredi/${article.url}-${article.id}`}>
+              <PencilIcon size={20} />
+            </Link>
           ) : null}
-          <NewArticleLoader
-            className="dark:bg-primary/80 dark:text-primary-foreground"
-            variant="ghost"
-            size="icon"
-            children={<PlusIcon size={24} />}
-          />
-        </>
+        </Button>
       ) : null}
+      <NewArticleLoader
+        className="dark:bg-primary/80 dark:text-primary-foreground"
+        variant="ghost"
+        size="icon"
+        children={<PlusIcon size={24} />}
+      />
     </>
   );
 }

@@ -10,7 +10,7 @@ import { Articles } from "./articles";
 
 export function ArticlesClient({ session }: { session: Session | null }) {
   //   const { data: session } = useSession();
-  const { showDrafts } = useContext(ShowDraftsContext);
+  const [showDrafts] = useContext(ShowDraftsContext);
 
   const articles =
     session && showDrafts

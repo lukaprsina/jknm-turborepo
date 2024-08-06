@@ -1,6 +1,7 @@
+import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
-import { Badge } from "@acme/ui/badge";
 import { Card, CardHeader, CardTitle } from "@acme/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import { EditableProvider } from "~/components/editable-context";
 import { Shell } from "~/components/shell";
@@ -19,7 +20,6 @@ export default async function NovicaPage({
 
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
-  const novica_ime = novica_parts.slice(0, -1).join("-");
 
   if (!novica_id_string) {
     return (
@@ -43,42 +43,91 @@ export default async function NovicaPage({
         id: novica_id,
       });
 
-  let article_element = (
-    <Card>
-      <CardHeader>Novica ne obstaja</CardHeader>
-    </Card>
-  );
-
-  if (article_by_url?.content_html) {
-    article_element = (
-      <div
-        dangerouslySetInnerHTML={{
-          __html: article_by_url.content_html,
-        }}
-      />
-    );
-  } else if (article_by_url?.draft_content_html) {
-    article_element = (
-      <>
-        <Badge className="mb-4">Osnutek</Badge>
-        <div
-          dangerouslySetInnerHTML={{
-            __html: article_by_url.draft_content_html,
-          }}
-        />
-      </>
-    );
-  }
-
   return (
     <EditableProvider editable="readonly">
-      <Shell article_url={novica_ime}>
+      <Shell article={article_by_url}>
         <div className="container h-full min-h-screen pt-16">
           <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
-            {article_element}
+            {session ? (
+              <TabbedContent article={article_by_url} />
+            ) : (
+              <PublishedContent article={article_by_url} />
+            )}
           </div>
         </div>
       </Shell>
     </EditableProvider>
+  );
+}
+
+function PublishedContent({
+  article,
+}: {
+  article?: typeof Article.$inferSelect;
+}) {
+  if (!article?.content_html) {
+    return (
+      <Card>
+        <CardHeader>Novica ne obstaja</CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <div
+      dangerouslySetInnerHTML={{
+        __html: article.content_html,
+      }}
+    />
+  );
+}
+
+async function TabbedContent({
+  article,
+}: {
+  article?: typeof Article.$inferSelect;
+}) {
+  const session = await auth();
+
+  if (
+    !article ||
+    (session && !article.content_html && !article.draft_content_html)
+  ) {
+    return (
+      <Card>
+        <CardHeader>Novica ne obstaja</CardHeader>
+      </Card>
+    );
+  }
+
+  return (
+    <Tabs defaultValue="draft" className="w-[400px]">
+      <TabsList>
+        <TabsTrigger disabled={!article.draft_content_html} value="draft">
+          Osnutek
+        </TabsTrigger>
+        <TabsTrigger disabled={!article.content_html} value="published">
+          Objavljeno
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="draft">
+        {article.draft_content_html && (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: article.draft_content_html,
+            }}
+          />
+        )}
+      </TabsContent>
+      <TabsContent value="published">
+        {article.content_html && (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: article.content_html,
+            }}
+          />
+        )}
+      </TabsContent>
+    </Tabs>
   );
 }

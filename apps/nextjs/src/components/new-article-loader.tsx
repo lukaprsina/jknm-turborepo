@@ -22,12 +22,17 @@ export default function NewArticleLoader({
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
   const article_create = api.article.create.useMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.preview_image ?? null);
 
-      router.replace(`/uredi/${variables.url}-${variables.id}`);
+      if (!data[0]?.id) {
+        console.log("No article ID returned", data);
+        return;
+      }
+
+      router.replace(`/uredi/${variables.url}-${data[0]?.id}`);
     },
   });
 
