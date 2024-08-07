@@ -1,5 +1,5 @@
 import { Shell } from "~/components/shell";
-import { ArticleConverter } from "./tst";
+import { ArticleConverter } from "./converter-editor";
 
 export default function Page() {
   return (
