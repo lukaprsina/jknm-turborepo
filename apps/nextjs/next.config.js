@@ -20,6 +20,12 @@ const config = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.jknm.si",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 

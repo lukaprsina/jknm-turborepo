@@ -2,6 +2,7 @@
 
 import type EditorJS from "@editorjs/editorjs";
 import type { Node as ParserNode } from "node-html-parser";
+import { parse as parseDate } from "date-format-parse";
 import dom_serialize from "dom-serializer";
 import { parseDocument } from "htmlparser2";
 import {
@@ -11,16 +12,22 @@ import {
 } from "node-html-parser";
 
 import type { CSVType } from "~/server/article-converter";
+import {
+  article_title_to_url,
+  edjsParser,
+  get_image_data_from_editor,
+} from "../uredi/[novica_ime]/editor-utils";
 
 let wrong_divs = 0;
 let videos = 0;
 export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
+  article_create: any,
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 1);
+  const spliced_csv_articles = csv_articles.slice(0, 10);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);
@@ -49,9 +56,44 @@ export async function iterate_over_articles(
       }
     }
 
+    const format = "M/D/YYYY HH:mm:ss";
+    const created_at = parseDate(csv_article.created_at, format);
+    const updated_at = parseDate(csv_article.updated_at, format);
+
+    /* 
+    console.log(
+        "Invalid date",
+        csv_article.created_at,
+        csv_article.updated_at,
+        created_at,
+        updated_at,
+      ); */
+
     const content = await editorJS?.save();
+    if (!content) throw new Error("No content");
+
+    const content_html = edjsParser.parse(content).join("\n");
     console.log(csv_article.title, content);
-    // editorJS?.clear();
+
+    const images = get_image_data_from_editor(content);
+    if (images.length == 0) {
+      throw new Error("No images in article " + csv_article.title);
+    }
+
+    article_create.mutate({
+      title: csv_article.title,
+      content,
+      preview_image: images[0]?.url,
+      content_html,
+      draft_content: undefined,
+      draft_content_html: undefined,
+      url: article_title_to_url(csv_article.title),
+      created_at,
+      updated_at,
+      published: true,
+    });
+
+    editorJS?.clear();
   }
 
   console.log("Total articles:", csv_articles.length);

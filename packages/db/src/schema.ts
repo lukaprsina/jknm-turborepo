@@ -92,10 +92,10 @@ export const Article = pgTable("article", {
   url: varchar("url", { length: 255 }).notNull(),
   published: boolean("published").default(false),
   created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updatedAt", {
+  updated_at: timestamp("updated_at", {
     mode: "date",
     withTimezone: true,
-  }) /* .$onUpdateFn(() => sql`now()`) */ /* .notNull() */,
+  }).notNull() /* .$onUpdateFn(() => sql`now()`) */,
   content: json("content").$type<ArticleContentType>(),
   content_html: text("content_html").default(""),
   draft_content: json("draft_content").$type<ArticleContentType>(),
@@ -117,12 +117,19 @@ const content_zod = z
   })
   .optional();
 
+export const CreateArticleWithDateSchema = createInsertSchema(Article, {
+  content: content_zod,
+  draft_content: content_zod,
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
 export const CreateArticleSchema = createInsertSchema(Article, {
   content: content_zod,
   draft_content: content_zod,
+  updated_at: z.date(),
 }).omit({
   created_at: true,
-  updated_at: true,
 });
 
 export const UpdateArticleSchema = createInsertSchema(Article, {

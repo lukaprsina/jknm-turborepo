@@ -5,6 +5,7 @@ import { and, desc, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
+  CreateArticleWithDateSchema,
   UpdateArticleSchema,
 } from "@acme/db/schema";
 
@@ -76,6 +77,12 @@ export const articleRouter = {
 
   create: protectedProcedure
     .input(CreateArticleSchema)
+    .mutation(({ ctx, input }) => {
+      return ctx.db.insert(Article).values(input).returning({ id: Article.id });
+    }),
+
+  createWithDate: protectedProcedure
+    .input(CreateArticleWithDateSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.insert(Article).values(input).returning({ id: Article.id });
     }),

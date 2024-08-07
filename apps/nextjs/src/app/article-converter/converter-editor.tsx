@@ -15,8 +15,8 @@ import {
 } from "@acme/ui/card";
 
 import { read_articles } from "~/server/article-converter";
+import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../uredi/[novica_ime]/plugins";
-// import { api } from "~/trpc/react";
 import { iterate_over_articles } from "./converter-spaghetti";
 
 // import { article_title_to_url } from "../uredi/[novica_ime]/editor-utils";
@@ -24,7 +24,7 @@ import { iterate_over_articles } from "./converter-spaghetti";
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
-  //   const article_update = api.article.create.useMutation();
+  const article_update = api.article.createWithDate.useMutation();
   // const article_all = api.article.allProtected.useQuery();
 
   return (
@@ -36,7 +36,11 @@ export function ArticleConverter() {
           await read_articles();
           console.clear();
           const csv_articles = await read_articles();
-          await iterate_over_articles(csv_articles, editorJS.current);
+          await iterate_over_articles(
+            csv_articles,
+            editorJS.current,
+            article_update,
+          );
           /* for (const csv_article of csv_articles.slice(0, 5)) {
             article_update.mutate({
               title: csv_article.title,
@@ -95,7 +99,7 @@ export function SampleArticle({
         <CardTitle>{article.title}</CardTitle>
         <CardDescription>
           <p>Created at {article.created_at.toISOString()}</p>
-          <p>Updated at {article.updated_at?.toISOString()}</p>
+          <p>Updated at {article.updated_at.toISOString()}</p>
         </CardDescription>
       </CardHeader>
 
