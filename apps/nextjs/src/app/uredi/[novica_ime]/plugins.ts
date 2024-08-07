@@ -33,7 +33,7 @@ export const EDITOR_JS_PLUGINS: Record<
   embed: Embed,
   table: {
     class: Table,
-    // inlineToolbar: true,
+    inlineToolbar: true,
     config: {
       withHeadings: true,
     },
@@ -42,7 +42,7 @@ export const EDITOR_JS_PLUGINS: Record<
   list: {
     // @ts-expect-error no types
     class: List,
-    // inlineToolbar: true,
+    inlineToolbar: true,
     config: {
       defaultStyle: "unordered",
     },
@@ -59,6 +59,7 @@ export const EDITOR_JS_PLUGINS: Record<
   image: {
     // @ts-expect-error no types
     class: Image,
+    inlineToolbar: true,
     config: {
       endpoints: {
         byFile: "/api/upload_image_by_file",

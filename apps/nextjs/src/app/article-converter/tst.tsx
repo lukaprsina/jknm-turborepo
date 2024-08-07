@@ -3,6 +3,13 @@
 import dompurify from "dompurify";
 
 import { Button } from "@acme/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui/card";
 
 import { read_articles } from "~/server/article-converter";
 import { api } from "~/trpc/react";
@@ -34,22 +41,27 @@ export function ArticleConverter() {
       </Button>
       <>
         {article_all.data?.map((article) => (
-          <div className="py-6" key={article.title}>
-            <p>Created at {article.created_at.toISOString()}</p>
-            <p>Updated at {article.updated_at?.toISOString()}</p>
-            <h2>{article.title}</h2>
-            <p>
+          <Card className="py-6" key={article.title}>
+            <CardHeader>
+              <CardTitle>{article.title}</CardTitle>
+              <CardDescription>
+                <p>Created at {article.created_at.toISOString()}</p>
+                <p>Updated at {article.updated_at?.toISOString()}</p>
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent>
               {dompurify.sanitize(
                 article.content_html ??
                   "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               )}
-            </p>
-            {/* <div
+            </CardContent>
+            {/* <divs
               dangerouslySetInnerHTML={{
                 __html: article.content_html ?? "<h1>Ne obstaja</h1>",
               }}
             /> */}
-          </div>
+          </Card>
         ))}
       </>
     </div>
