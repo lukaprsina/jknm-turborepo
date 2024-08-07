@@ -14,13 +14,13 @@ import type { CSVType } from "~/server/article-converter";
 
 let wrong_divs = 0;
 let videos = 0;
-export function iterate_over_articles(
+export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 2);
+  const spliced_csv_articles = csv_articles.slice(0, 1);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);
@@ -30,6 +30,7 @@ export function iterate_over_articles(
     if (csv_article.title == "Ponovno na Straškem hribu") {
       console.log(sanitized);
     } */
+    editorJS?.clear();
     editorJS?.blocks.insert("header", { text: csv_article.title, level: 1 });
 
     for (const node of root.childNodes) {
@@ -47,6 +48,10 @@ export function iterate_over_articles(
         throw new Error("Unexpected comment: " + node.text);
       }
     }
+
+    const content = await editorJS?.save();
+    console.log(csv_article.title, content);
+    // editorJS?.clear();
   }
 
   console.log("Total articles:", csv_articles.length);
@@ -90,10 +95,9 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
         return;
       }
 
+      let src: string | undefined;
+      let caption: string | undefined;
       for (const div_child of node.childNodes) {
-        let src: string | undefined;
-        let caption: string | undefined;
-
         if (div_child.nodeType == NodeType.ELEMENT_NODE) {
           if (!(div_child instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
@@ -111,10 +115,10 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
             );
 
           if (div_child.rawTagName === "img") {
-            src = div_child.attributes.src;
+            src = `https://www.jknm.si${div_child.attributes.src}`;
             // } else if (div_child.rawTagName === "a") {
           } else if (div_child.rawTagName === "p") {
-            caption = div_child.attributes.href;
+            caption = div_child.text;
           }
         } else if (div_child.nodeType == NodeType.TEXT_NODE) {
           if (div_child.text.trim() !== "")
@@ -122,22 +126,31 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
         } else {
           throw new Error("Unexpected comment: " + node.text);
         }
-
-        editorJS?.blocks.insert("image", {
-          file: {
-            url: src,
-          },
-          caption,
-        });
       }
+
+      editorJS?.blocks.insert("image", {
+        file: {
+          url: src,
+        },
+        caption,
+      });
       break;
     }
     case "ul":
-    case "br":
+    case "br": {
+      console.log(node.tagName, node.text);
+      break;
+    }
     case "h2":
     case "h3":
     case "h4": {
-      console.log("h2", node.rawText);
+      const level = node.rawTagName[1];
+      if (!level) throw new Error("No level in header tag");
+
+      editorJS?.blocks.insert("header", {
+        text: node.text,
+        level: parseInt(level),
+      });
       break;
     }
     default: {
@@ -145,7 +158,7 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
     }
   }
 
-  console.log(node.rawTagName, node.childNodes.length);
+  // console.log(node.rawTagName, node.childNodes.length);
 }
 
 function fixHtml(htmlString: string) {

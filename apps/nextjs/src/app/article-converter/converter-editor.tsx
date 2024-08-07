@@ -36,7 +36,7 @@ export function ArticleConverter() {
           await read_articles();
           console.clear();
           const csv_articles = await read_articles();
-          iterate_over_articles(csv_articles, editorJS.current);
+          await iterate_over_articles(csv_articles, editorJS.current);
           /* for (const csv_article of csv_articles.slice(0, 5)) {
             article_update.mutate({
               title: csv_article.title,
