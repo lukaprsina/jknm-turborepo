@@ -68,9 +68,8 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
 
   switch (node.rawTagName) {
     case "p": {
+      editorJS?.blocks.insert("paragraph", { text: node.innerHTML });
       for (const p_child of node.childNodes) {
-        editorJS?.blocks.insert("paragraph", { text: p_child.rawText });
-
         if (p_child.nodeType == NodeType.ELEMENT_NODE) {
           if (!(p_child instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
@@ -81,7 +80,7 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
               "Unexpected tag in p element: " + p_child.rawTagName,
             );
         } else if (p_child.nodeType == NodeType.TEXT_NODE) {
-          /*  */
+          // editorJS?.blocks.insert("paragraph", { text: p_child.text });
         } else {
           throw new Error("Unexpected comment: " + node.text);
         }

@@ -509,6 +509,9 @@ importers:
       editorjs-html:
         specifier: ^3.4.3
         version: 3.4.3
+      editorjs-inline-tool:
+        specifier: ^0.4.0
+        version: 0.4.0(@editorjs/editorjs@2.30.2)
       editorjs-undo:
         specifier: ^2.0.28
         version: 2.0.28
@@ -6508,6 +6511,11 @@ packages:
 
   editorjs-html@3.4.3:
     resolution: {integrity: sha512-HMqQ3BCE98uhSpJsbfH0c3CoMctUMCHlap2Eq/7/VjaHas+g3IJqyf+ERtMByoQCzvcW22ISYaZEeE7rGkd8Xg==}
+
+  editorjs-inline-tool@0.4.0:
+    resolution: {integrity: sha512-Ppb4e8IFPjWuNcoNM4tg9bDSo7FgMYAlqP4UhuV5W2JoJBubV5pUcpLrFrSyGTt1HJVEpbrib134zf4wxO+7VA==}
+    peerDependencies:
+      '@editorjs/editorjs': ^2.16.0
 
   editorjs-undo@2.0.28:
     resolution: {integrity: sha512-7MiLdjIsPOXn8+cHDeAt2HapVklg4vcLWWkd2eMMlGI6UVtwYSjdQquDSv9752B/fOEP1C3NMF2sdiCoZV3tTA==}
@@ -17526,6 +17534,10 @@ snapshots:
   editorjs-drag-drop@1.1.14: {}
 
   editorjs-html@3.4.3: {}
+
+  editorjs-inline-tool@0.4.0(@editorjs/editorjs@2.30.2):
+    dependencies:
+      '@editorjs/editorjs': 2.30.2
 
   editorjs-undo@2.0.28:
     dependencies:

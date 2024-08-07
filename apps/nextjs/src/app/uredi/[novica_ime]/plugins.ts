@@ -24,16 +24,35 @@ import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 // @ts-expect-error no types
 import Warning from "@editorjs/warning";
+import {
+  ItalicInlineTool,
+  StrongInlineTool,
+  UnderlineInlineTool,
+} from "editorjs-inline-tool";
 
-export const EDITOR_JS_PLUGINS: Record<
+export const EDITOR_JS_PLUGINS = {
+  header: Header,
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true,
+  },
+  // or use a pre-defined tool instead
+  italic: ItalicInlineTool,
+  underline: UnderlineInlineTool,
+};
+
+export const EDITOR_JS_PLUGINS2: Record<
   string,
   ToolConstructable | ToolSettings
 > = {
   paragraph: Paragraph,
   embed: Embed,
+  italic: ItalicInlineTool,
+  strong: StrongInlineTool,
+  underline: UnderlineInlineTool,
   table: {
     class: Table,
-    inlineToolbar: true,
+    // inlineToolbar: true,
     config: {
       withHeadings: true,
     },
@@ -42,7 +61,7 @@ export const EDITOR_JS_PLUGINS: Record<
   list: {
     // @ts-expect-error no types
     class: List,
-    inlineToolbar: true,
+    // inlineToolbar: true,
     config: {
       defaultStyle: "unordered",
     },
@@ -59,7 +78,7 @@ export const EDITOR_JS_PLUGINS: Record<
   image: {
     // @ts-expect-error no types
     class: Image,
-    inlineToolbar: true,
+    // inlineToolbar: true,
     config: {
       endpoints: {
         byFile: "/api/upload_image_by_file",

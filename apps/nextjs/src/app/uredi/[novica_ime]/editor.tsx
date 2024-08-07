@@ -69,7 +69,7 @@ export default function MyEditor({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
       data: content,
-      inlineToolbar: true, //["link", "marker", "bold", "italic"],
+      inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
       autofocus: true,
       onReady: () => {
         setTimeout(() => {
@@ -104,9 +104,6 @@ export default function MyEditor({
 
   return (
     <div className="mx-auto w-full outline outline-1">
-      <Button onClick={() => editorJS.current?.toolbar.toggleToolbox()}>
-        Toggle
-      </Button>
       <MyToolbar
         article={article}
         editor={editorJS.current ?? undefined}
