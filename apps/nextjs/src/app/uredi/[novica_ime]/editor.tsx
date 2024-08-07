@@ -69,7 +69,7 @@ export default function MyEditor({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS,
       data: content,
-      inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
+      // inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
       autofocus: true,
       onReady: () => {
         setTimeout(() => {

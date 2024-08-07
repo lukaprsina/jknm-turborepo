@@ -30,7 +30,7 @@ import {
   UnderlineInlineTool,
 } from "editorjs-inline-tool";
 
-export const EDITOR_JS_PLUGINS = {
+export const EDITOR_JS_PLUGINS2 = {
   header: Header,
   paragraph: {
     class: Paragraph,
@@ -41,11 +41,14 @@ export const EDITOR_JS_PLUGINS = {
   underline: UnderlineInlineTool,
 };
 
-export const EDITOR_JS_PLUGINS2: Record<
+export const EDITOR_JS_PLUGINS: Record<
   string,
   ToolConstructable | ToolSettings
 > = {
-  paragraph: Paragraph,
+  paragraph: {
+    class: Paragraph,
+    inlineToolbar: true,
+  },
   embed: Embed,
   italic: ItalicInlineTool,
   strong: StrongInlineTool,
@@ -78,6 +81,7 @@ export const EDITOR_JS_PLUGINS2: Record<
   image: {
     // @ts-expect-error no types
     class: Image,
+    // inlineToolbar: ["link"],
     // inlineToolbar: true,
     config: {
       endpoints: {
