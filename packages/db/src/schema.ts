@@ -1,6 +1,7 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   json,
   pgTable,
@@ -86,22 +87,35 @@ export interface ArticleContentType {
 }
 
 // My schema below
-export const Article = pgTable("article", {
-  id: serial("id").primaryKey(),
-  title: varchar("title", { length: 255 }).notNull(),
-  url: varchar("url", { length: 255 }).notNull(),
-  published: boolean("published").default(false),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at", {
-    mode: "date",
-    withTimezone: true,
-  }).notNull() /* .$onUpdateFn(() => sql`now()`) */,
-  content: json("content").$type<ArticleContentType>(),
-  content_html: text("content_html").default(""),
-  draft_content: json("draft_content").$type<ArticleContentType>(),
-  draft_content_html: text("draft_content_html").default(""),
-  preview_image: varchar("preview_image", { length: 255 }),
-});
+export const Article = pgTable(
+  "article",
+  {
+    id: serial("id").primaryKey(),
+    title: varchar("title", { length: 255 }).notNull(),
+    url: varchar("url", { length: 255 }).notNull(),
+    published: boolean("published").default(false),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+    updated_at: timestamp("updated_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull() /* .$onUpdateFn(() => sql`now()`) */,
+    content: json("content").$type<ArticleContentType>(),
+    content_html: text("content_html").default(""),
+    draft_content: json("draft_content").$type<ArticleContentType>(),
+    draft_content_html: text("draft_content_html").default(""),
+    preview_image: varchar("preview_image", { length: 255 }),
+  },
+  (table) => ({
+    title_search_index: index("title_search_index").using(
+      "gin",
+      sql`to_tsvector('english', ${table.title})`,
+    ),
+    content_html_search_index: index("content_html_search_index").using(
+      "gin",
+      sql`to_tsvector('english', ${table.content_html})`,
+    ),
+  }),
+);
 
 const content_zod = z
   .object({

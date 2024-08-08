@@ -13,26 +13,45 @@ import {
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 const matchQuery = (search: string) => sql`(
-  setweight(to_tsvector('slovenian', ${Article.title}), 'A') ||
-  setweight(to_tsvector('slovenian', ${Article.content_html}), 'B')), to_tsquery('slovenian', ${search})`;
+  setweight(to_tsvector('english', ${Article.title}), 'A') ||
+  setweight(to_tsvector('english', ${Article.content_html}), 'B')), plainto_tsquery('english', ${search})`;
 
 export const articleRouter = {
-  fullTextSearch: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  fullTextSearch: publicProcedure
+    .input(
+      z.object({
+        search: z.string(),
+        rank_weight: z.number().default(0.4),
+        rank_cd_weight: z.number().default(0.6),
+      }),
+    )
+    .query(({ ctx, input }) => {
+      return ctx.db
+        .select({
+          ...getTableColumns(Article),
+          /* rank: sql`ts_rank(${matchQuery(input)})`,
+        rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
+          combined_rank: sql`${input.rank_weight} * ts_rank(${matchQuery(input.search)}) + ${input.rank_cd_weight} * ts_rank_cd(${matchQuery(input.search)})`,
+        })
+        .from(Article)
+        .where(
+          and(
+            eq(Article.published, true),
+            sql`(
+      setweight(to_tsvector('english', ${Article.title}), 'A') ||
+      setweight(to_tsvector('english', ${Article.content_html}), 'B')
+      ) @@ to_tsquery('english', ${input.search})`,
+          ),
+        )
+        .orderBy((table) => desc(table.combined_rank));
+    }),
+
+  searchTitle: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.db
-      .select({
-        ...getTableColumns(Article),
-        rank: sql`ts_rank(${matchQuery(input)})`,
-        rankCd: sql`ts_rank_cd(${matchQuery(input)})`,
-      })
+      .select()
       .from(Article)
       .where(
-        and(
-          eq(Article.published, true),
-          sql`(
-      setweight(to_tsvector('slovenian', ${Article.title}), 'A') ||
-      setweight(to_tsvector('slovenian', ${Article.content_html}), 'B')
-      ) @@ to_tsquery('slovenian', ${input})`,
-        ),
+        sql`to_tsvector('english', ${Article.title}) @@ to_tsquery('english', ${input})`,
       );
   }),
 
