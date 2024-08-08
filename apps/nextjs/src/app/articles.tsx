@@ -13,7 +13,7 @@ export function Articles({
   return (
     <>
       {articles.length !== 0 && articles[0] ? (
-        <div className="prose lg:prose-xl dark:prose-invert prose-img:m-0 container grid grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="prose prose-h3:my-0 prose-p:mt-0 lg:prose-xl dark:prose-invert prose-img:m-0 container grid grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
           <FeaturedArticleCard article={articles[0]} />
           {rest.map((article, index) => (
             <ArticleCard key={index} article={article} />

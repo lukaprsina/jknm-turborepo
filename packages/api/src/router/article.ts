@@ -1,7 +1,8 @@
 import type { TRPCRouterRecord } from "@trpc/server";
+import { getTableColumns } from "drizzle-orm";
 import { z } from "zod";
 
-import { and, count, desc, eq } from "@acme/db";
+import { and, count, desc, eq, sql } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -11,7 +12,30 @@ import {
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
+const matchQuery = (search: string) => sql`(
+  setweight(to_tsvector('slovenian', ${Article.title}), 'A') ||
+  setweight(to_tsvector('slovenian', ${Article.content_html}), 'B')), to_tsquery('slovenian', ${search})`;
+
 export const articleRouter = {
+  fullTextSearch: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+    return ctx.db
+      .select({
+        ...getTableColumns(Article),
+        rank: sql`ts_rank(${matchQuery(input)})`,
+        rankCd: sql`ts_rank_cd(${matchQuery(input)})`,
+      })
+      .from(Article)
+      .where(
+        and(
+          eq(Article.published, true),
+          sql`(
+      setweight(to_tsvector('slovenian', ${Article.title}), 'A') ||
+      setweight(to_tsvector('slovenian', ${Article.content_html}), 'B')
+      ) @@ to_tsquery('slovenian', ${input})`,
+        ),
+      );
+  }),
+
   count: publicProcedure.query(({ ctx }) => {
     return ctx.db
       .select({

@@ -178,7 +178,8 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function DataTableDemo({ page_number }: { page_number: number }) {
+export function DataTableDemo() {
+  const page_number = 1;
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
