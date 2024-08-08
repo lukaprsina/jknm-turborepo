@@ -67,7 +67,7 @@ export default async function EditorPage({
 
   return (
     <Shell>
-      <div className="container mb-4 mt-8 h-full min-h-screen gap-72">
+      <div className="container mb-4 mt-8 h-full min-h-screen">
         {article_by_url ? (
           <>
             <ArticleBreadcrumb article={article_by_url} />

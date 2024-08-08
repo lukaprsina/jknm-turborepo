@@ -1,7 +1,7 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, desc, eq } from "@acme/db";
+import { and, count, desc, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -12,6 +12,23 @@ import {
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
+  count: publicProcedure.query(({ ctx }) => {
+    return ctx.db
+      .select({
+        count: count(Article.id),
+      })
+      .from(Article)
+      .where(eq(Article.published, true));
+  }),
+
+  countProtected: protectedProcedure.query(({ ctx }) => {
+    return ctx.db
+      .select({
+        count: count(Article.id),
+      })
+      .from(Article);
+  }),
+
   all: publicProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
@@ -21,12 +38,34 @@ export const articleRouter = {
     });
   }),
 
+  allWithOffset: publicProcedure
+    .input(z.object({ offset: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.query.Article.findMany({
+        where: eq(Article.published, true),
+        orderBy: desc(Article.created_at),
+        offset: input.offset,
+        limit: 10,
+      });
+    }),
+
   allProtected: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.Article.findMany({
       orderBy: desc(Article.created_at),
       limit: 10,
     });
   }),
+
+  allProtectedWithOffset: protectedProcedure
+    .input(z.object({ offset: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.query.Article.findMany({
+        where: eq(Article.published, true),
+        orderBy: desc(Article.created_at),
+        offset: input.offset,
+        limit: 10,
+      });
+    }),
 
   byId: publicProcedure
     .input(z.object({ id: z.number() }))

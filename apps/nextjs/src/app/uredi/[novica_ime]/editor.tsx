@@ -17,6 +17,8 @@ import DragDrop from "editorjs-drag-drop";
 import Undo from "editorjs-undo";
 import { SaveIcon, XIcon } from "lucide-react";
 
+import "./editor.css";
+
 import type { Article } from "@acme/db/schema";
 import {
   AlertDialog,

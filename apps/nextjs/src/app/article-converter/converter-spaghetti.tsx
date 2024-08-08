@@ -1,6 +1,7 @@
 "use client";
 
 import type EditorJS from "@editorjs/editorjs";
+import type { OutputBlockData } from "@editorjs/editorjs";
 import type { Node as ParserNode } from "node-html-parser";
 import { parse as parseDate } from "date-format-parse";
 import dom_serialize from "dom-serializer";
@@ -27,7 +28,7 @@ export async function iterate_over_articles(
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 20);
+  const spliced_csv_articles = csv_articles.slice(0, 10);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);
@@ -37,12 +38,17 @@ export async function iterate_over_articles(
     if (csv_article.title == "Ponovno na Straškem hribu") {
       console.log(sanitized);
     } */
-    editorJS?.clear();
-    editorJS?.blocks.insert("header", { text: csv_article.title, level: 1 });
+
+    const blocks: OutputBlockData[] = [
+      {
+        type: "header",
+        data: { text: csv_article.title, level: 1 },
+      },
+    ];
 
     for (const node of root.childNodes) {
       if (node.nodeType == NodeType.ELEMENT_NODE) {
-        const is_problem = parse_node(node, editorJS);
+        const is_problem = parse_node(node, blocks);
 
         if (is_problem) {
           console.log("Problematic article:", csv_article.title);
@@ -56,33 +62,38 @@ export async function iterate_over_articles(
       }
     }
 
-    const format = "M/D/YYYY HH:mm:ss";
+    await editorJS?.render({
+      blocks,
+    });
+
+    const format = "D/M/YYYY HH:mm:ss";
     const created_at = parseDate(csv_article.created_at, format);
     const updated_at = parseDate(csv_article.updated_at, format);
-
-    /* 
-    console.log(
-        "Invalid date",
-        csv_article.created_at,
-        csv_article.updated_at,
-        created_at,
-        updated_at,
-      ); */
 
     const content = await editorJS?.save();
     if (!content) throw new Error("No content");
 
     const content_html = edjsParser.parse(content).join("\n");
-    console.log(csv_article.title, content);
 
     const images = get_image_data_from_editor(content);
-    if (images.length == 0) {
-      throw new Error("No images in article " + csv_article.title);
+    const preview_image = images[0] ? images[0]?.url : undefined;
+
+    if (typeof preview_image === "undefined") {
+      console.error("No images in article", csv_article.title);
     }
+
+    console.log(
+      csv_article.title,
+      content,
+      csv_article.created_at,
+      csv_article.updated_at,
+      created_at,
+      updated_at,
+    );
 
     article_create.mutate({
       title: csv_article.title,
-      preview_image: images[0]?.url,
+      preview_image,
       content,
       content_html,
       draft_content: content,
@@ -92,8 +103,6 @@ export async function iterate_over_articles(
       updated_at,
       published: true,
     });
-
-    editorJS?.clear();
   }
 
   console.log("Total articles:", csv_articles.length);
@@ -104,13 +113,13 @@ export async function iterate_over_articles(
   );
 }
 
-function parse_node(node: ParserNode, editorJS: EditorJS | null) {
+function parse_node(node: ParserNode, blocks: OutputBlockData[]) {
   if (!(node instanceof ParserHTMLElement))
     throw new Error("Not an HTMLElement");
 
   switch (node.rawTagName) {
     case "p": {
-      editorJS?.blocks.insert("paragraph", { text: node.innerHTML });
+      blocks.push({ type: "paragraph", data: { text: node.innerHTML } });
       for (const p_child of node.childNodes) {
         if (p_child.nodeType == NodeType.ELEMENT_NODE) {
           if (!(p_child instanceof ParserHTMLElement))
@@ -169,11 +178,14 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
         }
       }
 
-      editorJS?.blocks.insert("image", {
-        file: {
-          url: src,
+      blocks.push({
+        type: "image",
+        data: {
+          file: {
+            url: src,
+          },
+          caption,
         },
-        caption,
       });
       break;
     }
@@ -185,12 +197,15 @@ function parse_node(node: ParserNode, editorJS: EditorJS | null) {
     case "h2":
     case "h3":
     case "h4": {
-      const level = node.rawTagName[1];
+      const level = node.rawTagName.trim()[1];
       if (!level) throw new Error("No level in header tag");
 
-      editorJS?.blocks.insert("header", {
-        text: node.text,
-        level: parseInt(level),
+      blocks.push({
+        type: "header",
+        data: {
+          text: node.text,
+          level: parseInt(level),
+        },
       });
       break;
     }

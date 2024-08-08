@@ -1,5 +1,10 @@
 import { Shell } from "~/components/shell";
+import { ArticleTable } from "./article-table";
 
 export default function Novice() {
-  return <Shell>test</Shell>;
+  return (
+    <Shell>
+      <ArticleTable />
+    </Shell>
+  );
 }

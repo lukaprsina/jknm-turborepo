@@ -28,7 +28,7 @@ export function FeaturedArticleCard({
         )}
         <div>
           <CardHeader>
-            <CardTitle>{article.title}</CardTitle>
+            <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
           {article.content_html ? (
             <CardContent>
@@ -72,7 +72,7 @@ export function ArticleCard({
         )}
         <div>
           <CardHeader>
-            <CardTitle>{article.title}</CardTitle>
+            <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
           {article.content_html ? (
             <CardContent>

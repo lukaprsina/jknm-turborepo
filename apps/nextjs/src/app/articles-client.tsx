@@ -17,5 +17,9 @@ export function ArticlesClient({ session }: { session: Session | null }) {
       ? api.article.allProtected.useQuery()
       : api.article.all.useQuery();
 
+  console.log(
+    articles.data?.map((article) => [article.title, article.created_at]),
+  );
+
   return <Articles articles={articles.data ?? []} />;
 }
