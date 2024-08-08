@@ -14,6 +14,8 @@ import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const db_language = "serbian";
 
+/* rank: sql`ts_rank(${matchQuery(input)})`,
+        rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
 const matchQuery = (search: string) => sql`(
   setweight(to_tsvector(${db_language}, ${Article.title}), 'A') ||
   setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')), plainto_tsquery(${db_language}, ${search})`;
@@ -31,8 +33,6 @@ export const articleRouter = {
       return ctx.db
         .select({
           ...getTableColumns(Article),
-          /* rank: sql`ts_rank(${matchQuery(input)})`,
-        rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
           combined_rank: sql`${input.rank_weight} * ts_rank(${matchQuery(input.search)}) + ${input.rank_cd_weight} * ts_rank_cd(${matchQuery(input.search)})`,
         })
         .from(Article)
@@ -48,14 +48,14 @@ export const articleRouter = {
         .orderBy((table) => desc(table.combined_rank));
     }),
 
-  searchTitle: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  /* searchTitle: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.db
       .select()
       .from(Article)
       .where(
         sql`to_tsvector(${db_language}, ${Article.title}) @@ to_tsquery(${db_language}, ${input})`,
       );
-  }),
+  }), */
 
   count: publicProcedure.query(({ ctx }) => {
     return ctx.db

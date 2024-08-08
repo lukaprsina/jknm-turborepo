@@ -15,7 +15,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import { db_language } from "./../../api/src/router/article";
+export const db_language = "serbian";
 
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -107,7 +107,7 @@ export const Article = pgTable(
     draft_content_html: text("draft_content_html").default(""),
     preview_image: varchar("preview_image", { length: 255 }),
   },
-  (table) => ({
+  /* (table) => ({
     title_search_index: index("title_search_index").using(
       "gin",
       sql`to_tsvector(${db_language}, ${table.title})`,
@@ -116,7 +116,7 @@ export const Article = pgTable(
       "gin",
       sql`to_tsvector(${db_language}, ${table.content_html})`,
     ),
-  }),
+  }), */
 );
 
 const content_zod = z
