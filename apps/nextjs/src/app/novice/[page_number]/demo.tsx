@@ -178,7 +178,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
 ];
 
-export function DataTableDemo() {
+export function DataTableDemo({ page_number }: { page_number: number }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -203,6 +203,10 @@ export function DataTableDemo() {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination: {
+        pageIndex: page_number - 1,
+        pageSize: 1,
+      },
     },
   });
 
@@ -303,11 +307,11 @@ export function DataTableDemo() {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        <div className="w-full space-x-2">
+        <div className="space-x-2">
           <Pagination>
             <PaginationContent>
               <PaginationItem>
-                <PaginationPrevious size="md" href="#" />
+                <PaginationPrevious href={`/novice/${page_number - 1}`} />
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink href="#">1</PaginationLink>
@@ -324,7 +328,7 @@ export function DataTableDemo() {
                 <PaginationEllipsis />
               </PaginationItem>
               <PaginationItem>
-                <PaginationNext href="#" />
+                <PaginationNext href={`/novice/${page_number + 1}`} />
               </PaginationItem>
             </PaginationContent>
           </Pagination>
