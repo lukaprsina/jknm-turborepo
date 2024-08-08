@@ -15,6 +15,8 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+import { db_language } from "./../../api/src/router/article";
+
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }),
@@ -108,11 +110,11 @@ export const Article = pgTable(
   (table) => ({
     title_search_index: index("title_search_index").using(
       "gin",
-      sql`to_tsvector('english', ${table.title})`,
+      sql`to_tsvector(${db_language}, ${table.title})`,
     ),
     content_html_search_index: index("content_html_search_index").using(
       "gin",
-      sql`to_tsvector('english', ${table.content_html})`,
+      sql`to_tsvector(${db_language}, ${table.content_html})`,
     ),
   }),
 );

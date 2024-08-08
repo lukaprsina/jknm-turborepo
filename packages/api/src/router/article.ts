@@ -12,9 +12,11 @@ import {
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
+export const db_language = "serbian";
+
 const matchQuery = (search: string) => sql`(
-  setweight(to_tsvector('english', ${Article.title}), 'A') ||
-  setweight(to_tsvector('english', ${Article.content_html}), 'B')), plainto_tsquery('english', ${search})`;
+  setweight(to_tsvector(${db_language}, ${Article.title}), 'A') ||
+  setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')), plainto_tsquery(${db_language}, ${search})`;
 
 export const articleRouter = {
   fullTextSearch: publicProcedure
@@ -38,9 +40,9 @@ export const articleRouter = {
           and(
             eq(Article.published, true),
             sql`(
-      setweight(to_tsvector('english', ${Article.title}), 'A') ||
-      setweight(to_tsvector('english', ${Article.content_html}), 'B')
-      ) @@ to_tsquery('english', ${input.search})`,
+      setweight(to_tsvector(${db_language}, ${Article.title}), 'A') ||
+      setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')
+      ) @@ to_tsquery(${db_language}, ${input.search})`,
           ),
         )
         .orderBy((table) => desc(table.combined_rank));
@@ -51,7 +53,7 @@ export const articleRouter = {
       .select()
       .from(Article)
       .where(
-        sql`to_tsvector('english', ${Article.title}) @@ to_tsquery('english', ${input})`,
+        sql`to_tsvector(${db_language}, ${Article.title}) @@ to_tsquery(${db_language}, ${input})`,
       );
   }),
 
