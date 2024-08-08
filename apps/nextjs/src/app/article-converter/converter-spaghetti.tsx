@@ -27,7 +27,7 @@ export async function iterate_over_articles(
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 10);
+  const spliced_csv_articles = csv_articles.slice(0, 20);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);
@@ -82,11 +82,11 @@ export async function iterate_over_articles(
 
     article_create.mutate({
       title: csv_article.title,
-      content,
       preview_image: images[0]?.url,
+      content,
       content_html,
-      draft_content: undefined,
-      draft_content_html: undefined,
+      draft_content: content,
+      draft_content_html: content_html,
       url: article_title_to_url(csv_article.title),
       created_at,
       updated_at,

@@ -46,15 +46,11 @@ export default async function NovicaPage({
   return (
     <EditableProvider editable="readonly">
       <Shell article={article_by_url}>
-        <div className="container h-full min-h-screen pt-16">
-          <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
-            {session ? (
-              <TabbedContent article={article_by_url} />
-            ) : (
-              <PublishedContent article={article_by_url} />
-            )}
-          </div>
-        </div>
+        {session ? (
+          <TabbedContent article={article_by_url} />
+        ) : (
+          <PublishedContent article={article_by_url} />
+        )}
       </Shell>
     </EditableProvider>
   );
@@ -74,11 +70,14 @@ function PublishedContent({
   }
 
   return (
-    <div
-      dangerouslySetInnerHTML={{
-        __html: article.content_html,
-      }}
-    />
+    <div className="container h-full min-h-screen pt-16">
+      <div
+        className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
+        dangerouslySetInnerHTML={{
+          __html: article.content_html,
+        }}
+      />
+    </div>
   );
 }
 
@@ -101,7 +100,7 @@ async function TabbedContent({
   }
 
   return (
-    <Tabs defaultValue="draft" className="w-[400px]">
+    <Tabs defaultValue="draft">
       <TabsList>
         <TabsTrigger disabled={!article.draft_content_html} value="draft">
           Osnutek
@@ -110,18 +109,26 @@ async function TabbedContent({
           Objavljeno
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="draft">
+      <TabsContent
+        value="draft"
+        className="container h-full min-h-screen pt-16"
+      >
         {article.draft_content_html && (
           <div
+            className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
             dangerouslySetInnerHTML={{
               __html: article.draft_content_html,
             }}
           />
         )}
       </TabsContent>
-      <TabsContent value="published">
+      <TabsContent
+        value="published"
+        className="container h-full min-h-screen pt-16"
+      >
         {article.content_html && (
           <div
+            className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
             dangerouslySetInnerHTML={{
               __html: article.content_html,
             }}
