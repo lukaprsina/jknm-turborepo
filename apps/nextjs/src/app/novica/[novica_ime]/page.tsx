@@ -100,7 +100,10 @@ async function TabbedContent({
   }
 
   return (
-    <Tabs defaultValue="draft">
+    <Tabs
+      defaultValue="draft"
+      className="prose lg:prose-xl dark:prose-invert mx-auto w-full py-4"
+    >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content_html} value="draft">
           Osnutek
@@ -109,26 +112,19 @@ async function TabbedContent({
           Objavljeno
         </TabsTrigger>
       </TabsList>
-      <TabsContent
-        value="draft"
-        className="container h-full min-h-screen pt-16"
-      >
+      <TabsContent value="draft">
         {article.draft_content_html && (
           <div
-            className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
             dangerouslySetInnerHTML={{
               __html: article.draft_content_html,
             }}
           />
         )}
       </TabsContent>
-      <TabsContent
-        value="published"
-        className="container h-full min-h-screen pt-16"
-      >
+      <TabsContent value="published">
         {article.content_html && (
           <div
-            className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
+            className="mx-auto w-full"
             dangerouslySetInnerHTML={{
               __html: article.content_html,
             }}

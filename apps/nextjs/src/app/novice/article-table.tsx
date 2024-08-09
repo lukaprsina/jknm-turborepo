@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 
-import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 
 import { ArticleCard } from "~/components/article-card";
@@ -27,10 +26,10 @@ export function ArticleTable() {
 
   useEffect(() => {
     console.log(query, article_fts.data?.length);
-  }, [article_fts.data]);
+  }, [article_fts.data, query]);
 
   return (
-    <>
+    <div className="prose lg:prose-xl dark:prose-invert">
       <Input
         value={search}
         onChange={(event) => {
@@ -40,6 +39,6 @@ export function ArticleTable() {
       {article_fts.data?.map((article) => (
         <ArticleCard key={article.id} article={article} />
       ))}
-    </>
+    </div>
   );
 }

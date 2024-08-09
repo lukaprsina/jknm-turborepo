@@ -5,8 +5,10 @@ import { DataTableDemo } from "./demo";
 export default function Novice() {
   return (
     <Shell>
-      <ArticleTable />
-      <DataTableDemo />
+      <div className="container mx-auto w-full">
+        <ArticleTable />
+        <DataTableDemo />
+      </div>
     </Shell>
   );
 }
