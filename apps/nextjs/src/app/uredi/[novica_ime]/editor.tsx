@@ -123,6 +123,7 @@ export default function MyEditor({
 export interface SaveCallbackProps {
   variables?: Partial<typeof Article.$inferInsert>;
   update?: Partial<{ draft: boolean; content: boolean }> | false;
+  redirect_to?: string | false;
 }
 
 export type SaveCallbackType = (props: SaveCallbackProps) => Promise<void>;
@@ -143,19 +144,11 @@ function MyToolbar({
   const { toast } = useToast();
 
   const article_update = api.article.save.useMutation({
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? null);
+      settings_store.set.preview_image(variables.preview_image ?? undefined);
       setDirty(false);
-
-      if (!data?.[0]?.id) {
-        console.log("No article ID returned", data);
-        return;
-      }
-
-      if (variables.url !== article?.url)
-        router.replace(`/uredi/${variables.url}-${data[0]?.id}`);
     },
     onError: (error) => {
       console.error("article_update error", error);
@@ -174,14 +167,13 @@ function MyToolbar({
   });
 
   const save_callback = useCallback(
-    async ({ variables, update }: SaveCallbackProps) => {
+    async ({ variables, update, redirect_to = "uredi" }: SaveCallbackProps) => {
       if (!editor || !article) return;
 
       if (update) setSaving(true);
       const editor_content = await editor.save();
 
       const image_data = get_image_data_from_editor(editor_content);
-      console.log(image_data);
       settings_store.set.image_data(image_data);
 
       const { title, error } = get_heading_from_editor(editor_content);
@@ -248,22 +240,41 @@ function MyToolbar({
           )
         : undefined;
 
-      article_update.mutate({
-        id: article.id,
-        title,
-        url: article_title_to_url(title),
-        draft_content: update.draft ? editor_content : article.draft_content,
-        draft_content_html: update.draft
-          ? html.join("\n")
-          : article.draft_content_html,
-        content: update.content ? editor_content : article.content,
-        content_html: update.content ? html.join("\n") : article.content_html,
-        preview_image: settings_store.get.preview_image(),
-        updated_at: new Date(),
-        ...filtered_values,
-      });
+      article_update.mutate(
+        {
+          id: article.id,
+          title: update.content ? title : article.title,
+          url: update.content ? article_title_to_url(title) : article.url,
+          draft_content: update.draft ? editor_content : article.draft_content,
+          draft_content_html: update.draft
+            ? html.join("\n")
+            : article.draft_content_html,
+          content: update.content ? editor_content : article.content,
+          content_html: update.content ? html.join("\n") : article.content_html,
+          preview_image: update.content
+            ? settings_store.get.preview_image()
+            : article.preview_image,
+          updated_at: update.content ? new Date() : article.updated_at,
+          ...filtered_values,
+        },
+        {
+          onSuccess: (data, variables) => {
+            if (!data?.[0]?.id) {
+              console.log("No article ID returned", data);
+              return;
+            }
+            /* console.log(
+              { variables },
+              `/${redirect_to}/${variables.url}-${data[0]?.id}`,
+            ); */
+
+            if (redirect_to /*  && variables.url !== article.url */)
+              router.replace(`/${redirect_to}/${variables.url}-${data[0]?.id}`);
+          },
+        },
+      );
     },
-    [article, article_update, editor, toast],
+    [article, article_update, editor, toast, router],
   );
 
   const handleKeyPress = useCallback(

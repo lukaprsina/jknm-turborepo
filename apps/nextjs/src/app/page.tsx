@@ -2,6 +2,7 @@
 
 import { auth } from "@acme/auth";
 
+import { ShowDraftsProvider } from "~/components/drafts-provider";
 import { Shell } from "../components/shell";
 import { ArticlesClient } from "./articles-client";
 import { ArticlesServer } from "./articles-server";
@@ -16,10 +17,10 @@ export default async function HomePageServer() {
   );
 
   return (
-    <Shell>
-      {articles}
-      {/* <ArticlesClient session={session} /> */}
-      {/* <ArticlesServer /> */}
-    </Shell>
+    <ShowDraftsProvider>
+      <Shell>
+        {articles}
+      </Shell>
+    </ShowDraftsProvider>
   );
 }

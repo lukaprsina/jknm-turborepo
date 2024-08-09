@@ -10,5 +10,5 @@ export async function ArticlesServer() {
     ? await api.article.allProtected()
     : await api.article.all();
 
-  return <Articles articles={articles} />;
+  return <Articles featured articles={articles} />;
 }

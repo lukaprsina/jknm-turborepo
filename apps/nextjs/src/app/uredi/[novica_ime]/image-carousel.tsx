@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 
+import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
 import {
@@ -18,14 +19,28 @@ import { settings_store } from "./settings-store";
 interface ImageCarouselProps {
   onImageUrlChange: (value: string) => void;
   imageUrl?: string;
+  article: typeof Article.$inferInsert;
 }
 
 const ImageCarousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & ImageCarouselProps
->(({ onImageUrlChange, imageUrl, ...props }, ref) => {
+>(({ onImageUrlChange, imageUrl, article, ...props }, ref) => {
   const file_ref = useRef<HTMLInputElement>(null);
+  const [uploadedUrl, setUploadedUrl] = useState<string | undefined>(undefined);
   const image_data = settings_store.use.image_data();
+
+  useEffect(() => {
+    /* for (const image of image_data) {
+      if (image.url === article.preview_image) {
+        onImageUrlChange(article.preview_image);
+        return;
+      }
+    } */
+
+    if (uploadedUrl) return;
+    setUploadedUrl(article.preview_image ?? undefined);
+  }, [article.preview_image, image_data, onImageUrlChange, uploadedUrl]);
 
   return (
     <Carousel
@@ -48,14 +63,29 @@ const ImageCarousel = React.forwardRef<
                 onImageUrlChange(image.url);
               }}
             >
-              <CardContent className="flex aspect-square items-center justify-center p-2">
+              <CardContent className="flex aspect-square items-center justify-center py-2 hover:bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={image.url} />
               </CardContent>
             </Card>
           </CarouselItem>
         ))}
-        <CarouselItem className="md:basis-1/2 lg:basis-1/3">
+        {uploadedUrl ? (
+          <CarouselItem className="cursor-pointer md:basis-1/2 lg:basis-1/3">
+            <Card
+              className={cn(imageUrl === uploadedUrl ? "bg-slate-600" : null)}
+              onClick={() => {
+                onImageUrlChange(uploadedUrl);
+              }}
+            >
+              <CardContent className="flex aspect-square items-center justify-center py-2 hover:bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={uploadedUrl} />
+              </CardContent>
+            </Card>
+          </CarouselItem>
+        ) : null}
+        <CarouselItem className="cursor-pointer md:basis-1/2 lg:basis-1/3">
           <input
             ref={file_ref}
             onChange={async (event) => {
@@ -80,8 +110,8 @@ const ImageCarousel = React.forwardRef<
 
               // TODO: ko se shrani, se image_data prepiše iz articla
               if (!image_json.success) return;
-              settings_store.set.image_data([...image_data, image_json.file]);
-
+              // settings_store.set.image_data([...image_data, image_json.file]);
+              setUploadedUrl(image_json.file.url);
               onImageUrlChange(image_json.file.url);
             }}
             id="fileid"
@@ -92,9 +122,8 @@ const ImageCarousel = React.forwardRef<
             onClick={() => {
               file_ref.current?.click();
             }}
-            className="cursor-pointer hover:bg-muted"
           >
-            <CardContent className="flex aspect-square items-center justify-center p-2">
+            <CardContent className="flex aspect-square items-center justify-center py-2 hover:bg-muted">
               <div className="flex items-baseline gap-2">
                 <PlusIcon />
                 <p>Naloži</p>

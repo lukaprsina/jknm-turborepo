@@ -25,7 +25,7 @@ export default function NewArticleLoader({
     onSuccess: (data, variables) => {
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? null);
+      settings_store.set.preview_image(variables.preview_image ?? undefined);
 
       if (!data[0]?.id) {
         console.log("No article ID returned", data);
@@ -64,6 +64,7 @@ export default function NewArticleLoader({
               preview_image: "",
               draft_content_html: "<h1>Nova novica</h1>",
               draft_content: template,
+              updated_at: new Date(),
             });
           }}
         />

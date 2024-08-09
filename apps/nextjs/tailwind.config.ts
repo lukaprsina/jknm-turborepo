@@ -9,15 +9,15 @@ export default {
   content: [...baseConfig.content, "../../packages/ui/**/*.{ts,tsx}"],
   presets: [baseConfig],
   theme: {
-    container: {
-      screens: {
-        sm: "100%",
-        md: "100%",
-        lg: "1024px",
-        xl: "1280px",
-      },
-    },
     extend: {
+      container: {
+        screens: {
+          sm: "100%",
+          md: "100%",
+          lg: "1024px",
+          xl: "1280px",
+        },
+      },
       fontFamily: {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
         mono: ["var(--font-geist-mono)", ...fontFamily.mono],

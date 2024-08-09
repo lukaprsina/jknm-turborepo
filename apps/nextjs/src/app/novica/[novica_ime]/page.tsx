@@ -101,8 +101,8 @@ async function TabbedContent({
 
   return (
     <Tabs
-      defaultValue="draft"
-      className="prose lg:prose-xl dark:prose-invert mx-auto w-full py-4"
+      defaultValue={article.draft_content_html ? "draft" : "published"}
+      className="prose lg:prose-xl dark:prose-invert container mx-auto w-full py-4"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content_html} value="draft">

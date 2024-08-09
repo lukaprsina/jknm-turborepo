@@ -41,20 +41,25 @@ export function UploadDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Shrani in objavi</AlertDialogTitle>
           <AlertDialogDescription>
-            Ste prepričani, da želite objaviti osnutek?
+            Ste prepričani, da želite objaviti novico?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Ne objavi</AlertDialogCancel>
           <AlertDialogAction
             onClick={() =>
               save_callback({
-                variables: { published: true },
-                update: { draft: true, content: true },
+                variables: {
+                  published: true,
+                  draft_content: null,
+                  draft_content_html: null,
+                },
+                update: { content: true },
+                redirect_to: "novica",
               })
             }
           >
-            Continue
+            Objavi
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

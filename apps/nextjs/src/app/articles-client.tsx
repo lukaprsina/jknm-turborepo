@@ -10,16 +10,17 @@ import { Articles } from "./articles";
 
 export function ArticlesClient({ session }: { session: Session | null }) {
   //   const { data: session } = useSession();
-  const [showDrafts] = useContext(ShowDraftsContext);
+  const drafts = useContext(ShowDraftsContext);
+  const showDrafts = drafts?.[0] ?? false;
 
   const articles =
     session && showDrafts
       ? api.article.allProtected.useQuery()
       : api.article.all.useQuery();
 
-  console.log(
+  /* console.log(
     articles.data?.map((article) => [article.title, article.created_at]),
-  );
+  ); */
 
-  return <Articles articles={articles.data ?? []} />;
+  return <Articles featured articles={articles.data ?? []} />;
 }

@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 import { Input } from "@acme/ui/input";
 
-import { ArticleCard } from "~/components/article-card";
 import { api } from "~/trpc/react";
+import { Articles } from "../articles";
 
 export function ArticleTable() {
   /* const [offset, setOffset] = useState(0);
@@ -14,31 +15,25 @@ export function ArticleTable() {
     offset,
   }); */
   const [search, setSearch] = useState("");
-  const query = useMemo(() => {
+  const debounced = useDebouncedCallback(() => {
     if (search.length == 0) return "";
 
     return `${search.trim().replace(/ /g, "+")}:*`;
-  }, [search]);
+  }, 500);
 
   const article_fts = api.article.fullTextSearch.useQuery({
-    search: query,
+    search: debounced() ?? "",
   });
 
-  useEffect(() => {
-    console.log(query, article_fts.data?.length);
-  }, [article_fts.data, query]);
-
   return (
-    <div className="prose lg:prose-xl dark:prose-invert">
+    <div className="prose lg:prose-xl dark:prose-invert pt-6">
       <Input
         value={search}
         onChange={(event) => {
           setSearch(event.target.value);
         }}
       />
-      {article_fts.data?.map((article) => (
-        <ArticleCard key={article.id} article={article} />
-      ))}
+      {article_fts.data ? <Articles articles={article_fts.data} /> : null}
     </div>
   );
 }

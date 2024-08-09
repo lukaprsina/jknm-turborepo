@@ -71,8 +71,14 @@ export function SettingsForm({
 
   async function onPublish(values: z.infer<typeof form_schema>) {
     await save_callback({
-      variables: { published: true, ...values },
-      update: { draft: true, content: true },
+      variables: {
+        ...values,
+        published: true,
+        draft_content: null,
+        draft_content_html: null,
+      },
+      update: { content: true },
+      redirect_to: "novica",
     });
   }
 
@@ -99,6 +105,7 @@ export function SettingsForm({
               </FormDescription>
               <FormControl>
                 <ImageCarousel
+                  article={article}
                   onImageUrlChange={(value) => field.onChange(value)}
                   imageUrl={field.value}
                 />
