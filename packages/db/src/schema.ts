@@ -15,7 +15,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const db_language = "serbian";
+const db_language = "serbian";
 
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -106,21 +106,21 @@ export const Article = pgTable(
     preview_image: varchar("preview_image", { length: 255 }),
     draft_preview_image: varchar("draft_preview_image", { length: 255 }),
   },
-  (table) => ({
+  /* (table) => ({
     title_search_index: index("title_search_index").using(
       "gin",
       sql`to_tsvector(${db_language}, ${table.title})`,
     ),
-    /* content_html_search_index: index("content_html_search_index").using(
+    content_html_search_index: index("content_html_search_index").using(
       "gin",
       sql`to_tsvector(${db_language}, ${table.content_html})`,
-    ), */
-  }),
+    ),
+  }), */
 );
 
 const content_zod = z
   .object({
-    time: z.number(),
+    time: z.number().optional(),
     blocks: z.array(
       z.object({
         id: z.string().optional(),

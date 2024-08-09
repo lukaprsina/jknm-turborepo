@@ -12,19 +12,19 @@ import {
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
-export const db_language = "serbian";
+const db_language = "serbian";
 
 /* rank: sql`ts_rank(${matchQuery(input)})`,
         rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
 
 /*  ||
   setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B' */
-const matchQuery = (search: string) => sql`(
+/* const matchQuery = (search: string) => sql`(
   setweight(to_tsvector(${db_language}, ${Article.title}), 'A')
-), plainto_tsquery(${db_language}, ${search})`;
+), plainto_tsquery(${db_language}, ${search})`; */
 
 export const articleRouter = {
-  fullTextSearch: publicProcedure
+  /*  fullTextSearch: publicProcedure
     .input(
       z.object({
         search: z.string(),
@@ -42,15 +42,14 @@ export const articleRouter = {
         .where(
           and(
             eq(Article.published, true),
-            /* ||
-      setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B') */
+            // ||      setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')
             sql`(
       setweight(to_tsvector(${db_language}, ${Article.title}), 'A')
       ) @@ to_tsquery(${db_language}, ${input.search})`,
           ),
         )
         .orderBy((table) => desc(table.combined_rank));
-    }),
+    }), */
 
   /* searchTitle: publicProcedure.input(z.string()).query(({ ctx, input }) => {
     return ctx.db
