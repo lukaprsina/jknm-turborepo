@@ -52,7 +52,6 @@ export function UploadDialog({
                 variables: {
                   published: true,
                   draft_content: null,
-                  draft_content_html: null,
                 },
                 update: { content: true },
                 redirect_to: "novica",

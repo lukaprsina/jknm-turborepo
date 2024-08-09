@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import EditorJS from "@editorjs/editorjs";
-import dompurify from "dompurify";
 
 import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
@@ -19,8 +18,6 @@ import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../uredi/[novica_ime]/plugins";
 import { iterate_over_articles } from "./converter-spaghetti";
 
-// import { article_title_to_url } from "../uredi/[novica_ime]/editor-utils";
-
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
@@ -36,11 +33,13 @@ export function ArticleConverter() {
           await read_articles();
           console.clear();
           const csv_articles = await read_articles();
+
           await iterate_over_articles(
             csv_articles,
             editorJS.current,
             article_update,
           );
+
           /* for (const csv_article of csv_articles.slice(0, 5)) {
             article_update.mutate({
               title: csv_article.title,
@@ -104,11 +103,11 @@ export function SampleArticle({
       </CardHeader>
 
       <CardContent>
-        {dompurify.sanitize(
+        {/* {dompurify.sanitize(
           article.content_html ??
             "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         )}
-        {/* <divs
+        <divs
               dangerouslySetInnerHTML={{
                 __html: article.content_html ?? "<h1>Ne obstaja</h1>",
               }}

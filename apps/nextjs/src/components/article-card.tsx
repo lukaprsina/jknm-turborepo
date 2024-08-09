@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Blocks from "editorjs-blocks-react-renderer";
 
 import type { Article } from "@acme/db/schema";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
@@ -30,17 +31,11 @@ export function FeaturedArticleCard({
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
-          {article.content_html ? (
+          {article.content ? (
             <CardContent>
-              <div
-                className="line-clamp-2 h-full overflow-y-hidden"
-                dangerouslySetInnerHTML={{
-                  __html: article.content_html
-                    .split("\n")
-                    .filter((tag) => tag.includes("<p>"))
-                    .join("\n"),
-                }}
-              />
+              <div className="line-clamp-2 h-full overflow-y-hidden">
+                <Blocks data={article.content} />
+              </div>
             </CardContent>
           ) : null}
         </div>
@@ -74,17 +69,11 @@ export function ArticleCard({
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
-          {article.content_html ? (
+          {article.content ? (
             <CardContent>
-              <div
-                className="line-clamp-2 h-full overflow-y-hidden"
-                dangerouslySetInnerHTML={{
-                  __html: article.content_html
-                    .split("\n")
-                    .filter((tag) => tag.includes("<p>"))
-                    .join("\n"),
-                }}
-              />
+              <div className="line-clamp-2 h-full overflow-y-hidden">
+                <Blocks data={article.content} />
+              </div>
             </CardContent>
           ) : null}
         </div>

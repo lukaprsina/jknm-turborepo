@@ -1,3 +1,5 @@
+import Blocks from "editorjs-blocks-react-renderer";
+
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import { Card, CardHeader, CardTitle } from "@acme/ui/card";
@@ -61,7 +63,7 @@ function PublishedContent({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
-  if (!article?.content_html) {
+  if (!article?.content) {
     return (
       <Card>
         <CardHeader>Novica ne obstaja</CardHeader>
@@ -71,12 +73,9 @@ function PublishedContent({
 
   return (
     <div className="container h-full min-h-screen pt-16">
-      <div
-        className="prose lg:prose-xl dark:prose-invert mx-auto w-full"
-        dangerouslySetInnerHTML={{
-          __html: article.content_html,
-        }}
-      />
+      <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
+        <Blocks data={article.content} />
+      </div>
     </div>
   );
 }
@@ -88,10 +87,7 @@ async function TabbedContent({
 }) {
   const session = await auth();
 
-  if (
-    !article ||
-    (session && !article.content_html && !article.draft_content_html)
-  ) {
+  if (!article || (session && !article.content && !article.draft_content)) {
     return (
       <Card>
         <CardHeader>Novica ne obstaja</CardHeader>
@@ -101,35 +97,22 @@ async function TabbedContent({
 
   return (
     <Tabs
-      defaultValue={article.draft_content_html ? "draft" : "published"}
+      defaultValue={article.draft_content ? "draft" : "published"}
       className="prose lg:prose-xl dark:prose-invert container mx-auto w-full py-4"
     >
       <TabsList>
-        <TabsTrigger disabled={!article.draft_content_html} value="draft">
+        <TabsTrigger disabled={!article.draft_content} value="draft">
           Osnutek
         </TabsTrigger>
-        <TabsTrigger disabled={!article.content_html} value="published">
+        <TabsTrigger disabled={!article.content} value="published">
           Objavljeno
         </TabsTrigger>
       </TabsList>
       <TabsContent value="draft">
-        {article.draft_content_html && (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: article.draft_content_html,
-            }}
-          />
-        )}
+        {article.draft_content && <Blocks data={article.draft_content} />}
       </TabsContent>
       <TabsContent value="published">
-        {article.content_html && (
-          <div
-            className="mx-auto w-full"
-            dangerouslySetInnerHTML={{
-              __html: article.content_html,
-            }}
-          />
-        )}
+        {article.content && <Blocks data={article.content} />}
       </TabsContent>
     </Tabs>
   );

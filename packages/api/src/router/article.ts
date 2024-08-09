@@ -16,9 +16,12 @@ export const db_language = "serbian";
 
 /* rank: sql`ts_rank(${matchQuery(input)})`,
         rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
+
+/*  ||
+  setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B' */
 const matchQuery = (search: string) => sql`(
-  setweight(to_tsvector(${db_language}, ${Article.title}), 'A') ||
-  setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')), plainto_tsquery(${db_language}, ${search})`;
+  setweight(to_tsvector(${db_language}, ${Article.title}), 'A')
+), plainto_tsquery(${db_language}, ${search})`;
 
 export const articleRouter = {
   fullTextSearch: publicProcedure
@@ -39,9 +42,10 @@ export const articleRouter = {
         .where(
           and(
             eq(Article.published, true),
+            /* ||
+      setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B') */
             sql`(
-      setweight(to_tsvector(${db_language}, ${Article.title}), 'A') ||
-      setweight(to_tsvector(${db_language}, ${Article.content_html}), 'B')
+      setweight(to_tsvector(${db_language}, ${Article.title}), 'A')
       ) @@ to_tsquery(${db_language}, ${input.search})`,
           ),
         )

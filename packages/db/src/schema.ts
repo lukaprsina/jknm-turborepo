@@ -102,26 +102,25 @@ export const Article = pgTable(
       withTimezone: true,
     }).notNull() /* .$onUpdateFn(() => sql`now()`) */,
     content: json("content").$type<ArticleContentType>(),
-    content_html: text("content_html").default(""),
     draft_content: json("draft_content").$type<ArticleContentType>(),
-    draft_content_html: text("draft_content_html").default(""),
     preview_image: varchar("preview_image", { length: 255 }),
+    draft_preview_image: varchar("draft_preview_image", { length: 255 }),
   },
-  /* (table) => ({
+  (table) => ({
     title_search_index: index("title_search_index").using(
       "gin",
       sql`to_tsvector(${db_language}, ${table.title})`,
     ),
-    content_html_search_index: index("content_html_search_index").using(
+    /* content_html_search_index: index("content_html_search_index").using(
       "gin",
       sql`to_tsvector(${db_language}, ${table.content_html})`,
-    ),
-  }), */
+    ), */
+  }),
 );
 
 const content_zod = z
   .object({
-    time: z.number().optional(),
+    time: z.number(),
     blocks: z.array(
       z.object({
         id: z.string().optional(),

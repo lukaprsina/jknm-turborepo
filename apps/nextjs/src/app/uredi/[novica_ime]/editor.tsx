@@ -38,7 +38,6 @@ import { useToast } from "@acme/ui/use-toast";
 import { api } from "~/trpc/react";
 import {
   article_title_to_url,
-  edjsParser,
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "./editor-utils";
@@ -227,9 +226,6 @@ function MyToolbar({
       settings_store.set.title(title);
       settings_store.set.url(article_title_to_url(title));
 
-      const content = await editor.save();
-      const html = edjsParser.parse(content);
-
       if (!update) return;
 
       const filtered_values = variables
@@ -245,12 +241,8 @@ function MyToolbar({
           id: article.id,
           title: update.content ? title : article.title,
           url: update.content ? article_title_to_url(title) : article.url,
-          draft_content: update.draft ? editor_content : article.draft_content,
-          draft_content_html: update.draft
-            ? html.join("\n")
-            : article.draft_content_html,
           content: update.content ? editor_content : article.content,
-          content_html: update.content ? html.join("\n") : article.content_html,
+          draft_content: update.draft ? editor_content : article.draft_content,
           preview_image: update.content
             ? settings_store.get.preview_image()
             : article.preview_image,
@@ -368,8 +360,8 @@ function ClearButton({
             onClick={() =>
               save_callback({
                 variables: {
+                  /* TODO: do I need to update title, url */
                   draft_content: article.content,
-                  draft_content_html: article.content_html,
                 },
               })
             }

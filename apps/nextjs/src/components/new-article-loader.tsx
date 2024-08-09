@@ -62,7 +62,6 @@ export default function NewArticleLoader({
               title: article_title,
               url: article_url,
               preview_image: "",
-              draft_content_html: "<h1>Nova novica</h1>",
               draft_content: template,
               updated_at: new Date(),
             });

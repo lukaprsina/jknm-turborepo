@@ -15,7 +15,6 @@ import {
 import type { CSVType } from "~/server/article-converter";
 import {
   article_title_to_url,
-  edjsParser,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
 
@@ -73,8 +72,6 @@ export async function iterate_over_articles(
     const content = await editorJS?.save();
     if (!content) throw new Error("No content");
 
-    const content_html = edjsParser.parse(content).join("\n");
-
     const images = get_image_data_from_editor(content);
     const preview_image = images[0] ? images[0]?.url : undefined;
 
@@ -95,9 +92,7 @@ export async function iterate_over_articles(
       title: csv_article.title,
       preview_image,
       content,
-      content_html,
       draft_content: content,
-      draft_content_html: content_html,
       url: article_title_to_url(csv_article.title),
       created_at,
       updated_at,

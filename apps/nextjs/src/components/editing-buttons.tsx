@@ -36,7 +36,6 @@ export default function EditingButtons({
             article_update.mutate({
               ...article,
               draft_content: article.content,
-              draft_content_html: article.content_html,
               updated_at: new Date(),
             });
 
