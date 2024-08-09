@@ -15,7 +15,7 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-const db_language = "serbian";
+// const db_language = "serbian";
 
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
