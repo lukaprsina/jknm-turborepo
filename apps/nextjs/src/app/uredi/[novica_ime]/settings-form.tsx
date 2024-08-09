@@ -35,9 +35,11 @@ export const form_schema = z.object({
 export function SettingsForm({
   article,
   save_callback,
+  closeDialog,
 }: {
   article: typeof Article.$inferInsert;
   save_callback: SaveCallbackType;
+  closeDialog: () => void;
 }) {
   const router = useRouter();
 
@@ -55,46 +57,16 @@ export function SettingsForm({
     },
   });
 
-  async function onDraftSave(values: z.infer<typeof form_schema>) {
-    await save_callback({
-      variables: values,
-      update: { draft: true },
-    });
-  }
-
-  async function onUnpublish(values: z.infer<typeof form_schema>) {
-    await save_callback({
-      variables: { published: false, ...values },
-      update: { draft: true, content: true },
-    });
-  }
-
-  async function onPublish(values: z.infer<typeof form_schema>) {
-    await save_callback({
-      variables: {
-        ...values,
-        published: true,
-        draft_content: null,
-      },
-      update: { content: true },
-      redirect_to: "novica",
-    });
-  }
-
-  function onDelete(_: z.infer<typeof form_schema>) {
-    if (!article.id) {
-      console.error("Article ID is missing.");
-      return;
-    }
-
-    article_delete.mutate(article.id);
-  }
-
   return (
     <Form {...form}>
       <form className="space-y-4">
         <FormField
           control={form.control}
+          defaultValue={
+            article.preview_image ??
+            settings_store.get.image_data()[0]?.url ??
+            undefined
+          }
           name="preview_image"
           render={({ field }) => (
             <FormItem>
@@ -128,29 +100,70 @@ export function SettingsForm({
         />
         <div className="mt-6 flex flex-col gap-4">
           <Button
-            type="submit"
-            onClick={form.handleSubmit(onPublish)}
+            onClick={form.handleSubmit(
+              async (values: z.infer<typeof form_schema>) => {
+                await save_callback({
+                  variables: {
+                    ...values,
+                    published: true,
+                    draft_content: null,
+                  },
+                  update: { content: true },
+                  redirect_to: "novica",
+                });
+
+                closeDialog();
+              },
+            )}
             variant="secondary"
           >
             Objavi spremembe
           </Button>
           {article.published ? (
             <Button
-              onClick={form.handleSubmit(onUnpublish)}
+              onClick={form.handleSubmit(
+                async (values: z.infer<typeof form_schema>) => {
+                  await save_callback({
+                    variables: { published: false, ...values },
+                    update: { draft: true, content: true },
+                  });
+
+                  closeDialog();
+                },
+              )}
               variant="secondary"
             >
               Skrij novičko
             </Button>
           ) : null}
           <Button
-            type="submit"
-            onClick={form.handleSubmit(onDelete)}
+            onClick={form.handleSubmit((_: z.infer<typeof form_schema>) => {
+              if (!article.id) {
+                console.error("Article ID is missing.");
+                return;
+              }
+
+              article_delete.mutate(article.id);
+
+              closeDialog();
+            })}
             variant="destructive"
           >
             Zbriši novičko
           </Button>
           <hr />
-          <Button type="submit" onClick={form.handleSubmit(onDraftSave)}>
+          <Button
+            onClick={form.handleSubmit(
+              async (values: z.infer<typeof form_schema>) => {
+                await save_callback({
+                  variables: values,
+                  update: { draft: true },
+                });
+
+                closeDialog();
+              },
+            )}
+          >
             Shrani osnutek
           </Button>
         </div>

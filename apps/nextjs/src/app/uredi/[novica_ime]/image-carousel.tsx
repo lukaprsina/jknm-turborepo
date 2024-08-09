@@ -31,13 +31,6 @@ const ImageCarousel = React.forwardRef<
   const image_data = settings_store.use.image_data();
 
   useEffect(() => {
-    /* for (const image of image_data) {
-      if (image.url === article.preview_image) {
-        onImageUrlChange(article.preview_image);
-        return;
-      }
-    } */
-
     if (uploadedUrl) return;
     setUploadedUrl(article.preview_image ?? undefined);
   }, [article.preview_image, image_data, onImageUrlChange, uploadedUrl]);

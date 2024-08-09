@@ -1,10 +1,13 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import Blocks from "editorjs-blocks-react-renderer";
 
 import type { Article } from "@acme/db/schema";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+
+import { EditorToReact } from "./editor-to-react";
 
 export function FeaturedArticleCard({
   article,
@@ -31,13 +34,12 @@ export function FeaturedArticleCard({
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
-          {article.content ? (
-            <CardContent>
-              <div className="line-clamp-2 h-full overflow-y-hidden">
-                <Blocks data={article.content} />
-              </div>
-            </CardContent>
-          ) : null}
+
+          <CardContent>
+            <div className="line-clamp-2 h-full overflow-y-hidden">
+              <EditorToReact just_text content={article.content ?? undefined} />
+            </div>
+          </CardContent>
         </div>
       </Card>
     </Link>
@@ -59,7 +61,7 @@ export function ArticleCard({
           <AspectRatio ratio={16 / 9} className="rounded-md">
             <Image
               src={article.preview_image}
-              alt=""
+              alt={article.title}
               fill
               className="rounded-md object-cover"
             />
@@ -69,13 +71,11 @@ export function ArticleCard({
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>
-          {article.content ? (
-            <CardContent>
-              <div className="line-clamp-2 h-full overflow-y-hidden">
-                <Blocks data={article.content} />
-              </div>
-            </CardContent>
-          ) : null}
+          <CardContent>
+            <div className="line-clamp-2 h-full overflow-y-hidden">
+              <EditorToReact just_text content={article.content ?? undefined} />
+            </div>
+          </CardContent>
         </div>
       </Card>
     </Link>

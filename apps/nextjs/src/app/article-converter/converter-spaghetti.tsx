@@ -92,7 +92,7 @@ export async function iterate_over_articles(
       title: csv_article.title,
       preview_image,
       content,
-      draft_content: content,
+      draft_content: null,
       url: article_title_to_url(csv_article.title),
       created_at,
       updated_at,

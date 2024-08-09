@@ -12,13 +12,6 @@ type ShowDraftsContextProps =
     ]
   | undefined;
 
-/* [
-  false,
-  () => {
-    // alert("You forgot to wrap your component in a provider");
-  },
-] */
-
 export const ShowDraftsContext = createContext<
   ShowDraftsContextProps | undefined
 >(undefined);
@@ -45,13 +38,17 @@ export function ShowDraftsCheckbox() {
 
 export function ShowDraftsProvider({
   children,
+  show_button = true,
 }: {
   children: React.ReactNode;
+  show_button?: boolean;
 }) {
   const [showDrafts, setShowDrafts] = useState(true);
 
   return (
-    <ShowDraftsContext.Provider value={[showDrafts, setShowDrafts]}>
+    <ShowDraftsContext.Provider
+      value={show_button ? [showDrafts, setShowDrafts] : undefined}
+    >
       {children}
     </ShowDraftsContext.Provider>
   );

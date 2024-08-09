@@ -1,3 +1,6 @@
+"use state";
+
+import { useState } from "react";
 import { Settings2Icon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
@@ -22,8 +25,10 @@ export function SettingsDialog({
   article: typeof Article.$inferInsert;
   save_callback: SaveCallbackType;
 }) {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   return (
-    <Dialog>
+    <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
@@ -48,7 +53,11 @@ export function SettingsDialog({
             osnutek.
           </DialogDescription>
         </DialogHeader>
-        <SettingsForm article={article} save_callback={save_callback} />
+        <SettingsForm
+          closeDialog={() => setDialogOpen(false)}
+          article={article}
+          save_callback={save_callback}
+        />
       </DialogContent>
     </Dialog>
   );

@@ -1,11 +1,10 @@
-import Blocks from "editorjs-blocks-react-renderer";
-
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import { Card, CardHeader, CardTitle } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import { EditableProvider } from "~/components/editable-context";
+import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
 
@@ -74,7 +73,7 @@ function PublishedContent({
   return (
     <div className="container h-full min-h-screen pt-16">
       <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
-        <Blocks data={article.content} />
+        <EditorToReact content={article.content} />
       </div>
     </div>
   );
@@ -98,7 +97,7 @@ async function TabbedContent({
   return (
     <Tabs
       defaultValue={article.draft_content ? "draft" : "published"}
-      className="prose lg:prose-xl dark:prose-invert container mx-auto w-full py-4"
+      className="prose lg:prose-xl dark:prose-invert container mx-auto w-full pt-8"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content} value="draft">
@@ -108,11 +107,11 @@ async function TabbedContent({
           Objavljeno
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="draft">
-        {article.draft_content && <Blocks data={article.draft_content} />}
+      <TabsContent value="draft" className="py-6">
+        <EditorToReact content={article.draft_content ?? undefined} />
       </TabsContent>
-      <TabsContent value="published">
-        {article.content && <Blocks data={article.content} />}
+      <TabsContent value="published" className="py-6">
+        <EditorToReact content={article.content ?? undefined} />
       </TabsContent>
     </Tabs>
   );

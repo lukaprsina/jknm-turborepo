@@ -290,7 +290,7 @@ function MyToolbar({
         <SaveButton saving={saving} save_callback={save_callback} />
         <UploadDialog save_callback={save_callback} />
         <SettingsDialog article={article} save_callback={save_callback} />
-        <ClearButton article={article} save_callback={save_callback} />
+        <ClearButton save_callback={save_callback} />
       </div>
     </div>
   );
@@ -326,13 +326,7 @@ function SaveButton({
   );
 }
 
-function ClearButton({
-  save_callback,
-  article,
-}: {
-  save_callback: SaveCallbackType;
-  article: typeof Article.$inferSelect;
-}) {
+function ClearButton({ save_callback }: { save_callback: SaveCallbackType }) {
   return (
     <AlertDialog>
       <Tooltip>
@@ -359,9 +353,11 @@ function ClearButton({
           <AlertDialogAction
             onClick={() =>
               save_callback({
+                update: { draft: true },
+                redirect_to: "novica",
                 variables: {
                   /* TODO: do I need to update title, url */
-                  draft_content: article.content,
+                  draft_content: null,
                 },
               })
             }

@@ -17,10 +17,8 @@ export default async function HomePageServer() {
   );
 
   return (
-    <ShowDraftsProvider>
-      <Shell>
-        {articles}
-      </Shell>
+    <ShowDraftsProvider show_button={!!session}>
+      <Shell>{articles}</Shell>
     </ShowDraftsProvider>
   );
 }
