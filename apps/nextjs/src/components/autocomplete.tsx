@@ -31,6 +31,7 @@ export type NoviceHit = {
   objectID: string;
   title: string;
   url: string;
+  created_at: Date;
   content?: ArticleContentType;
   image?: string;
 };
@@ -87,6 +88,7 @@ interface AutocompleteProps {
   getSources: (props: { query: string }) => AutocompleteSource<NoviceHit>[];
 }
 
+let created_search = false;
 // https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
 export function Autocomplete(props: AutocompleteProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -99,6 +101,7 @@ export function Autocomplete(props: AutocompleteProps) {
       return;
     }
 
+    console.log("creating search");
     const search = autocomplete({
       container: containerRef.current,
       detachedMediaQuery: props.detached ?? "(max-width: 1024px)",
@@ -122,11 +125,12 @@ export function Autocomplete(props: AutocompleteProps) {
   }, [props]);
 
   useEffect(() => {
-    if (search_api.current || !containerRef.current) {
+    if (created_search || search_api.current || !containerRef.current) {
       return;
     }
 
     search_api.current = create_search() ?? null;
+    created_search = true;
 
     return () => {
       search_api.current?.destroy();

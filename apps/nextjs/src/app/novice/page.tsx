@@ -1,14 +1,15 @@
 import { Shell } from "~/components/shell";
-// import { ArticleTable } from "./article-table";
+import { Search } from "./search";
 
-import { DataTableDemo } from "./demo";
+export const dynamic = 'force-dynamic';
 
 export default function Novice() {
   return (
     <Shell>
       <div className="container mx-auto w-full px-0">
         {/* <ArticleTable /> */}
-        <DataTableDemo />
+        {/* <DataTableDemo /> */}
+        <Search />
       </div>
     </Shell>
   );
