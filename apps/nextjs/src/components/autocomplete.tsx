@@ -91,7 +91,7 @@ export function Autocomplete(props: AutocompleteProps) {
 
     const search = autocomplete({
       container: containerRef.current,
-      detachedMediaQuery: "",
+      detachedMediaQuery: "(max-width: 1024px)",
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       renderer: { createElement, Fragment, render: () => {} },
       defaultActiveItemId: 0,
@@ -113,7 +113,7 @@ export function Autocomplete(props: AutocompleteProps) {
     };
   }, [props]);
 
-  return <div ref={containerRef} />;
+  return <div className="box-border flex-grow border-0" ref={containerRef} />;
 }
 
 interface ProductItemProps {
@@ -121,22 +121,23 @@ interface ProductItemProps {
   components: AutocompleteComponents;
 }
 
-function ProductItem({ hit }: ProductItemProps) {
+function ProductItem({ hit, components }: ProductItemProps) {
   return (
     <Link
       href={`/novica/${hit.url}-${hit.objectID}`}
       className="aa-ItemLink text-inherit"
     >
       <div className="aa-ItemContent h-12 overflow-hidden">
-        {/* <div className="aa-ItemIcon">
-          <img src={hit.imageUrl} alt="TODO: alt" width="40" height="40" />
-        </div> */}
+        {/* {hit.image && (
+          <div className="aa-ItemIcon aa-ItemIcon--noBorder">
+            <img src={hit.image}/>
+          </div>
+        )} */}
         <div className="aa-ItemContentBody">
-          {/* <div className="aa-ItemContentTitle">
+          <div className="aa-ItemContentTitle">
             <components.Highlight hit={hit} attribute="title" />
-          </div> */}
+          </div>
           <div className="aa-ItemContentDescription">
-            {hit.title}
             {/* <components.Snippet hit={hit} attribute="content" /> */}
           </div>
         </div>

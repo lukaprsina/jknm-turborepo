@@ -21,7 +21,7 @@ import logo from "~/../assets/logo.png";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import { NoviceAutocomplete } from "./autocomplete";
-import { ShowDraftsCheckbox } from "./drafts-provider";
+import { ShowDraftsSwitch } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
@@ -85,7 +85,7 @@ async function DesktopHeader({
             <SearchIcon size={18} />
           </Button> */}
           <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <ShowDraftsCheckbox />
+          <ShowDraftsSwitch />
           <NoviceAutocomplete />
         </div>
       </div>
@@ -107,21 +107,23 @@ async function TabletHeader({
     >
       <Logo />
       <div className="container flex flex-col gap-2">
-        <div className="flex justify-end">
-          <LinksMenu />
-        </div>
-        <div className="flex justify-end gap-1">
-          <EditingButtons article={article} session={session ?? undefined} />
-          {/* <Button
+        <div className="flex gap-4">
+          <NoviceAutocomplete />
+          <div className="flex gap-1">
+            <EditingButtons article={article} session={session ?? undefined} />
+            {/* <Button
               className="dark:bg-primary/80 dark:text-primary-foreground"
               variant="ghost"
               size="icon"
             >
               <SearchIcon size={18} />
             </Button> */}
-          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <ShowDraftsCheckbox />
-          <NoviceAutocomplete />
+            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+            <ShowDraftsSwitch />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <LinksMenu />
         </div>
       </div>
     </div>

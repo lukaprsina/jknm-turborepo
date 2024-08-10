@@ -2,8 +2,8 @@
 
 import React, { createContext, useState } from "react";
 
-import { cn } from "@acme/ui";
-import { Badge } from "@acme/ui/badge";
+import { Label } from "@acme/ui/label";
+import { Switch } from "@acme/ui/switch";
 
 type ShowDraftsContextProps =
   | [
@@ -16,7 +16,7 @@ export const ShowDraftsContext = createContext<
   ShowDraftsContextProps | undefined
 >(undefined);
 
-export function ShowDraftsCheckbox() {
+export function ShowDraftsSwitch() {
   const drafts = React.useContext(ShowDraftsContext);
 
   if (!drafts) {
@@ -26,13 +26,14 @@ export function ShowDraftsCheckbox() {
   const [showDrafts, setShowDrafts] = drafts;
 
   return (
-    <Badge
-      className={cn("cursor-pointer", !showDrafts ? "text-background" : "")}
-      variant={showDrafts ? "secondary" : "outline"}
-      onClick={() => setShowDrafts(!showDrafts)}
-    >
-      Osnutki
-    </Badge>
+    <div className="flex h-9 items-center space-x-2 rounded-md px-2">
+      <Switch
+        id="show-drafts-switch"
+        checked={showDrafts}
+        onCheckedChange={(checked) => setShowDrafts(checked)}
+      />
+      <Label htmlFor="show-drafts-switch">Osnutki</Label>
+    </div>
   );
 }
 
