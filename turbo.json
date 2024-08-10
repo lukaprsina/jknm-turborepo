@@ -50,7 +50,9 @@
     "AUTH_DISCORD_SECRET",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",
-    "PORT"
+    "PORT",
+    "NEXT_PUBLIC_ALGOLIA_ID",
+    "NEXT_PUBLIC_ALGOLIA_SEARCH_KEY"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

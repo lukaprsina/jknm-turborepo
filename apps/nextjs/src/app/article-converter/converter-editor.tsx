@@ -13,9 +13,9 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { read_articles } from "~/server/article-converter";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../uredi/[novica_ime]/plugins";
+import { read_articles, sync_with_algolia } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
 
 export function ArticleConverter() {
@@ -39,17 +39,16 @@ export function ArticleConverter() {
             editorJS.current,
             article_update,
           );
-
-          /* for (const csv_article of csv_articles.slice(0, 5)) {
-            article_update.mutate({
-              title: csv_article.title,
-              content_html: csv_article.content,
-              url: article_title_to_url(csv_article.title),
-            });
-          } */
         }}
       >
         Convert
+      </Button>
+      <Button
+        onClick={async () => {
+          await sync_with_algolia();
+        }}
+      >
+        Sync with Algolia
       </Button>
       <TempEditor editorJS={editorJS} />
       {/* <>

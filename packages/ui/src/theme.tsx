@@ -17,7 +17,16 @@ function ThemeToggle({
   className,
   ...props
 }: React.HTMLAttributes<HTMLButtonElement>) {
-  const { setTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
+
+  // for algolia
+  React.useEffect(() => {
+    if (resolvedTheme === "dark") {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }, [resolvedTheme]);
 
   return (
     <DropdownMenu>

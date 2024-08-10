@@ -12,7 +12,8 @@ import {
   HTMLElement as ParserHTMLElement,
 } from "node-html-parser";
 
-import type { CSVType } from "~/server/article-converter";
+import type { CSVType } from "./converter-server";
+import type { api } from "~/trpc/react";
 import {
   article_title_to_url,
   get_image_data_from_editor,
@@ -20,10 +21,14 @@ import {
 
 let wrong_divs = 0;
 let videos = 0;
+type ArticleUpdateType = ReturnType<
+  typeof api.article.createWithDate.useMutation
+>;
+
 export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
-  article_create: any,
+  article_create: ArticleUpdateType,
 ) {
   const problematic_articles: CSVType[] = [];
 

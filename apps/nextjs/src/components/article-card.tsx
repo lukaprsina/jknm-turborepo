@@ -67,7 +67,8 @@ export function ArticleCard({
             />
           </AspectRatio>
         )}
-        <div>
+        {/* TODO: če sta dve vrstici, ni poravnano */}
+        <div className="flex flex-col justify-between">
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
           </CardHeader>

@@ -1,0 +1,146 @@
+"use client";
+
+import type {
+  AutocompleteComponents,
+  AutocompleteSource,
+} from "@algolia/autocomplete-js";
+import type { Root } from "react-dom/client";
+import React, { createElement, Fragment, useEffect, useRef } from "react";
+import { autocomplete, getAlgoliaResults } from "@algolia/autocomplete-js";
+import { createRoot } from "react-dom/client";
+
+import { algoliaInstance } from "~/lib/algolia";
+
+import "@algolia/autocomplete-theme-classic";
+
+import Link from "next/link";
+
+import "./autocomplete.css";
+
+import type { ArticleContentType } from "@acme/db/schema";
+
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export type NoviceHit = {
+  objectID: string;
+  title: string;
+  url: string;
+  content?: ArticleContentType;
+  image?: string;
+};
+
+interface AutocompleteProps {
+  openOnFocus: boolean;
+  getSources: (props: { query: string }) => AutocompleteSource<NoviceHit>[];
+}
+
+export function NoviceAutocomplete() {
+  const searchClient = algoliaInstance.getClient();
+
+  return (
+    <Autocomplete
+      openOnFocus
+      getSources={({ query }) => [
+        {
+          sourceId: "products",
+          getItems() {
+            return getAlgoliaResults({
+              searchClient,
+              queries: [
+                {
+                  indexName: "novice",
+                  query,
+                  params: {
+                    hitsPerPage: 8,
+                  },
+                },
+              ],
+            });
+          },
+          templates: {
+            header() {
+              return (
+                <>
+                  <span className="aa-SourceHeaderTitle">Novice</span>
+                  <div className="aa-SourceHeaderLine" />
+                </>
+              );
+            },
+            item({ item, components }) {
+              return <ProductItem hit={item} components={components} />;
+            },
+            noResults() {
+              return "Ni ujemajočih novic.";
+            },
+          },
+        },
+      ]}
+    />
+  );
+}
+
+// https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
+export function Autocomplete(props: AutocompleteProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLElement>();
+  const panelRootRef = useRef<Root>();
+
+  useEffect(() => {
+    if (!containerRef.current) {
+      return undefined;
+    }
+
+    const search = autocomplete({
+      container: containerRef.current,
+      detachedMediaQuery: "",
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      renderer: { createElement, Fragment, render: () => {} },
+      defaultActiveItemId: 0,
+      render({ children }, root) {
+        if (!panelRootRef.current || rootRef.current !== root) {
+          rootRef.current = root;
+
+          panelRootRef.current?.unmount();
+          panelRootRef.current = createRoot(root);
+        }
+
+        panelRootRef.current.render(children);
+      },
+      ...props,
+    });
+
+    return () => {
+      search.destroy();
+    };
+  }, [props]);
+
+  return <div ref={containerRef} />;
+}
+
+interface ProductItemProps {
+  hit: NoviceHit;
+  components: AutocompleteComponents;
+}
+
+function ProductItem({ hit }: ProductItemProps) {
+  return (
+    <Link
+      href={`/novica/${hit.url}-${hit.objectID}`}
+      className="aa-ItemLink text-inherit"
+    >
+      <div className="aa-ItemContent h-12 overflow-hidden">
+        {/* <div className="aa-ItemIcon">
+          <img src={hit.imageUrl} alt="TODO: alt" width="40" height="40" />
+        </div> */}
+        <div className="aa-ItemContentBody">
+          {/* <div className="aa-ItemContentTitle">
+            <components.Highlight hit={hit} attribute="title" />
+          </div> */}
+          <div className="aa-ItemContentDescription">
+            {hit.title}
+            {/* <components.Snippet hit={hit} attribute="content" /> */}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}

@@ -1,7 +1,6 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
-  index,
   integer,
   json,
   pgTable,
@@ -105,16 +104,16 @@ export const Article = pgTable(
     preview_image: varchar("preview_image", { length: 255 }),
     draft_preview_image: varchar("draft_preview_image", { length: 255 }),
   },
-  (table) => ({
+  /* (table) => ({
     title_search_index: index("title_search_index").using(
       "gin",
       sql`to_tsvector('serbian', ${table.title})`,
     ),
-    /* text_content_index: index("text_content_index").using(
+    text_content_index: index("text_content_index").using(
       "gin",
       sql`to_tsvector('serbian', ${table.text_content})`,
-    ), */
-  }),
+    ),
+  }), */
 );
 
 const content_zod = z

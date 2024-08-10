@@ -7,6 +7,10 @@ import { parse as csv_parse } from "csv-parse";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
+import type { NoviceHit } from "~/components/autocomplete";
+import { algoliaElevatedInstance } from "~/lib/algolia_elevated";
+import { api } from "~/trpc/server";
+
 /* import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema"; */
 
@@ -42,4 +46,28 @@ export async function read_articles() {
   );
 
   return csv_articles;
+}
+
+// sync just the published articles
+export async function sync_with_algolia() {
+  const articles = await api.article.all();
+  const algolia = algoliaElevatedInstance.getClient();
+  const index = algolia.initIndex("novice");
+
+  const empty_query_results = await index.search("", {
+    attributesToRetrieve: ["objectID"],
+  });
+  index.deleteObjects(empty_query_results.hits.map((hit) => hit.objectID));
+
+  const objects: NoviceHit[] = articles.map((article) => ({
+    objectID: article.id.toString(),
+    title: article.title,
+    url: article.url,
+    image: article.preview_image ?? undefined,
+    content: article.content ?? undefined,
+  }));
+
+  console.log("Syncing articles:", objects);
+
+  await index.saveObjects(objects);
 }

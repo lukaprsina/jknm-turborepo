@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MenuIcon, SearchIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
@@ -20,6 +20,7 @@ import { ThemeToggle } from "@acme/ui/theme";
 import logo from "~/../assets/logo.png";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
+import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsCheckbox } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
@@ -76,15 +77,16 @@ async function DesktopHeader({
         <LinksMenu />
         <div className="flex gap-1">
           <EditingButtons article={article} session={session ?? undefined} />
-          <Button
+          {/* <Button
             className="dark:bg-primary/80 dark:text-primary-foreground"
             variant="ghost"
             size="icon"
           >
             <SearchIcon size={18} />
-          </Button>
+          </Button> */}
           <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
           <ShowDraftsCheckbox />
+          <NoviceAutocomplete />
         </div>
       </div>
     </div>
@@ -106,21 +108,20 @@ async function TabletHeader({
       <Logo />
       <div className="container flex flex-col gap-2">
         <div className="flex justify-end">
-          <div className="flex gap-1">
-            <EditingButtons article={article} session={session ?? undefined} />
-            <Button
+          <LinksMenu />
+        </div>
+        <div className="flex justify-end gap-1">
+          <EditingButtons article={article} session={session ?? undefined} />
+          {/* <Button
               className="dark:bg-primary/80 dark:text-primary-foreground"
               variant="ghost"
               size="icon"
             >
               <SearchIcon size={18} />
-            </Button>
-            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-            <ShowDraftsCheckbox />
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <LinksMenu />
+            </Button> */}
+          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+          <ShowDraftsCheckbox />
+          <NoviceAutocomplete />
         </div>
       </div>
     </div>
