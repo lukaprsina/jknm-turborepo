@@ -110,10 +110,10 @@ export const Article = pgTable(
       "gin",
       sql`to_tsvector('serbian', ${table.title})`,
     ),
-    text_content_index: index("text_content_index").using(
+    /* text_content_index: index("text_content_index").using(
       "gin",
       sql`to_tsvector('serbian', ${table.text_content})`,
-    ),
+    ), */
   }),
 );
 

@@ -16,8 +16,7 @@ import { protectedProcedure, publicProcedure } from "../trpc";
         rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
 
 const matchQuery = (search: string) => sql`(
-  setweight(to_tsvector('serbian', ${Article.title}), 'A') ||
-  setweight(to_tsvector('serbian', ${Article.text_content}), 'B')
+  setweight(to_tsvector('serbian', ${Article.title}), 'A')
 ), plainto_tsquery('serbian', ${search})`;
 
 export const articleRouter = {
@@ -40,8 +39,7 @@ export const articleRouter = {
           and(
             eq(Article.published, true),
             sql`(
-      setweight(to_tsvector('serbian', ${Article.title}), 'A') ||
-      setweight(to_tsvector('serbian', ${Article.text_content}), 'B')
+      setweight(to_tsvector('serbian', ${Article.title}), 'A')
       ) @@ to_tsquery('serbian', ${input.search})`,
           ),
         )

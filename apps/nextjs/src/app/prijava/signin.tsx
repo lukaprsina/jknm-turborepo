@@ -3,7 +3,7 @@ import Image from "next/image";
 import { auth, signIn, signOut } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 
-import logo from "./logo.png";
+import logo from "~/../assets/logo.png";
 
 export default async function SignIn() {
   const session = await auth();

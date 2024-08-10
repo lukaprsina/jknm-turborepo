@@ -51,74 +51,145 @@ function Header({
   article?: typeof Article.$inferSelect;
 }) {
   return (
-    <div className="container flex items-center justify-between">
-      <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
-        <Image
-          src={logo}
-          alt="logo"
-          sizes="(max-width: 640px) 100vw, 640px" // TODO: Modify the sizes prop here
-          placeholder="empty"
-          className="h-auto w-14 object-contain"
-        />
-        <p>Jamarski klub Novo mesto</p>
-      </Link>
-      <DesktopHeader article={article} />
-      <Button className="md:hidden">
+    <>
+      <DesktopHeader className="hidden xl:flex" article={article} />
+      <TabletHeader className="hidden md:flex xl:hidden" article={article} />
+      <MobileHeader className="md:hidden" />
+    </>
+  );
+}
+
+async function DesktopHeader({
+  article,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
+  const session = await auth();
+
+  return (
+    <div
+      className={cn("container flex items-center justify-between", className)}
+      {...props}
+    >
+      <Logo />
+      <div className="flex gap-6">
+        <LinksMenu />
+        <div className="flex gap-1">
+          <EditingButtons article={article} session={session ?? undefined} />
+          <Button
+            className="dark:bg-primary/80 dark:text-primary-foreground"
+            variant="ghost"
+            size="icon"
+          >
+            <SearchIcon size={18} />
+          </Button>
+          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+          <ShowDraftsCheckbox />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function TabletHeader({
+  article,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
+  const session = await auth();
+
+  return (
+    <div
+      className={cn("flex items-center justify-between", className)}
+      {...props}
+    >
+      <Logo />
+      <div className="container flex flex-col gap-2">
+        <div className="flex justify-end">
+          <div className="flex gap-1">
+            <EditingButtons article={article} session={session ?? undefined} />
+            <Button
+              className="dark:bg-primary/80 dark:text-primary-foreground"
+              variant="ghost"
+              size="icon"
+            >
+              <SearchIcon size={18} />
+            </Button>
+            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+            <ShowDraftsCheckbox />
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <LinksMenu />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MobileHeader({
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
+  return (
+    <div
+      className={cn("container flex items-center justify-between", className)}
+      {...props}
+    >
+      <Logo />
+      <Button>
         <MenuIcon />
       </Button>
     </div>
   );
 }
 
-async function DesktopHeader({
-  article,
-}: {
-  article?: typeof Article.$inferSelect;
-}) {
-  const session = await auth();
-
+function LinksMenu() {
   return (
-    <div className="hidden gap-6 xl:flex">
-      <NavigationMenu>
-        <NavigationMenuList>
-          <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
-          <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
-          <DesktopHeaderLink href="/raziskovanje">
-            Raziskovanje
-          </DesktopHeaderLink>
-          <DesktopHeaderLink href="/publiciranje">
-            Publiciranje
-          </DesktopHeaderLink>
-          <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
-          <NavigationMenuItem>
-            <NavigationMenuTrigger className="bg-transparent text-primary-foreground focus:bg-transparent focus:text-primary-foreground dark:bg-primary/80">
-              Klub
-            </NavigationMenuTrigger>
-            <NavigationMenuContent className="relative">
-              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                <ListItem title="Kataster jam" href=""></ListItem>
-                <ListItem title="Izobraževanje" href=""></ListItem>
-                <ListItem title="Etični kodeks" href=""></ListItem>
-                <ListItem title="Društvo v javnem interesu" href=""></ListItem>
-                <ListItem title="Jamarska reševalna služba" href=""></ListItem>
-              </ul>
-            </NavigationMenuContent>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-      <div className="flex gap-1">
-        <EditingButtons article={article} session={session ?? undefined} />
-        <Button
-          className="dark:bg-primary/80 dark:text-primary-foreground"
-          variant="ghost"
-          size="icon"
-        >
-          <SearchIcon size={18} />
-        </Button>
-        <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-        <ShowDraftsCheckbox />
+    <NavigationMenu>
+      <NavigationMenuList>
+        <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
+        <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
+        <DesktopHeaderLink href="/raziskovanje">Raziskovanje</DesktopHeaderLink>
+        <DesktopHeaderLink href="/publiciranje">Publiciranje</DesktopHeaderLink>
+        <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger className="bg-transparent text-primary-foreground focus:bg-transparent focus:text-primary-foreground dark:bg-primary/80">
+            Klub
+          </NavigationMenuTrigger>
+          <NavigationMenuContent className="relative">
+            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              <ListItem title="Kataster jam" href=""></ListItem>
+              <ListItem title="Izobraževanje" href=""></ListItem>
+              <ListItem title="Etični kodeks" href=""></ListItem>
+              <ListItem title="Društvo v javnem interesu" href=""></ListItem>
+              <ListItem title="Jamarska reševalna služba" href=""></ListItem>
+            </ul>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+    </NavigationMenu>
+  );
+}
+
+function Logo() {
+  return (
+    <Link
+      href="/"
+      className="flex w-full items-center gap-2 text-2xl font-bold"
+    >
+      <Image
+        src={logo}
+        alt="logo"
+        sizes="100vw" // TODO: Modify the sizes prop here
+        placeholder="empty"
+        className="w-24" // object-contain
+      />
+      <div>
+        <p>Jamarski klub</p>
+        <p>Novo mesto</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
