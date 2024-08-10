@@ -31,9 +31,17 @@ export function EditorToReact({
   const filtered_content = useMemo(() => {
     if (!content) return undefined;
 
-    const blocks = just_text
-      ? content.blocks.filter((block) => allowed_blocks.includes(block.type))
-      : content.blocks;
+    if (!just_text) {
+      return {
+        version: content.version ?? "2.19.0",
+        blocks: content.blocks,
+        time: content.time ?? Date.now(),
+      };
+    }
+
+    const blocks = content.blocks.filter((block) =>
+      allowed_blocks.includes(block.type),
+    );
 
     const without_links = blocks.map((block) => {
       if (block.type !== "paragraph") return block;
