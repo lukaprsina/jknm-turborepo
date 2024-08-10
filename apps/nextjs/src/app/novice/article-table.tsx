@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 import { Input } from "@acme/ui/input";
@@ -24,6 +24,10 @@ export function ArticleTable() {
   const article_fts = api.article.fullTextSearch.useQuery({
     search: debounced() ?? "",
   });
+
+  useEffect(() => {
+    console.log(article_fts.data);
+  }, [article_fts.data]);
 
   return (
     <div className="prose lg:prose-xl dark:prose-invert pt-6">
