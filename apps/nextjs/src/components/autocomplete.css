@@ -15,6 +15,12 @@ body {
   border-radius: 6px;
 }
 
+.aa-DetachedSearchButton {
+  border: 0px;
+  border-radius: 6px;
+  padding-right: 20px;
+}
+
 .aa-Autocomplete {
   border: 0px;
   box-sizing: border-box;

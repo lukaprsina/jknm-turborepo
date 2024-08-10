@@ -206,7 +206,7 @@ export function DataTableDemo() {
       rowSelection,
       pagination: {
         pageIndex: page_number - 1,
-        pageSize: 1,
+        pageSize: 3,
       },
     },
   });

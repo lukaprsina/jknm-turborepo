@@ -1,11 +1,18 @@
 "use client";
 
 import type {
+  AutocompleteApi,
   AutocompleteComponents,
   AutocompleteSource,
 } from "@algolia/autocomplete-js";
 import type { Root } from "react-dom/client";
-import React, { createElement, Fragment, useEffect, useRef } from "react";
+import React, {
+  createElement,
+  Fragment,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import { autocomplete, getAlgoliaResults } from "@algolia/autocomplete-js";
 import { createRoot } from "react-dom/client";
 
@@ -28,16 +35,12 @@ export type NoviceHit = {
   image?: string;
 };
 
-interface AutocompleteProps {
-  openOnFocus: boolean;
-  getSources: (props: { query: string }) => AutocompleteSource<NoviceHit>[];
-}
-
-export function NoviceAutocomplete() {
+export function NoviceAutocomplete({ detached }: { detached?: string }) {
   const searchClient = algoliaInstance.getClient();
 
   return (
     <Autocomplete
+      detached={detached}
       openOnFocus
       getSources={({ query }) => [
         {
@@ -78,20 +81,27 @@ export function NoviceAutocomplete() {
   );
 }
 
+interface AutocompleteProps {
+  detached?: string;
+  openOnFocus: boolean;
+  getSources: (props: { query: string }) => AutocompleteSource<NoviceHit>[];
+}
+
 // https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
 export function Autocomplete(props: AutocompleteProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLElement>();
   const panelRootRef = useRef<Root>();
+  const search_api = useRef<AutocompleteApi<NoviceHit> | null>(null);
 
-  useEffect(() => {
-    if (!containerRef.current) {
-      return undefined;
+  const create_search = useCallback(() => {
+    if (search_api.current || !containerRef.current) {
+      return;
     }
 
     const search = autocomplete({
       container: containerRef.current,
-      detachedMediaQuery: "(max-width: 1024px)",
+      detachedMediaQuery: props.detached ?? "(max-width: 1024px)",
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       renderer: { createElement, Fragment, render: () => {} },
       defaultActiveItemId: 0,
@@ -108,10 +118,20 @@ export function Autocomplete(props: AutocompleteProps) {
       ...props,
     });
 
-    return () => {
-      search.destroy();
-    };
+    return search;
   }, [props]);
+
+  useEffect(() => {
+    if (search_api.current || !containerRef.current) {
+      return;
+    }
+
+    search_api.current = create_search() ?? null;
+
+    return () => {
+      search_api.current?.destroy();
+    };
+  }, [create_search]);
 
   return <div className="box-border flex-grow border-0" ref={containerRef} />;
 }

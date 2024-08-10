@@ -57,6 +57,7 @@ export async function sync_with_algolia() {
   const empty_query_results = await index.search("", {
     attributesToRetrieve: ["objectID"],
   });
+
   index.deleteObjects(empty_query_results.hits.map((hit) => hit.objectID));
 
   const objects: NoviceHit[] = articles.map((article) => ({

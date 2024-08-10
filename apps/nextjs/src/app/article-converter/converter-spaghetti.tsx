@@ -32,7 +32,7 @@ export async function iterate_over_articles(
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 10);
+  const spliced_csv_articles = csv_articles.slice(0, 30);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);
@@ -140,6 +140,24 @@ function parse_node(node: ParserNode, blocks: OutputBlockData[]) {
     }
     case "div": {
       if (node.attributes.class?.includes("video")) {
+        const param = node.querySelector('param[name="movie"]');
+        const src = param?.attributes.value;
+        if (!src) throw new Error("No video src, " + node.innerHTML);
+
+        // TODO: video caption
+        const id = youtube_url_to_id(src);
+
+        blocks.push({
+          type: "embed",
+          data: {
+            service: "youtube",
+            embed: `https://www.youtube.com/embed/${id}`,
+            source: `https://www.youtube.com/watch?v=${id}`,
+            width: 580,
+            height: 320,
+          },
+        });
+
         videos++;
         console.log("video", node.rawText);
         return;
@@ -189,9 +207,35 @@ function parse_node(node: ParserNode, blocks: OutputBlockData[]) {
       });
       break;
     }
-    case "ul":
+    case "ul": {
+      const items: string[] = [];
+
+      for (const ul_child of node.childNodes) {
+        if (ul_child.nodeType == NodeType.ELEMENT_NODE) {
+          if (!(ul_child instanceof ParserHTMLElement))
+            throw new Error("Not an HTMLElement");
+
+          if (ul_child.rawTagName !== "li")
+            throw new Error(
+              "Unexpected element in ul element: " + ul_child.rawTagName,
+            );
+
+          items.push(ul_child.innerHTML);
+        } else if (ul_child.nodeType == NodeType.TEXT_NODE) {
+          if (ul_child.text.trim() !== "")
+            throw new Error("Some text: " + ul_child.text);
+        } else {
+          throw new Error("Unexpected comment: " + node.text);
+        }
+      }
+
+      blocks.push({ type: "list", data: { style: "unordered", items } });
+
+      break;
+    }
     case "br": {
-      console.log(node.tagName, node.text);
+      blocks.push({ type: "delimiter", data: {} });
+      // console.log(node.tagName, node.text);
       break;
     }
     case "h2":
@@ -228,4 +272,12 @@ function fixHtml(htmlString: string) {
   const fixedHtml = dom_serialize(document);
 
   return fixedHtml;
+}
+
+function youtube_url_to_id(url: string) {
+  const youtube_regex =
+    /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+  const match = youtube_regex.exec(url);
+
+  return match && match[7]?.length == 11 ? match[7] : false;
 }
