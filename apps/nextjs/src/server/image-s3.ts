@@ -17,7 +17,8 @@ async function list_objects(prefix: string) {
         Prefix: prefix,
       }),
     );
-    return response.Contents ?? [];
+
+    return response.Contents;
   } catch (error) {
     console.error("Error listing objects:", error);
     throw error;
@@ -47,6 +48,8 @@ export async function clean_directory(
 ) {
   try {
     const objects = await list_objects(directory);
+    if (typeof objects === "undefined") return;
+
     const keys_to_delete = objects
       .map((object) => object.Key)
       .filter(

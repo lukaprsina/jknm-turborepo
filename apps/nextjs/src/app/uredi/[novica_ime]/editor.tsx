@@ -36,6 +36,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 import { useToast } from "@acme/ui/use-toast";
 
 import { api } from "~/trpc/react";
+import { rename_s3_directory } from "./editor-server";
 import {
   article_title_to_url,
   get_heading_from_editor,
@@ -54,6 +55,7 @@ export default function MyEditor({
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | null>(null);
   const [dirty, setDirty] = useState(false);
+  const toast = useToast();
 
   const content = useMemo(
     () => article?.draft_content ?? DEFAULT_VALUE,
@@ -68,7 +70,7 @@ export default function MyEditor({
   const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({
       holder: "editorjs",
-      tools: EDITOR_JS_PLUGINS,
+      tools: EDITOR_JS_PLUGINS(toast),
       data: content,
       // inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
       autofocus: true,
@@ -81,6 +83,13 @@ export default function MyEditor({
         setTimeout(() => {
           forceUpdate();
         }, 1000);
+
+        if (!article) return;
+
+        settings_store.set.id(article.id);
+        settings_store.set.title(article.title);
+        settings_store.set.url(article.url);
+        settings_store.set.preview_image(article.preview_image ?? undefined);
       },
       onChange: (_, event) => {
         if (Array.isArray(event)) {
@@ -94,7 +103,7 @@ export default function MyEditor({
     });
 
     return temp_editor;
-  }, [content, onChange]);
+  }, [toast, content, article, onChange]);
 
   useEffect(() => {
     if (editorJS.current != null) return;
@@ -104,19 +113,27 @@ export default function MyEditor({
   }, [editor_factory]);
 
   return (
-    <div className="mx-auto w-full outline outline-1">
-      <MyToolbar
-        article={article}
-        editor={editorJS.current ?? undefined}
-        dirty={dirty}
-        setDirty={setDirty}
-      />
-      <div
-        id="editorjs"
-        className="prose lg:prose-xl dark:prose-invert mx-auto"
-      />
-    </div>
+    <>
+      <SettingsSummary />
+      <div className="mx-auto w-full outline outline-1">
+        <MyToolbar
+          article={article}
+          editor={editorJS.current ?? undefined}
+          dirty={dirty}
+          setDirty={setDirty}
+        />
+        <div
+          id="editorjs"
+          className="prose lg:prose-xl dark:prose-invert mx-auto"
+        />
+      </div>
+    </>
   );
+}
+
+function SettingsSummary() {
+  const data = settings_store.useStore();
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
 }
 
 export interface SaveCallbackProps {
@@ -143,7 +160,13 @@ function MyToolbar({
   const { toast } = useToast();
 
   const article_update = api.article.save.useMutation({
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
+      if (!data?.at(0)?.id) {
+        console.log("No article ID returned", data);
+        return;
+      }
+
+      settings_store.set.id(data[0]?.id ?? -1);
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
       settings_store.set.preview_image(variables.preview_image ?? undefined);
@@ -170,63 +193,36 @@ function MyToolbar({
       if (!editor || !article) return;
 
       if (update) setSaving(true);
-      const editor_content = await editor.save();
+      let editor_content = await editor.save();
 
-      const image_data = get_image_data_from_editor(editor_content);
-      settings_store.set.image_data(image_data);
-
-      const { title, error } = get_heading_from_editor(editor_content);
+      const { title: new_title, error } =
+        get_heading_from_editor(editor_content);
 
       if (error === "NO_HEADING") {
         toast({
           title: "Naslov ni nastavljen",
           description: "Prva vrstica mora biti H1 naslov.",
-          action: (
-            <Button
-              onClick={() => {
-                editor.blocks.insert(
-                  "header",
-                  { text: "Neimenovana novica", level: 1 },
-                  undefined,
-                  0,
-                  true,
-                  false,
-                );
-              }}
-            >
-              Dodaj naslov
-            </Button>
-          ),
+          action: <NoHeadingButton editor={editor} />,
         });
       } else if (error === "WRONG_HEADING_LEVEL") {
         toast({
           title: "Naslov ni pravilne ravni",
           description: "Prva vrstica mora biti H1 naslov.",
-          action: (
-            <Button
-              onClick={() => {
-                editor.blocks.insert(
-                  "header",
-                  { text: title ?? "Neimenovana novica", level: 1 },
-                  undefined,
-                  0,
-                  true,
-                  true,
-                );
-              }}
-            >
-              Popravi naslov
-            </Button>
-          ),
+          action: <WrongHeadingButton editor={editor} title={new_title} />,
         });
       }
 
-      if (!title) return;
-
-      settings_store.set.title(title);
-      settings_store.set.url(article_title_to_url(title));
-
       if (!update) return;
+      if (!new_title) return;
+      const new_url = article_title_to_url(new_title);
+
+      const old_article_url = `${article.url}-${article.id}`;
+      const new_article_url = `${new_url}-${article.id}`;
+      await rename_images(editor, old_article_url, new_article_url);
+      editor_content = await editor.save();
+
+      const image_data = get_image_data_from_editor(editor_content);
+      settings_store.set.image_data(image_data);
 
       const filtered_values = variables
         ? Object.fromEntries(
@@ -239,8 +235,8 @@ function MyToolbar({
       article_update.mutate(
         {
           id: article.id,
-          title: update.content ? title : article.title,
-          url: update.content ? article_title_to_url(title) : article.url,
+          title: update.content ? new_title : article.title,
+          url: update.content ? new_url : article.url,
           content: update.content ? editor_content : article.content,
           draft_content: update.draft ? editor_content : article.draft_content,
           preview_image: update.content
@@ -250,23 +246,24 @@ function MyToolbar({
           ...filtered_values,
         },
         {
-          onSuccess: (data, variables) => {
-            if (!data?.[0]?.id) {
-              console.log("No article ID returned", data);
-              return;
-            }
-            /* console.log(
-              { variables },
-              `/${redirect_to}/${variables.url}-${data[0]?.id}`,
-            ); */
+          onSuccess: (_, success_variables) => {
+            const navigate_to_redirect = () => {
+              if (redirect_to)
+                router.replace(`/${redirect_to}/${new_article_url}`);
+            };
 
-            if (redirect_to /*  && variables.url !== article.url */)
-              router.replace(`/${redirect_to}/${variables.url}-${data[0]?.id}`);
+            if (success_variables.url !== article.url) {
+              void rename_s3_directory(old_article_url, new_article_url).then(
+                navigate_to_redirect,
+              );
+            } else {
+              navigate_to_redirect();
+            }
           },
         },
       );
     },
-    [article, article_update, editor, toast, router],
+    [editor, article, article_update, toast, router],
   );
 
   const handleKeyPress = useCallback(
@@ -294,6 +291,71 @@ function MyToolbar({
       </div>
     </div>
   );
+}
+
+function NoHeadingButton({ editor }: { editor: EditorJS }) {
+  return (
+    <Button
+      onClick={() => {
+        editor.blocks.insert(
+          "header",
+          { text: "Neimenovana novica", level: 1 },
+          undefined,
+          0,
+          true,
+          false,
+        );
+      }}
+    >
+      Dodaj naslov
+    </Button>
+  );
+}
+
+function WrongHeadingButton({
+  editor,
+  title,
+}: {
+  editor: EditorJS;
+  title?: string;
+}) {
+  return (
+    <Button
+      onClick={() => {
+        editor.blocks.insert(
+          "header",
+          { text: title ?? "Neimenovana novica", level: 1 },
+          undefined,
+          0,
+          true,
+          true,
+        );
+      }}
+    >
+      Popravi naslov
+    </Button>
+  );
+}
+
+async function rename_images(
+  editor: EditorJS,
+  old_dir: string,
+  new_dir: string,
+) {
+  const editor_content = await editor.save();
+
+  for (const block of editor_content.blocks) {
+    // TODO: files
+    if (!block.id || block.type !== "image") continue;
+
+    const image_data = block.data as { file: { url: string } };
+    const new_url = image_data.file.url.replace(old_dir, new_dir);
+    image_data.file.url = new_url;
+
+    await editor.blocks.update(block.id, {
+      data: image_data,
+    });
+  }
 }
 
 function SaveButton({

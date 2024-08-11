@@ -23,16 +23,17 @@ export default function NewArticleLoader({
   const router = useRouter();
   const article_create = api.article.create.useMutation({
     onSuccess: (data, variables) => {
-      settings_store.set.title(variables.title);
-      settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? undefined);
-
       if (!data[0]?.id) {
         console.log("No article ID returned", data);
         return;
       }
 
-      router.replace(`/uredi/${variables.url}-${data[0]?.id}`);
+      settings_store.set.id(data[0].id);
+      settings_store.set.title(variables.title);
+      settings_store.set.url(variables.url);
+      settings_store.set.preview_image(variables.preview_image ?? undefined);
+
+      router.replace(`/uredi/${variables.url}-${data[0].id}`);
     },
   });
 

@@ -33,13 +33,18 @@ export default function EditingButtons({
           variant="ghost"
           size="icon"
           onClick={() => {
-            article_update.mutate({
-              ...article,
-              draft_content: article.content,
-              updated_at: new Date(),
-            });
-
-            router.push(`/uredi/${article.url}-${article.id}`);
+            article_update.mutate(
+              {
+                ...article,
+                draft_content: article.content,
+                updated_at: new Date(),
+              },
+              {
+                onSuccess: () => {
+                  router.push(`/uredi/${article.url}-${article.id}`);
+                },
+              },
+            );
           }}
         >
           <PencilIcon size={20} />

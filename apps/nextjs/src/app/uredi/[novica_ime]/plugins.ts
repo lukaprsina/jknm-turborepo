@@ -30,75 +30,73 @@ import {
   UnderlineInlineTool,
 } from "editorjs-inline-tool";
 
-export const EDITOR_JS_PLUGINS2 = {
-  header: Header,
-  paragraph: {
-    class: Paragraph,
-    inlineToolbar: true,
-  },
-  // or use a pre-defined tool instead
-  italic: ItalicInlineTool,
-  underline: UnderlineInlineTool,
-};
+import type { useToast } from "@acme/ui/use-toast";
 
-export const EDITOR_JS_PLUGINS: Record<
-  string,
-  ToolConstructable | ToolSettings
-> = {
-  paragraph: {
-    class: Paragraph,
-    inlineToolbar: true,
-  },
-  embed: Embed,
-  italic: ItalicInlineTool,
-  strong: StrongInlineTool,
-  underline: UnderlineInlineTool,
-  table: {
-    class: Table,
-    // inlineToolbar: true,
-    config: {
-      withHeadings: true,
+import { upload_image_by_file, upload_image_by_url } from "./upload-file";
+
+export function EDITOR_JS_PLUGINS(
+  toast: ReturnType<typeof useToast>,
+): Record<string, ToolConstructable | ToolSettings> {
+  return {
+    paragraph: {
+      class: Paragraph,
+      inlineToolbar: true,
     },
-  },
-  marker: Marker,
-  list: {
-    // @ts-expect-error no types
-    class: List,
-    // inlineToolbar: true,
-    config: {
-      defaultStyle: "unordered",
-    },
-  },
-  warning: Warning,
-  code: Code,
-  // linkTool: LinkTool,
-  attaches: {
-    class: AttachesTool,
-    config: {
-      endpoint: "/api/upload_file",
-    },
-  },
-  image: {
-    // @ts-expect-error no types
-    class: Image,
-    // inlineToolbar: ["link"],
-    // inlineToolbar: true,
-    config: {
-      endpoints: {
-        byFile: "/api/upload_image_by_file",
-        byUrl: "/api/upload_image_by_url",
+    embed: Embed,
+    italic: ItalicInlineTool,
+    strong: StrongInlineTool,
+    underline: UnderlineInlineTool,
+    table: {
+      class: Table,
+      // inlineToolbar: true,
+      config: {
+        withHeadings: true,
       },
     },
-  },
-  header: {
-    // @ts-expect-error no types
-    class: Header,
-    config: {
-      defaultLevel: 2,
+    marker: Marker,
+    list: {
+      // @ts-expect-error no types
+      class: List,
+      // inlineToolbar: true,
+      config: {
+        defaultStyle: "unordered",
+      },
     },
-  },
-  quote: Quote,
-  checklist: CheckList,
-  delimiter: Delimiter,
-  inlineCode: InlineCode,
-};
+    warning: Warning,
+    code: Code,
+    // linkTool: LinkTool,
+    attaches: {
+      class: AttachesTool,
+      config: {
+        endpoint: "/api/upload_file",
+      },
+    },
+    image: {
+      // @ts-expect-error no types
+      class: Image,
+      // inlineToolbar: ["link"],
+      // inlineToolbar: true,
+      config: {
+        /* endpoints: {
+          byFile: "/api/upload_image_by_file",
+          byUrl: "/api/upload_image_by_url",
+        }, */
+        uploader: {
+          uploadByFile: (file: File) => upload_image_by_file(file, toast),
+          uploadByUrl: (url: string) => upload_image_by_url(url, toast),
+        },
+      },
+    },
+    header: {
+      // @ts-expect-error no types
+      class: Header,
+      config: {
+        defaultLevel: 2,
+      },
+    },
+    quote: Quote,
+    checklist: CheckList,
+    delimiter: Delimiter,
+    inlineCode: InlineCode,
+  };
+}
