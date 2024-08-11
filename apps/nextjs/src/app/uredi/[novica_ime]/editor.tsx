@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 "use client";
 
@@ -85,11 +86,30 @@ export default function MyEditor({
         }, 1000);
 
         if (!article) return;
+        if (!editorJS.current) {
+          console.error("No editorJS.current");
+          return;
+        }
 
-        settings_store.set.id(article.id);
-        settings_store.set.title(article.title);
-        settings_store.set.url(article.url);
-        settings_store.set.preview_image(article.preview_image ?? undefined);
+        void editorJS.current.save().then((editor_content) => {
+          const image_data = get_image_data_from_editor(editor_content);
+          settings_store.set.image_data(image_data);
+
+          settings_store.set.id(article.id);
+          settings_store.set.title(article.title);
+          settings_store.set.url(article.url);
+          settings_store.set.preview_image(
+            article.draft_preview_image ||
+              article.preview_image ||
+              image_data[0]?.url,
+          );
+
+          console.log("preview image", {
+            draft: article.draft_preview_image,
+            published: article.preview_image,
+            image_data_first: image_data[0]?.url,
+          });
+        });
       },
       onChange: (_, event) => {
         if (Array.isArray(event)) {
@@ -161,15 +181,37 @@ function MyToolbar({
 
   const article_update = api.article.save.useMutation({
     onSuccess: (data, variables) => {
-      if (!data?.at(0)?.id) {
+      const id = data?.at(0)?.id;
+      if (!id) {
         console.log("No article ID returned", data);
         return;
       }
 
-      settings_store.set.id(data[0]?.id ?? -1);
-      settings_store.set.title(variables.title);
-      settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? undefined);
+      if (!editor) {
+        console.error("No editorJS.current");
+        return;
+      }
+
+      void editor.save().then((editor_content) => {
+        const image_data = get_image_data_from_editor(editor_content);
+        settings_store.set.image_data(image_data);
+
+        settings_store.set.id(id);
+        settings_store.set.title(variables.title);
+        settings_store.set.url(variables.url);
+        settings_store.set.preview_image(
+          variables.draft_preview_image ||
+            variables.preview_image ||
+            image_data[0]?.url,
+        );
+
+        console.log("preview image", {
+          draft: variables.draft_preview_image,
+          published: variables.preview_image,
+          image_data_first: image_data[0]?.url,
+        });
+      });
+
       setDirty(false);
     },
     onError: (error) => {
@@ -218,11 +260,14 @@ function MyToolbar({
 
       const old_article_url = `${article.url}-${article.id}`;
       const new_article_url = `${new_url}-${article.id}`;
-      await rename_images(editor, old_article_url, new_article_url);
-      editor_content = await editor.save();
 
-      const image_data = get_image_data_from_editor(editor_content);
-      settings_store.set.image_data(image_data);
+      if (update.content) {
+        await rename_images(editor, old_article_url, new_article_url);
+        editor_content = await editor.save();
+      }
+
+      /* const image_data = get_image_data_from_editor(editor_content);
+      settings_store.set.image_data(image_data); */
 
       const filtered_values = variables
         ? Object.fromEntries(
@@ -242,6 +287,9 @@ function MyToolbar({
           preview_image: update.content
             ? settings_store.get.preview_image()
             : article.preview_image,
+          draft_preview_image: update.draft
+            ? settings_store.get.preview_image()
+            : article.draft_preview_image,
           updated_at: update.content ? new Date() : article.updated_at,
           ...filtered_values,
         },

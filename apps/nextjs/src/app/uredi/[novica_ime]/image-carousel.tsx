@@ -30,10 +30,34 @@ const ImageCarousel = React.forwardRef<
   const [uploadedUrl, setUploadedUrl] = useState<string | undefined>(undefined);
   const image_data = settings_store.use.image_data();
 
-  useEffect(() => {
+  /* useEffect(() => {
     if (uploadedUrl) return;
-    setUploadedUrl(article.preview_image ?? undefined);
-  }, [article.preview_image, image_data, onImageUrlChange, uploadedUrl]);
+    const found_image = image_data.find(
+      (image) => image.url === article.draft_preview_image,
+    );
+
+    console.log("carousel effect", {
+      imageUrl,
+      draft: article.draft_preview_image,
+      published: article.preview_image,
+      image_data_first: image_data[0]?.url,
+    });
+    if (found_image) {
+      onImageUrlChange(found_image.url);
+      return;
+    } else {
+      setUploadedUrl(
+        article.draft_preview_image ?? article.preview_image ?? undefined,
+      );
+    }
+  }, [
+    article.draft_preview_image,
+    article.preview_image,
+    imageUrl,
+    image_data,
+    onImageUrlChange,
+    uploadedUrl,
+  ]); */
 
   return (
     <Carousel

@@ -23,6 +23,7 @@ export default async function NovicaPage({
   const novica_id_string = novica_parts[novica_parts.length - 1];
 
   if (!novica_id_string) {
+    console.error("No article ID found in URL", novica_ime_raw);
     return (
       <Shell>
         <Card>
@@ -62,6 +63,7 @@ function PublishedContent({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
+  console.log("published", article);
   if (!article?.content) {
     return (
       <Card>
@@ -86,6 +88,7 @@ async function TabbedContent({
 }) {
   const session = await auth();
 
+  console.log("tabbed", article);
   if (!article || (session && !article.content && !article.draft_content)) {
     return (
       <Card>

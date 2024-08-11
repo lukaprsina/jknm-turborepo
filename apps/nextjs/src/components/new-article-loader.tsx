@@ -12,7 +12,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
-import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
+// import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
 import { api } from "~/trpc/react";
 
 export default function NewArticleLoader({
@@ -28,10 +28,12 @@ export default function NewArticleLoader({
         return;
       }
 
-      settings_store.set.id(data[0].id);
+      /* settings_store.set.id(data[0].id);
       settings_store.set.title(variables.title);
       settings_store.set.url(variables.url);
-      settings_store.set.preview_image(variables.preview_image ?? undefined);
+      settings_store.set.preview_image(
+        variables.draft_preview_image ?? variables.preview_image ?? undefined,
+      ); */
 
       router.replace(`/uredi/${variables.url}-${data[0].id}`);
     },

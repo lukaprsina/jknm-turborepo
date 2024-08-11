@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -62,11 +63,7 @@ export function SettingsForm({
       <form className="space-y-4">
         <FormField
           control={form.control}
-          defaultValue={
-            article.preview_image ??
-            settings_store.get.image_data()[0]?.url ??
-            undefined
-          }
+          defaultValue={settings_store.get.preview_image()}
           name="preview_image"
           render={({ field }) => (
             <FormItem>
@@ -107,6 +104,11 @@ export function SettingsForm({
                     ...values,
                     published: true,
                     draft_content: null,
+                    draft_preview_image: null,
+                    preview_image:
+                      values.preview_image ||
+                      article.draft_preview_image ||
+                      article.preview_image,
                   },
                   update: { content: true },
                   redirect_to: "novica",
@@ -124,7 +126,10 @@ export function SettingsForm({
               onClick={form.handleSubmit(
                 async (values: z.infer<typeof form_schema>) => {
                   await save_callback({
-                    variables: { published: false, ...values },
+                    variables: {
+                      ...values,
+                      published: false,
+                    },
                     update: { draft: true, content: true },
                   });
 
@@ -156,7 +161,10 @@ export function SettingsForm({
             onClick={form.handleSubmit(
               async (values: z.infer<typeof form_schema>) => {
                 await save_callback({
-                  variables: values,
+                  variables: {
+                    ...values,
+                    draft_preview_image: values.preview_image,
+                  },
                   update: { draft: true },
                 });
 

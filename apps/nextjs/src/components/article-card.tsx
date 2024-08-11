@@ -2,18 +2,28 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 
 import type { Article } from "@acme/db/schema";
+import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
+import { Badge } from "@acme/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
 import { EditorToReact } from "./editor-to-react";
+
+/* <ShineBorder
+              className="text-2xl font-bold"
+              color={theme.resolvedTheme === "dark" ? "white" : "black"}
+            > */
 
 export function FeaturedArticleCard({
   article,
 }: {
   article: typeof Article.$inferSelect;
 }) {
+  const theme = useTheme();
+
   return (
     <Link
       href={`/novica/${article.url}-${article.id}`}
@@ -21,13 +31,25 @@ export function FeaturedArticleCard({
     >
       <Card className="h-full">
         {article.preview_image && (
-          <AspectRatio ratio={16 / 9} className="rounded-md">
+          <AspectRatio ratio={16 / 9} className="relative rounded-md">
             <Image
               src={article.preview_image}
               alt="Photo by Drew Beamer"
               fill
               className="rounded-md object-cover"
             />
+            {!article.published && (
+              <Badge
+                className={cn(
+                  "absolute bottom-0 right-0 m-4 shadow-sm",
+                  theme.resolvedTheme === "dark"
+                    ? "shadow-black"
+                    : "shadow-white",
+                )}
+              >
+                Osnutek
+              </Badge>
+            )}
           </AspectRatio>
         )}
         <div>
@@ -51,6 +73,8 @@ export function ArticleCard({
 }: {
   article: typeof Article.$inferSelect;
 }) {
+  const theme = useTheme();
+
   return (
     <Link
       href={`/novica/${article.url}-${article.id}`}
@@ -58,13 +82,25 @@ export function ArticleCard({
     >
       <Card className="h-full">
         {article.preview_image && (
-          <AspectRatio ratio={16 / 9} className="rounded-md">
+          <AspectRatio ratio={16 / 9} className="relative rounded-md">
             <Image
               src={article.preview_image}
               alt={article.title}
               fill
               className="rounded-md object-cover"
             />
+            {!article.published && (
+              <Badge
+                className={cn(
+                  "absolute bottom-0 right-0 m-4 shadow-sm",
+                  theme.resolvedTheme === "dark"
+                    ? "shadow-black"
+                    : "shadow-white",
+                )}
+              >
+                Osnutek
+              </Badge>
+            )}
           </AspectRatio>
         )}
         {/* TODO: če sta dve vrstici, ni poravnano */}
