@@ -53,7 +53,7 @@ export default function MyEditor({
   article?: typeof Article.$inferSelect;
 }) {
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const editorJS = useRef<EditorJS | null>(null);
+  const editorJS = useRef<EditorJS | undefined>();
   const [dirty, setDirty] = useState(false);
   const toast = useToast();
 

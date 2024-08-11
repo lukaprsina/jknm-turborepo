@@ -1,9 +1,9 @@
 "use client";
 
+import type EditorJS from "@editorjs/editorjs";
 import mime from "mime/lite";
 
 import type { useToast } from "@acme/ui/use-toast";
-import { ToastAction } from "@acme/ui/toast";
 
 import type { FileUploadResponse } from "~/app/api/upload_file_to_s3/route";
 import { settings_store } from "./settings-store";
@@ -62,7 +62,7 @@ export async function upload_image_by_url(
     body: formData,
   });
 
-  return await parse_s3_response(file_data, toast, novica_url, title);
+  return await parse_s3_response(file_data, toast, novica_url, title, editor);
 }
 
 export async function parse_s3_response(
@@ -77,16 +77,45 @@ export async function parse_s3_response(
 
   const file_json = (await file_data.json()) as FileUploadResponse;
 
+  /* function InsertImageToast() {
+    return (
+      <ToastAction
+        altText="Vstavi sliko"
+        onClick={() => {
+          const image_data = settings_store.get.image_data();
+
+          const found_image = image_data.find((image) => {
+            const url_split = image.url.split("/");
+            const image_name = url_split[url_split.length - 1];
+            console.log({ image_name, filename });
+
+            return image_name === filename;
+          });
+
+          if (!found_image) {
+            console.error("Image not found", filename);
+            return;
+          }
+
+          console.log("inserting image", found_image, editor);
+
+          return {
+            success: 1,
+            file: found_image,
+          };
+        }}
+      >
+        Vstavi sliko
+      </ToastAction>
+    );
+  } */
+
   if (file_data.ok) {
     if (file_json.error == "File exists") {
       toast.toast({
         title: "Slika s takim imenom že obstaja",
         description: `Novica: ${novica_url}, ime: ${filename}`,
-        action: (
-          <ToastAction altText="Vstavi sliko" onClick={() => {}}>
-            Vstavi sliko
-          </ToastAction>
-        ),
+        // action: <InsertImageToast />, // TODO, maybe alert better
       });
 
       return {

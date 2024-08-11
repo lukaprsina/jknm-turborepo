@@ -2,5 +2,6 @@ settingsi ne delujejo na majhnih zaslonih
 https://github.com/moveyourdigital/editorjs-blocks-react-renderer
 
 draft preview image?
+store update instead of image duplicate toast
 
 Objave.txt 21518 youtube

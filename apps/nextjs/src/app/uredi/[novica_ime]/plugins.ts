@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ToolConstructable, ToolSettings } from "@editorjs/editorjs";
+
 // @ts-expect-error no types
 import AttachesTool from "@editorjs/attaches";
 // @ts-expect-error no types
@@ -82,7 +83,8 @@ export function EDITOR_JS_PLUGINS(
           byUrl: "/api/upload_image_by_url",
         }, */
         uploader: {
-          uploadByFile: (file: File) => upload_image_by_file(file, toast),
+          uploadByFile: (file: File) =>
+            upload_image_by_file(file, toast),
           uploadByUrl: (url: string) => upload_image_by_url(url, toast),
         },
       },
