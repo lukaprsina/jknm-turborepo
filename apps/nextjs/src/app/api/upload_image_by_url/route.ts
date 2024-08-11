@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import mime from "mime/lite";
 
+import { FileExistsError } from "~/lib/file-exists-error";
 import { upload_file_to_s3 } from "~/server/upload-file-to-s3";
 
 export async function POST(request: Request) {
@@ -41,7 +42,18 @@ export async function POST(request: Request) {
     return;
   }
 
-  const image_url = await upload_file_to_s3(novica_url, file);
+  let image_url: string | null = null;
+
+  try {
+    image_url = await upload_file_to_s3(novica_url, file);
+  } catch (error: unknown) {
+    if (error instanceof FileExistsError) {
+      return NextResponse.json({
+        success: 0,
+        error,
+      });
+    }
+  }
 
   if (image_url) {
     return NextResponse.json({

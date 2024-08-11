@@ -2,6 +2,7 @@
 
 import { NextResponse } from "next/server";
 
+import { FileExistsError } from "~/lib/file-exists-error";
 import { upload_file_to_s3 } from "~/server/upload-file-to-s3";
 
 export async function POST(request: Request) {
@@ -23,7 +24,18 @@ export async function POST(request: Request) {
     });
   }
 
-  const file_url = await upload_file_to_s3(novica_url, file);
+  let file_url: string | null = null;
+
+  try {
+    file_url = await upload_file_to_s3(novica_url, file);
+  } catch (error: unknown) {
+    if (error instanceof FileExistsError) {
+      return NextResponse.json({
+        success: 0,
+        error,
+      });
+    }
+  }
 
   if (file_url) {
     return NextResponse.json({

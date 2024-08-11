@@ -1,16 +1,30 @@
 "use server";
 
-import { S3Client } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, NotFound, S3Client } from "@aws-sdk/client-s3";
 import { createPresignedPost } from "@aws-sdk/s3-presigned-post";
 
 import { env } from "~/env";
+import { FileExistsError } from "~/lib/file-exists-error";
 
 export async function upload_file_to_s3(directory: string, file: File) {
   const client = new S3Client({ region: env.AWS_REGION });
+  const key = `${directory}/${file.name}`;
+
+  const headObjectParams = {
+    Bucket: env.AWS_BUCKET_NAME,
+    Key: key,
+  };
+
+  try {
+    await client.send(new HeadObjectCommand(headObjectParams));
+    throw new FileExistsError(`File ${key} already exists`);
+  } catch (error: unknown) {
+    if (!(error instanceof NotFound)) throw error;
+  }
 
   const { url, fields } = await createPresignedPost(client, {
     Bucket: env.AWS_BUCKET_NAME,
-    Key: `${directory}/${file.name}`, //uuidv4(),
+    Key: key, //uuidv4(),
     Conditions: [
       ["content-length-range", 0, 5 * 10485760], // up to 10 MB
       ["starts-with", "$Content-Type", file.type],

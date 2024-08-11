@@ -8,6 +8,7 @@ import {
   CustomSearchBox,
   CustomSortBy,
   Timeline,
+  TimelineItem,
 } from "./search-components";
 
 export function Search() {
@@ -26,7 +27,11 @@ export function Search() {
           ]}
         />
       </div>
-      <Timeline />
+      <Timeline>
+        <TimelineItem year={2022} />
+        <TimelineItem year={2023} />
+        <TimelineItem year={2024} />
+      </Timeline>
       <Hits
         hitComponent={ArticleHit}
         classNames={{
