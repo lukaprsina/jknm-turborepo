@@ -38,10 +38,10 @@ export default async function NovicaPage({
   const novica_id = parseInt(novica_id_string);
 
   const article_by_url = session
-    ? await api.article.byIdProtected({
+    ? await api.article.by_id_protected({
         id: novica_id,
       })
-    : await api.article.byId({
+    : await api.article.by_id({
         id: novica_id,
       });
 

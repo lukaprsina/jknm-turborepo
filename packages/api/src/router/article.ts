@@ -21,7 +21,7 @@ export const articleRouter = {
       .where(eq(Article.published, true));
   }),
 
-  countProtected: protectedProcedure.query(({ ctx }) => {
+  count_protected: protectedProcedure.query(({ ctx }) => {
     return ctx.db
       .select({
         count: count(Article.id),
@@ -38,7 +38,7 @@ export const articleRouter = {
     });
   }),
 
-  allWithOffset: publicProcedure
+  all_with_offset: publicProcedure
     .input(z.object({ offset: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.query.Article.findMany({
@@ -49,14 +49,14 @@ export const articleRouter = {
       });
     }),
 
-  allProtected: protectedProcedure.query(({ ctx }) => {
+  all_protected: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.Article.findMany({
       orderBy: desc(Article.created_at),
       limit: 10,
     });
   }),
 
-  allProtectedWithOffset: protectedProcedure
+  all_protected_with_offset: protectedProcedure
     .input(z.object({ offset: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.query.Article.findMany({
@@ -67,7 +67,7 @@ export const articleRouter = {
       });
     }),
 
-  byId: publicProcedure
+  by_id: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(({ ctx, input }) => {
       // return ctx.db
@@ -80,7 +80,7 @@ export const articleRouter = {
       });
     }),
 
-  byIdProtected: protectedProcedure
+  by_id_protected: protectedProcedure
     .input(z.object({ id: z.number() }))
     .query(({ ctx, input }) => {
       // return ctx.db
@@ -93,13 +93,13 @@ export const articleRouter = {
       });
     }),
 
-  create: protectedProcedure
+  create_article: protectedProcedure
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.insert(Article).values(input).returning({ id: Article.id });
     }),
 
-  createWithDate: protectedProcedure
+  create_article_with_date: protectedProcedure
     .input(CreateArticleWithDateSchema)
     .mutation(({ ctx, input }) => {
       return ctx.db.insert(Article).values(input).returning({ id: Article.id });
@@ -127,7 +127,7 @@ export const articleRouter = {
           draft_preview_image: article.preview_image,
         })
         .where(eq(Article.id, input.id))
-        .returning({ id: Article.id });
+        .returning({ id: Article.id, url: Article.url });
     }),
 
   save_draft: protectedProcedure
@@ -175,7 +175,7 @@ export const articleRouter = {
           draft_preview_image: null,
         })
         .where(eq(Article.id, input.id))
-        .returning({ id: Article.id });
+        .returning({ id: Article.id, url: Article.url });
     }),
 
   unpublish: protectedProcedure
@@ -195,7 +195,7 @@ export const articleRouter = {
           published: false,
         })
         .where(eq(Article.id, input.id))
-        .returning({ id: Article.id });
+        .returning({ id: Article.id, url: Article.url });
     }),
 
   delete: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {

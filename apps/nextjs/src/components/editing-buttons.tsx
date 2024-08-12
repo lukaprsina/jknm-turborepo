@@ -20,7 +20,14 @@ export default function EditingButtons({
   article?: typeof Article.$inferSelect;
 }) {
   const editable = useContext(EditableContext);
-  const article_update = api.article.save.useMutation();
+  const article_create_draft = api.article.create_draft.useMutation({
+    onSuccess: (data) => {
+      const returned_data = data?.at(0);
+      if (!returned_data) return;
+
+      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
+    },
+  });
   const router = useRouter();
 
   if (!session?.user) return null;
@@ -33,18 +40,9 @@ export default function EditingButtons({
           variant="ghost"
           size="icon"
           onClick={() => {
-            article_update.mutate(
-              {
-                ...article,
-                draft_content: article.content,
-                updated_at: new Date(),
-              },
-              {
-                onSuccess: () => {
-                  router.push(`/uredi/${article.url}-${article.id}`);
-                },
-              },
-            );
+            article_create_draft.mutate({
+              id: article.id,
+            });
           }}
         >
           <PencilIcon size={20} />

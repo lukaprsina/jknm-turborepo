@@ -15,7 +15,7 @@ export function ArticlesClient({ session }: { session: Session | null }) {
 
   const articles =
     session && showDrafts
-      ? api.article.allProtected.useQuery()
+      ? api.article.all_protected.useQuery()
       : api.article.all.useQuery();
 
   return <Articles featured articles={articles.data ?? []} />;

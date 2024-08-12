@@ -179,7 +179,7 @@ function MyToolbar({
   const [saving, setSaving] = useState(false);
   const { toast } = useToast();
 
-  const article_update = api.article.save.useMutation({
+  /* const article_update = api.article.save.useMutation({
     onSuccess: (data, variables) => {
       const id = data?.at(0)?.id;
       if (!id) {
@@ -220,7 +220,7 @@ function MyToolbar({
     onSettled: () => {
       setSaving(false);
     },
-  });
+  }); */
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyPress);
@@ -230,7 +230,7 @@ function MyToolbar({
     };
   });
 
-  const save_callback = useCallback(
+  /* const save_callback = useCallback(
     async ({ variables, update, redirect_to = "uredi" }: SaveCallbackProps) => {
       if (!editor || !article) return;
 
@@ -265,9 +265,6 @@ function MyToolbar({
         await rename_images(editor, old_article_url, new_article_url);
         editor_content = await editor.save();
       }
-
-      /* const image_data = get_image_data_from_editor(editor_content);
-      settings_store.set.image_data(image_data); */
 
       const filtered_values = variables
         ? Object.fromEntries(
@@ -312,7 +309,7 @@ function MyToolbar({
       );
     },
     [editor, article, article_update, toast, router],
-  );
+  ); */
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {
@@ -321,9 +318,9 @@ function MyToolbar({
       if (event.key !== "s" || !event.ctrlKey) return;
 
       event.preventDefault();
-      void save_callback({ update: { draft: true } });
+      // void save_callback({ update: { draft: true } });
     },
-    [save_callback, article, editor],
+    [article, editor],
   );
 
   if (!editor || !article) return null;

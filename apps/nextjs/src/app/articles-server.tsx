@@ -7,7 +7,7 @@ export async function ArticlesServer() {
   const session = await auth();
 
   const articles = session
-    ? await api.article.allProtected()
+    ? await api.article.all_protected()
     : await api.article.all();
 
   return <Articles featured articles={articles} />;

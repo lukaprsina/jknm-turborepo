@@ -22,7 +22,7 @@ export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
   const article_update = api.article.createWithDate.useMutation();
-  // const article_all = api.article.allProtected.useQuery();
+  // const article_all = api.article.all_protected.useQuery();
 
   return (
     <div className="prose container mx-auto py-8">
