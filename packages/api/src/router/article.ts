@@ -126,14 +126,22 @@ export const articleRouter = {
 
       if (!article?.id) return;
 
-      return ctx.db
-        .update(Article)
-        .set({
-          draft_content: article.content,
-          draft_preview_image: article.preview_image,
-        })
-        .where(eq(Article.id, input.id))
-        .returning({ id: Article.id, url: Article.url });
+      if (article.draft_content && article.draft_preview_image) {
+        // draft already exists, edit it
+        console.log("Draft already exists, edit it");
+        return [{ id: article.id, url: article.url }];
+      } else {
+        // draft was deleted when the article was published
+        console.log("Draft was deleted when the article was published");
+        return ctx.db
+          .update(Article)
+          .set({
+            draft_content: article.content,
+            draft_preview_image: article.preview_image,
+          })
+          .where(eq(Article.id, input.id))
+          .returning({ id: Article.id, url: Article.url });
+      }
     }),
 
   save_draft: protectedProcedure

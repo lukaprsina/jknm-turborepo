@@ -11,6 +11,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 // @ts-expect-error no types
 import DragDrop from "editorjs-drag-drop";
@@ -21,12 +22,14 @@ import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
+import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import {
   article_title_to_url,
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
 import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
+import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
 export interface EditorContextType {
@@ -44,6 +47,12 @@ export interface EditorContextType {
   setSavingText: (value: string | undefined) => void;
   dirty: boolean;
   setDirty: (value: boolean) => void;
+  mutations: {
+    save_draft: ReturnType<typeof api.article.save_draft.useMutation>["mutate"];
+    publish: ReturnType<typeof api.article.publish.useMutation>["mutate"];
+    unpublish: ReturnType<typeof api.article.unpublish.useMutation>["mutate"];
+    delete_by_id: ReturnType<typeof api.article.delete.useMutation>["mutate"];
+  };
 }
 
 const EditorContext = createContext<EditorContextType | undefined>(undefined);
@@ -61,6 +70,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   children,
   article,
 }: EditorProviderProps) => {
+  const router = useRouter();
   const [savingText, setSavingText] = useState<string | undefined>();
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | undefined>();
@@ -143,6 +153,42 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     return temp_editor;
   }, [content, article, update_settings_from_editor, onChange]);
 
+  const hide_save_text = {
+    onSuccess: () => {
+      setSavingText(undefined);
+    },
+  };
+
+  const save_draft = api.article.save_draft.useMutation(hide_save_text);
+
+  const publish = api.article.publish.useMutation({
+    onSuccess: async () => {
+      if (!editorJS.current) return;
+
+      const urls = await configure_article_before_publish();
+      if (!urls) return;
+
+      const navigate_to_redirect = () => {
+        router.replace(`/novica/${urls.new_article_url}`);
+      };
+
+      setSavingText(undefined);
+
+      if (urls.new_article_url !== urls.old_article_url)
+        await rename_s3_directory(urls.old_article_url, urls.new_article_url);
+
+      navigate_to_redirect();
+    },
+  });
+
+  const unpublish = api.article.unpublish.useMutation(hide_save_text);
+
+  const delete_by_id = api.article.delete.useMutation({
+    onSuccess: () => {
+      router.replace(`/`);
+    },
+  });
+
   useEffect(() => {
     if (editorJS.current != null) return;
 
@@ -198,6 +244,12 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         setDirty,
         configure_article_before_publish,
         update_settings_from_editor,
+        mutations: {
+          save_draft: save_draft.mutate,
+          publish: publish.mutate,
+          unpublish: unpublish.mutate,
+          delete_by_id: delete_by_id.mutate,
+        },
       }}
     >
       {children}

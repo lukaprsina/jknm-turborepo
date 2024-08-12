@@ -16,7 +16,14 @@ import {
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
+import { useEditor } from "~/components/editor-context";
+import { settings_store } from "./settings-store";
+
 export function UploadDialog() {
+  const editor = useEditor();
+
+  if (!editor) return null;
+
   return (
     <AlertDialog>
       <Tooltip>
@@ -41,16 +48,23 @@ export function UploadDialog() {
         <AlertDialogFooter>
           <AlertDialogCancel>Ne objavi</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => {
-              // TODO
-              /* save_callback({
-                variables: {
-                  published: true,
-                  draft_content: null,
-                },
-                update: { content: true },
-                redirect_to: "novica",
-              }) */
+            onClick={async () => {
+              if (!editor.article?.id) {
+                console.error("Article ID is missing.");
+                return;
+              }
+
+              editor.setSavingText("Objavljam spremembe ...");
+
+              const editor_content = await editor.editor?.save();
+
+              editor.mutations.publish({
+                ...editor.article,
+                content: editor_content,
+                title: settings_store.get.title(),
+                url: settings_store.get.url(),
+                preview_image: settings_store.get.preview_image() ?? "",
+              });
             }}
           >
             Objavi

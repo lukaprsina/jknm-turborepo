@@ -2,6 +2,8 @@
 
 import { Hits, InstantSearch } from "react-instantsearch";
 
+import { PaginationWithLinks } from "@acme/ui/pagination-with-links";
+
 import { algoliaInstance } from "~/lib/algolia";
 import {
   ArticleHit,
@@ -38,6 +40,7 @@ export function Search() {
           list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
         }}
       />
+      <PaginationWithLinks page={1} pageSize={20} totalCount={500} />
     </InstantSearch>
   );
 }

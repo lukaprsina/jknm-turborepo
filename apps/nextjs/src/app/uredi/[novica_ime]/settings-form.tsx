@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,8 +17,6 @@ import {
 } from "@acme/ui/form";
 
 import { useEditor } from "~/components/editor-context";
-import { api } from "~/trpc/react";
-import { rename_s3_directory } from "./editor-server";
 import { ImageCarousel } from "./image-carousel";
 import { settings_store } from "./settings-store";
 
@@ -33,47 +30,7 @@ export const form_schema = z.object({
 });
 
 export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
-  const router = useRouter();
-
   const editor = useEditor();
-
-  const hide_save_text = {
-    onSuccess: () => {
-      if (!editor) return;
-
-      editor.setSavingText(undefined);
-    },
-  };
-
-  const article_save_draft = api.article.save_draft.useMutation(hide_save_text);
-
-  const article_publish = api.article.publish.useMutation({
-    onSuccess: async () => {
-      if (!editor) return;
-
-      const urls = await editor.configure_article_before_publish();
-      if (!urls) return;
-
-      const navigate_to_redirect = () => {
-        router.replace(`/novica/${urls.new_article_url}`);
-      };
-
-      editor.setSavingText(undefined);
-
-      if (urls.new_article_url !== urls.old_article_url)
-        await rename_s3_directory(urls.old_article_url, urls.new_article_url);
-
-      navigate_to_redirect();
-    },
-  });
-
-  const article_unpublish = api.article.unpublish.useMutation(hide_save_text);
-
-  const article_delete = api.article.delete.useMutation({
-    onSuccess: () => {
-      router.replace(`/`);
-    },
-  });
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
@@ -127,7 +84,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
         <div className="mt-6 flex flex-col gap-4">
           <Button
             onClick={form.handleSubmit(
-              (values: z.infer<typeof form_schema>) => {
+              async (values: z.infer<typeof form_schema>) => {
                 if (!editor.article?.id) {
                   console.error("Article ID is missing.");
                   return;
@@ -135,12 +92,15 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
 
                 editor.setSavingText("Objavljam spremembe ...");
 
-                article_publish.mutate({
+                const editor_content = await editor.editor?.save();
+
+                editor.mutations.publish({
                   id: editor.article.id,
                   created_at: values.created_at,
                   title: settings_store.get.title(),
                   url: settings_store.get.url(),
                   preview_image: settings_store.get.preview_image() ?? "",
+                  content: editor_content,
                 });
 
                 closeDialog();
@@ -160,7 +120,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
 
                 editor.setSavingText("Skrivam novičko ...");
 
-                article_unpublish.mutate({
+                editor.mutations.unpublish({
                   id: editor.article.id,
                 });
 
@@ -180,7 +140,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
 
               editor.setSavingText("Brišem novičko ...");
 
-              article_delete.mutate(editor.article.id);
+              editor.mutations.delete_by_id(editor.article.id);
 
               closeDialog();
             })}
@@ -201,7 +161,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
 
                 const editor_content = await editor.editor?.save();
 
-                article_save_draft.mutate({
+                editor.mutations.save_draft({
                   id: editor.article.id,
                   draft_content: editor_content,
                   draft_preview_image: values.preview_image ?? "",
