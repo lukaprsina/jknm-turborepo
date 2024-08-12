@@ -1,8 +1,15 @@
 import { z } from "zod";
 
-export const unused = z.string().describe(
-  `This lib is currently not used as we use drizzle-zod for simple schemas
-   But as your application grows and you need other validators to share
-   with back and frontend, you can put them in here
-  `,
-);
+export const content_validator = z
+  .object({
+    time: z.number().optional(),
+    blocks: z.array(
+      z.object({
+        id: z.string().optional(),
+        type: z.string(),
+        data: z.record(z.any()),
+      }),
+    ),
+    version: z.string().optional(),
+  })
+  .optional();

@@ -6,45 +6,12 @@ import {
   Article,
   CreateArticleSchema,
   CreateArticleWithDateSchema,
-  UpdateArticleSchema,
 } from "@acme/db/schema";
+import { content_validator } from "@acme/validators";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
-/* rank: sql`ts_rank(${matchQuery(input)})`,
-        rankCd: sql`ts_rank_cd(${matchQuery(input)})`, */
-
-/* const matchQuery = (search: string) => sql`(
-  setweight(to_tsvector('serbian', ${Article.title}), 'A')
-), plainto_tsquery('serbian', ${search})`; */
-
 export const articleRouter = {
-  /* fullTextSearch: publicProcedure
-    .input(
-      z.object({
-        search: z.string(),
-        rank_weight: z.number().default(0.4),
-        rank_cd_weight: z.number().default(0.6),
-      }),
-    )
-    .query(({ ctx, input }) => {
-      return ctx.db
-        .select({
-          ...getTableColumns(Article),
-          combined_rank: sql`${input.rank_weight} * ts_rank(${matchQuery(input.search)}) + ${input.rank_cd_weight} * ts_rank_cd(${matchQuery(input.search)})`,
-        })
-        .from(Article)
-        .where(
-          and(
-            eq(Article.published, true),
-            sql`(
-      setweight(to_tsvector('serbian', ${Article.title}), 'A')
-      ) @@ to_tsquery('serbian', ${input.search})`,
-          ),
-        )
-        .orderBy((table) => desc(table.combined_rank));
-    }), */
-
   count: publicProcedure.query(({ ctx }) => {
     return ctx.db
       .select({
@@ -126,27 +93,6 @@ export const articleRouter = {
       });
     }),
 
-  /* byUrl: publicProcedure
-    .input(z.object({ url: z.string() }))
-    .query(({ ctx, input }) => {
-      // return ctx.db
-      //   .select()
-      //   .from(schema.post)
-      //   .where(eq(schema.post.id, input.id));
-
-      return ctx.db.query.Article.findFirst({
-        where: and(eq(Article.url, input.url), eq(Article.published, true)),
-      });
-    }),
-
-  byUrlProtected: protectedProcedure
-    .input(z.object({ url: z.string() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.query.Article.findFirst({
-        where: eq(Article.url, input.url),
-      });
-    }), */
-
   create: protectedProcedure
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
@@ -159,13 +105,95 @@ export const articleRouter = {
       return ctx.db.insert(Article).values(input).returning({ id: Article.id });
     }),
 
-  save: protectedProcedure
-    .input(UpdateArticleSchema)
+  create_draft: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.id) return;
+
+      const article = await ctx.db.query.Article.findFirst({
+        where: eq(Article.id, input.id),
+      });
+
+      if (!article?.id) return;
+
+      return ctx.db
+        .update(Article)
+        .set({
+          draft_content: article.content,
+          draft_preview_image: article.preview_image,
+        })
+        .where(eq(Article.id, input.id))
+        .returning({ id: Article.id });
+    }),
+
+  save_draft: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        draft_content: content_validator,
+        draft_preview_image: z.string(),
+      }),
+    )
     .mutation(({ ctx, input }) => {
       if (!input.id) return;
       return ctx.db
         .update(Article)
-        .set(input)
+        .set({
+          draft_content: input.draft_content,
+          draft_preview_image: input.draft_preview_image,
+        })
+        .where(eq(Article.id, input.id))
+        .returning({ id: Article.id });
+    }),
+
+  publish_draft: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        content: content_validator,
+        preview_image: z.string(),
+        title: z.string(),
+        url: z.string(),
+        published: z.boolean(),
+      }),
+    )
+    .mutation(({ ctx, input }) => {
+      if (!input.id) return;
+      return ctx.db
+        .update(Article)
+        .set({
+          content: input.content,
+          preview_image: input.preview_image,
+          title: input.title,
+          url: input.url,
+          published: input.published,
+          draft_content: null,
+          draft_preview_image: null,
+        })
+        .where(eq(Article.id, input.id))
+        .returning({ id: Article.id });
+    }),
+
+  unpublish: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.id) return;
+
+      return ctx.db
+        .update(Article)
+        .set({
+          content: null,
+          preview_image: null,
+          published: false,
+        })
         .where(eq(Article.id, input.id))
         .returning({ id: Article.id });
     }),

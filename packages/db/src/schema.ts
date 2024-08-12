@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -13,6 +13,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+
+import { content_validator } from "@acme/validators";
 
 export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
@@ -86,68 +88,34 @@ export interface ArticleContentType {
 }
 
 // My schema below
-export const Article = pgTable(
-  "article",
-  {
-    id: serial("id").primaryKey(),
-    title: varchar("title", { length: 255 }).notNull(),
-    url: varchar("url", { length: 255 }).notNull(),
-    published: boolean("published").default(false),
-    created_at: timestamp("created_at").defaultNow().notNull(),
-    updated_at: timestamp("updated_at", {
-      mode: "date",
-      withTimezone: true,
-    }).notNull() /* .$onUpdateFn(() => sql`now()`) */,
-    content: json("content").$type<ArticleContentType>(),
-    draft_content: json("draft_content").$type<ArticleContentType>(),
-    text_content: text("text_content"),
-    preview_image: varchar("preview_image", { length: 255 }),
-    draft_preview_image: varchar("draft_preview_image", { length: 255 }),
-  },
-  /* (table) => ({
-    title_search_index: index("title_search_index").using(
-      "gin",
-      sql`to_tsvector('serbian', ${table.title})`,
-    ),
-    text_content_index: index("text_content_index").using(
-      "gin",
-      sql`to_tsvector('serbian', ${table.text_content})`,
-    ),
-  }), */
-);
-
-const content_zod = z
-  .object({
-    time: z.number().optional(),
-    blocks: z.array(
-      z.object({
-        id: z.string().optional(),
-        type: z.string(),
-        data: z.record(z.any()),
-      }),
-    ),
-    version: z.string().optional(),
-  })
-  .optional();
+export const Article = pgTable("article", {
+  id: serial("id").primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  url: varchar("url", { length: 255 }).notNull(),
+  published: boolean("published").default(false),
+  created_at: timestamp("created_at").defaultNow().notNull(),
+  updated_at: timestamp("updated_at", {
+    mode: "date",
+    withTimezone: true,
+  }).$onUpdateFn(() => sql`now()`),
+  content: json("content").$type<ArticleContentType>(),
+  draft_content: json("draft_content").$type<ArticleContentType>(),
+  text_content: text("text_content"),
+  preview_image: varchar("preview_image", { length: 255 }),
+  draft_preview_image: varchar("draft_preview_image", { length: 255 }),
+});
 
 export const CreateArticleWithDateSchema = createInsertSchema(Article, {
-  content: content_zod,
-  draft_content: content_zod,
+  content: content_validator,
+  draft_content: content_validator,
   created_at: z.date(),
   updated_at: z.date(),
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
-  content: content_zod,
-  draft_content: content_zod,
+  content: content_validator,
+  draft_content: content_validator,
   updated_at: z.date(),
-}).omit({
-  created_at: true,
-});
-
-export const UpdateArticleSchema = createInsertSchema(Article, {
-  content: content_zod,
-  draft_content: content_zod,
 }).omit({
   created_at: true,
 });
