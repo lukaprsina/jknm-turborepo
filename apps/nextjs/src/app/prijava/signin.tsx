@@ -1,9 +1,7 @@
-import Image from "next/image";
-
 import { auth, signIn, signOut } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 
-import logo from "~/../assets/logo.png";
+import { Logo } from "~/components/logo";
 
 export default async function SignIn() {
   const session = await auth();
@@ -14,13 +12,14 @@ export default async function SignIn() {
         <div className="dark:border-r> relative hidden h-full flex-col justify-center bg-muted p-10 text-white lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="z-10 flex items-center justify-center text-lg font-medium">
-            <Image
+            {/* <Image
               src={logo}
               alt="logo"
               sizes="100vw"
               placeholder="blur"
               className="w-1/2"
-            />
+            /> */}
+            <Logo />
           </div>
         </div>
         <div className="lg:p-8">

@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { DateTimePicker } from "@acme/ui/date-time-picker";
 import {
@@ -18,7 +17,9 @@ import {
   FormMessage,
 } from "@acme/ui/form";
 
+import { useEditor } from "~/components/editor-context";
 import { api } from "~/trpc/react";
+import { rename_s3_directory } from "./editor-server";
 import { ImageCarousel } from "./image-carousel";
 import { settings_store } from "./settings-store";
 
@@ -27,31 +28,46 @@ export const form_schema = z.object({
   username: z.string().min(2, {
     message: "Username must be at least 2 characters.",
   }), */
-  created_at: z.date().optional(),
+  created_at: z.date(),
   preview_image: z.string().optional(),
 });
 
-export function SettingsForm({
-  article,
-  closeDialog,
-}: {
-  article: typeof Article.$inferInsert;
-  closeDialog: () => void;
-}) {
+export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
   const router = useRouter();
 
-  const article_save_draft = api.article.save_draft.useMutation();
+  const editor = useEditor();
+
+  const hide_save_text = {
+    onSuccess: () => {
+      if (!editor) return;
+
+      editor.setSavingText(undefined);
+    },
+  };
+
+  const article_save_draft = api.article.save_draft.useMutation(hide_save_text);
 
   const article_publish = api.article.publish.useMutation({
-    onSuccess: (data) => {
-      const returned_data = data?.at(0);
-      if (!returned_data) return;
+    onSuccess: async () => {
+      if (!editor) return;
 
-      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
+      const urls = await editor.configure_article_before_publish();
+      if (!urls) return;
+
+      const navigate_to_redirect = () => {
+        router.replace(`/novica/${urls.new_article_url}`);
+      };
+
+      editor.setSavingText(undefined);
+
+      if (urls.new_article_url !== urls.old_article_url)
+        await rename_s3_directory(urls.old_article_url, urls.new_article_url);
+
+      navigate_to_redirect();
     },
   });
 
-  const article_unpublish = api.article.unpublish.useMutation();
+  const article_unpublish = api.article.unpublish.useMutation(hide_save_text);
 
   const article_delete = api.article.delete.useMutation({
     onSuccess: () => {
@@ -63,9 +79,11 @@ export function SettingsForm({
     resolver: zodResolver(form_schema),
     defaultValues: {
       preview_image: settings_store.get.preview_image() ?? undefined,
-      created_at: article.created_at,
+      created_at: editor?.article?.created_at,
     },
   });
+
+  if (!editor) return null;
 
   return (
     <Form {...form}>
@@ -82,8 +100,10 @@ export function SettingsForm({
               </FormDescription>
               <FormControl>
                 <ImageCarousel
-                  article={article}
-                  onImageUrlChange={(value) => field.onChange(value)}
+                  onImageUrlChange={(value) => {
+                    field.onChange(value);
+                    settings_store.set.preview_image(value);
+                  }}
                   imageUrl={field.value}
                 />
               </FormControl>
@@ -108,14 +128,19 @@ export function SettingsForm({
           <Button
             onClick={form.handleSubmit(
               (values: z.infer<typeof form_schema>) => {
-                if (!article.id) {
+                if (!editor.article?.id) {
                   console.error("Article ID is missing.");
                   return;
                 }
 
+                editor.setSavingText("Objavljam spremembe ...");
+
                 article_publish.mutate({
-                  id: article.id,
+                  id: editor.article.id,
                   created_at: values.created_at,
+                  title: settings_store.get.title(),
+                  url: settings_store.get.url(),
+                  preview_image: settings_store.get.preview_image() ?? "",
                 });
 
                 closeDialog();
@@ -125,16 +150,18 @@ export function SettingsForm({
           >
             Objavi spremembe
           </Button>
-          {article.published ? (
+          {editor.article?.published ? (
             <Button
               onClick={form.handleSubmit((_: z.infer<typeof form_schema>) => {
-                if (!article.id) {
+                if (!editor.article?.id) {
                   console.error("Article ID is missing.");
                   return;
                 }
 
+                editor.setSavingText("Skrivam novičko ...");
+
                 article_unpublish.mutate({
-                  id: article.id,
+                  id: editor.article.id,
                 });
 
                 closeDialog();
@@ -146,12 +173,14 @@ export function SettingsForm({
           ) : null}
           <Button
             onClick={form.handleSubmit((_: z.infer<typeof form_schema>) => {
-              if (!article.id) {
+              if (!editor.article?.id) {
                 console.error("Article ID is missing.");
                 return;
               }
 
-              article_delete.mutate(article.id);
+              editor.setSavingText("Brišem novičko ...");
+
+              article_delete.mutate(editor.article.id);
 
               closeDialog();
             })}
@@ -162,16 +191,20 @@ export function SettingsForm({
           <hr />
           <Button
             onClick={form.handleSubmit(
-              (values: z.infer<typeof form_schema>) => {
-                if (!article.id) {
+              async (values: z.infer<typeof form_schema>) => {
+                if (!editor.article?.id) {
                   console.error("Article ID is missing.");
                   return;
                 }
 
+                editor.setSavingText("Shranjujem osnutek ...");
+
+                const editor_content = await editor.editor?.save();
+
                 article_save_draft.mutate({
-                  id: article.id,
-                  draft_content: article.draft_content,
-                  draft_preview_image: values.preview_image,
+                  id: editor.article.id,
+                  draft_content: editor_content,
+                  draft_preview_image: values.preview_image ?? "",
                 });
 
                 closeDialog();

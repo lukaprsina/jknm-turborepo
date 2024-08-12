@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { MenuIcon } from "lucide-react";
 
@@ -17,13 +16,13 @@ import {
 } from "@acme/ui/navigation-menu";
 import { ThemeToggle } from "@acme/ui/theme";
 
-import logo from "~/../assets/logo.png";
 import { Background } from "~/components/backgrounds";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsSwitch } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
+import { Logo } from "./logo";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {
@@ -74,7 +73,7 @@ async function DesktopHeader({
       className={cn("container flex items-center justify-between", className)}
       {...props}
     >
-      <Logo />
+      <LogoAndTitle />
       <div className="flex gap-6">
         <LinksMenu />
         <div className="flex gap-1">
@@ -107,7 +106,7 @@ async function TabletHeader({
       className={cn("flex items-center justify-between", className)}
       {...props}
     >
-      <Logo />
+      <LogoAndTitle />
       <div className="container flex flex-col gap-2">
         <div className="flex justify-end">
           <LinksMenu />
@@ -139,7 +138,7 @@ function MobileHeader({
       className={cn("container flex items-center justify-between", className)}
       {...props}
     >
-      <Logo />
+      <LogoAndTitle />
       <Button>
         <MenuIcon />
       </Button>
@@ -175,19 +174,20 @@ function LinksMenu() {
   );
 }
 
-function Logo() {
+function LogoAndTitle() {
   return (
     <Link
       href="/"
-      className="flex w-full items-center gap-2 text-2xl font-bold"
+      className="flex w-full items-center gap-4 text-2xl font-bold"
     >
-      <Image
+      {/* <Image
         src={logo}
         alt="logo"
         sizes="100vw" // TODO: Modify the sizes prop here
         placeholder="empty"
         className="w-24" // object-contain
-      />
+      /> */}
+      <Logo className="w-24" />
       <div>
         <p>Jamarski klub</p>
         <p>Novo mesto</p>

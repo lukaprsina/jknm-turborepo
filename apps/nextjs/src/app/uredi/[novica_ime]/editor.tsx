@@ -1,24 +1,10 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { useRouter } from "next/navigation";
-import EditorJS from "@editorjs/editorjs";
-// @ts-expect-error no types
-import DragDrop from "editorjs-drag-drop";
-// @ts-expect-error no types
-import Undo from "editorjs-undo";
 import { SaveIcon, XIcon } from "lucide-react";
 
 import "./editor.css";
+
+import { useCallback, useEffect } from "react";
 
 import type { Article } from "@acme/db/schema";
 import {
@@ -34,16 +20,9 @@ import {
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
-import { useToast } from "@acme/ui/use-toast";
 
+import { EditorProvider, useEditor } from "~/components/editor-context";
 import { api } from "~/trpc/react";
-import { rename_s3_directory } from "./editor-server";
-import {
-  article_title_to_url,
-  get_heading_from_editor,
-  get_image_data_from_editor,
-} from "./editor-utils";
-import { EDITOR_JS_PLUGINS } from "./plugins";
 import { SettingsDialog } from "./settings-button";
 import { settings_store } from "./settings-store";
 import { UploadDialog } from "./upload-dialog";
@@ -53,107 +32,23 @@ export default function MyEditor({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const editorJS = useRef<EditorJS | undefined>();
-  const [dirty, setDirty] = useState(false);
-  const toast = useToast();
-
-  const content = useMemo(
-    () => article?.draft_content ?? DEFAULT_VALUE,
-    [article],
-  );
-
-  // api: API, event: BlockMutationEvent | BlockMutationEvent[]
-  const onChange = useCallback(() => {
-    setDirty(true);
-  }, []);
-
-  const editor_factory = useCallback(() => {
-    const temp_editor = new EditorJS({
-      holder: "editorjs",
-      tools: EDITOR_JS_PLUGINS(toast),
-      data: content,
-      // inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
-      autofocus: true,
-      onReady: () => {
-        setTimeout(() => {
-          new Undo({ editor: editorJS.current });
-          new DragDrop(editorJS.current);
-        }, 500);
-
-        setTimeout(() => {
-          forceUpdate();
-        }, 1000);
-
-        if (!article) return;
-        if (!editorJS.current) {
-          console.error("No editorJS.current");
-          return;
-        }
-
-        void editorJS.current.save().then((editor_content) => {
-          const image_data = get_image_data_from_editor(editor_content);
-          settings_store.set.image_data(image_data);
-
-          settings_store.set.id(article.id);
-          settings_store.set.title(article.title);
-          settings_store.set.url(article.url);
-          settings_store.set.preview_image(
-            article.draft_preview_image ||
-              article.preview_image ||
-              image_data[0]?.url,
-          );
-
-          console.log("preview image", {
-            draft: article.draft_preview_image,
-            published: article.preview_image,
-            image_data_first: image_data[0]?.url,
-          });
-        });
-      },
-      onChange: (_, event) => {
-        if (Array.isArray(event)) {
-          for (const _ of event) {
-            onChange();
-          }
-        } else {
-          onChange();
-        }
-      },
-    });
-
-    return temp_editor;
-  }, [toast, content, article, onChange]);
-
-  useEffect(() => {
-    if (editorJS.current != null) return;
-
-    const temp_editor = editor_factory();
-    editorJS.current = temp_editor;
-  }, [editor_factory]);
-
   return (
-    <>
-      <SettingsSummary />
+    <EditorProvider article={article}>
       <div className="mx-auto w-full outline outline-1">
-        <MyToolbar
-          article={article}
-          editor={editorJS.current ?? undefined}
-          dirty={dirty}
-          setDirty={setDirty}
-        />
+        <MyToolbar />
         <div
           id="editorjs"
           className="prose lg:prose-xl dark:prose-invert mx-auto"
         />
       </div>
-    </>
+      <SettingsSummary />
+    </EditorProvider>
   );
 }
 
 function SettingsSummary() {
   const data = settings_store.useStore();
-  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+  return <pre className="my-8">{JSON.stringify(data, null, 2)}</pre>;
 }
 
 export interface SaveCallbackProps {
@@ -164,21 +59,7 @@ export interface SaveCallbackProps {
 
 export type SaveCallbackType = (props: SaveCallbackProps) => Promise<void>;
 
-function MyToolbar({
-  editor,
-  article,
-  dirty,
-  setDirty,
-}: {
-  editor?: EditorJS;
-  article?: typeof Article.$inferSelect;
-  dirty: boolean;
-  setDirty: (value: boolean) => void;
-}) {
-  const router = useRouter();
-  const [saving, setSaving] = useState(false);
-  const { toast } = useToast();
-
+function MyToolbar() {
   /* const article_update = api.article.save.useMutation({
     onSuccess: (data, variables) => {
       const id = data?.at(0)?.id;
@@ -221,14 +102,6 @@ function MyToolbar({
       setSaving(false);
     },
   }); */
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  });
 
   /* const save_callback = useCallback(
     async ({ variables, update, redirect_to = "uredi" }: SaveCallbackProps) => {
@@ -311,112 +184,81 @@ function MyToolbar({
     [editor, article, article_update, toast, router],
   ); */
 
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      if (!editor || !article) return;
+  const editor = useEditor();
 
-      if (event.key !== "s" || !event.ctrlKey) return;
-
-      event.preventDefault();
-      // void save_callback({ update: { draft: true } });
-    },
-    [article, editor],
-  );
-
-  if (!editor || !article) return null;
+  if (!editor) return null;
 
   return (
     <div className="flex w-full items-baseline justify-between p-4">
-      <div>{dirty ? <p>Ni shranjeno</p> : null}</div>
+      <div>{editor.dirty ? <p>Ni shranjeno</p> : null}</div>
       <div className="flex">
-        <SaveButton saving={saving} />
+        <SaveButton />
         <UploadDialog />
-        <SettingsDialog article={article} />
+        <SettingsDialog />
         <ClearButton />
       </div>
     </div>
   );
 }
 
-function NoHeadingButton({ editor }: { editor: EditorJS }) {
-  return (
-    <Button
-      onClick={() => {
-        editor.blocks.insert(
-          "header",
-          { text: "Neimenovana novica", level: 1 },
-          undefined,
-          0,
-          true,
-          false,
-        );
-      }}
-    >
-      Dodaj naslov
-    </Button>
-  );
-}
+function SaveButton() {
+  const editor = useEditor();
+  const article_save_draft = api.article.save_draft.useMutation({
+    onSuccess: () => {
+      if (!editor) return;
 
-function WrongHeadingButton({
-  editor,
-  title,
-}: {
-  editor: EditorJS;
-  title?: string;
-}) {
-  return (
-    <Button
-      onClick={() => {
-        editor.blocks.insert(
-          "header",
-          { text: title ?? "Neimenovana novica", level: 1 },
-          undefined,
-          0,
-          true,
-          true,
-        );
-      }}
-    >
-      Popravi naslov
-    </Button>
-  );
-}
+      editor.setSavingText(undefined);
+    },
+  });
 
-async function rename_images(
-  editor: EditorJS,
-  old_dir: string,
-  new_dir: string,
-) {
-  const editor_content = await editor.save();
+  const save_callback = useCallback(async () => {
+    if (!editor?.article?.id) {
+      console.error("Article ID is missing.");
+      return;
+    }
 
-  for (const block of editor_content.blocks) {
-    // TODO: files
-    if (!block.id || block.type !== "image") continue;
+    editor.setSavingText("Shranjujem osnutek ...");
 
-    const image_data = block.data as { file: { url: string } };
-    const new_url = image_data.file.url.replace(old_dir, new_dir);
-    image_data.file.url = new_url;
+    const editor_content = await editor.editor?.save();
 
-    await editor.blocks.update(block.id, {
-      data: image_data,
+    article_save_draft.mutate({
+      id: editor.article.id,
+      draft_content: editor_content,
+      draft_preview_image: settings_store.get.preview_image() ?? "",
     });
-  }
-}
+  }, [article_save_draft, editor]);
 
-function SaveButton({ saving }: { saving: boolean }) {
+  const handleKeyPress = useCallback(
+    (event: KeyboardEvent) => {
+      if (!editor?.article?.id) return;
+
+      if (event.key !== "s" || !event.ctrlKey) return;
+
+      event.preventDefault();
+
+      void save_callback();
+    },
+    [editor?.article?.id, save_callback],
+  );
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  });
+
+  if (!editor) return null;
+
   return (
     <div className="not-prose flex gap-1 text-sm">
-      <p hidden={!saving} className="h-full pt-3">
-        Shranujem...
-      </p>
+      {typeof editor.savingText === "undefined" ? (
+        <p className="h-full pt-3">{editor.savingText}</p>
+      ) : null}
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            // TODO
-            // onClick={() => save_callback({ update: { draft: true } })}
-          >
+          <Button variant="ghost" size="icon" onClick={() => save_callback()}>
             <SaveIcon />
           </Button>
         </TooltipTrigger>
@@ -465,17 +307,3 @@ function ClearButton() {
     </AlertDialog>
   );
 }
-
-const DEFAULT_VALUE = {
-  time: 1635603431943,
-  blocks: [
-    {
-      id: "sheNwCUP5A",
-      type: "header",
-      data: {
-        text: "Editor.js",
-        level: 1,
-      },
-    },
-  ],
-};

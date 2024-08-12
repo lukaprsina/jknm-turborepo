@@ -14,7 +14,7 @@ import {
 } from "@acme/ui/card";
 
 import { api } from "~/trpc/react";
-import { EDITOR_JS_PLUGINS } from "../uredi/[novica_ime]/plugins";
+import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import { read_articles, sync_with_algolia } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
 

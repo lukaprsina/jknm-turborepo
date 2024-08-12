@@ -145,7 +145,6 @@ export const articleRouter = {
       }),
     )
     .mutation(({ ctx, input }) => {
-      if (!input.id) return;
       return ctx.db
         .update(Article)
         .set(input)
@@ -162,21 +161,23 @@ export const articleRouter = {
         preview_image: z.string(),
         title: z.string(),
         url: z.string(),
-        published: z.boolean(),
       }),
     )
     .mutation(({ ctx, input }) => {
-      if (!input.id) return;
       return ctx.db
         .update(Article)
         .set({
           ...input,
+          published: true,
           draft_content: null,
           draft_preview_image: null,
           updated_at: new Date(),
         })
         .where(eq(Article.id, input.id))
-        .returning({ id: Article.id, url: Article.url });
+        .returning({
+          id: Article.id,
+          url: Article.url,
+        });
     }),
 
   unpublish: protectedProcedure

@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Settings2Icon } from "lucide-react";
 
-import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
@@ -15,14 +14,13 @@ import {
 } from "@acme/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
+import { useEditor } from "~/components/editor-context";
 import { SettingsForm } from "./settings-form";
 
-export function SettingsDialog({
-  article,
-}: {
-  article: typeof Article.$inferInsert;
-}) {
+export function SettingsDialog() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const editor = useEditor();
+  if (!editor) return null;
 
   return (
     <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
@@ -30,8 +28,7 @@ export function SettingsDialog({
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              // TODO
-              // onClick={() => save_callback({ update: false })}
+              onClick={() => editor.update_settings_from_editor()}
               variant="ghost"
               size="icon"
             >
@@ -51,10 +48,7 @@ export function SettingsDialog({
             osnutek.
           </DialogDescription>
         </DialogHeader>
-        <SettingsForm
-          closeDialog={() => setDialogOpen(false)}
-          article={article}
-        />
+        <SettingsForm closeDialog={() => setDialogOpen(false)} />
       </DialogContent>
     </Dialog>
   );

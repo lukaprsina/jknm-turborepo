@@ -82,7 +82,7 @@ interface AutocompleteProps {
 }
 
 // https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
-export function Autocomplete(props: AutocompleteProps) {
+export function Autocomplete({ detached, ...props }: AutocompleteProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const rootRef = useRef<HTMLElement>();
   const panelRootRef = useRef<Root>();
@@ -94,6 +94,7 @@ export function Autocomplete(props: AutocompleteProps) {
 
     const search_api = autocomplete({
       container: containerRef.current,
+      detachedMediaQuery: detached ?? "(max-width: 1024px)",
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       renderer: { createElement, Fragment, render: () => {} },
       render({ children }, root) {
@@ -112,7 +113,7 @@ export function Autocomplete(props: AutocompleteProps) {
     return () => {
       search_api.destroy();
     };
-  }, [props]);
+  }, [detached, props]);
 
   return <div className="box-border flex-grow border-0" ref={containerRef} />;
 }

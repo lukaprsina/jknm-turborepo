@@ -21,11 +21,13 @@ export const metadata: Metadata = {
       : "http://localhost:3000",
   ),
   title: "Jamarski klub Novo mesto",
-  description: "Simple monorepo with shared backend for web & mobile apps",
+  description:
+    "Smo specialisti za dokumentirano raziskovanje in ohranjanje čistega ter zdravega podzemskega sveta.",
   openGraph: {
     title: "Jamarski klub Novo mesto",
-    description: "Simple monorepo with shared backend for web & mobile apps",
-    url: "https://create-t3-turbo.vercel.app",
+    description:
+      "Smo specialisti za dokumentirano raziskovanje in ohranjanje čistega ter zdravega podzemskega sveta.",
+    url: "https://jknm.si",
     siteName: "Jamarski klub Novo mesto",
   },
   twitter: {
@@ -45,6 +47,7 @@ export const viewport: Viewport = {
 const open_sans = Open_Sans({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-opensans",
 });
 
 export default function RootLayout(props: { children: React.ReactNode }) {
@@ -53,9 +56,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
       <body
         className={cn(
           "min-h-screen bg-background font-sans text-foreground antialiased",
-          open_sans.className,
-          /* GeistSans.variable,
-          GeistMono.variable, */
+          open_sans.variable,
+          GeistSans.variable,
+          GeistMono.variable,
         )}
       >
         <TooltipProvider>

@@ -1,3 +1,3 @@
 store update instead of image duplicate toast
 Objave.txt 21518 youtube
-čudna dogajanja pri shrajevanju. vse testiraj
+daj api.article. mutation v editor context

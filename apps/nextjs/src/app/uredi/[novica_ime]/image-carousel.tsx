@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 
-import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardContent } from "@acme/ui/card";
 import {
@@ -19,45 +18,18 @@ import { settings_store } from "./settings-store";
 interface ImageCarouselProps {
   onImageUrlChange: (value: string) => void;
   imageUrl?: string;
-  article: typeof Article.$inferInsert;
 }
 
 const ImageCarousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & ImageCarouselProps
->(({ onImageUrlChange, imageUrl, article, ...props }, ref) => {
+>(({ onImageUrlChange, imageUrl, ...props }, ref) => {
   const file_ref = useRef<HTMLInputElement>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | undefined>(undefined);
   const image_data = settings_store.use.image_data();
+  /* const editor = useEditor();
 
-  /* useEffect(() => {
-    if (uploadedUrl) return;
-    const found_image = image_data.find(
-      (image) => image.url === article.draft_preview_image,
-    );
-
-    console.log("carousel effect", {
-      imageUrl,
-      draft: article.draft_preview_image,
-      published: article.preview_image,
-      image_data_first: image_data[0]?.url,
-    });
-    if (found_image) {
-      onImageUrlChange(found_image.url);
-      return;
-    } else {
-      setUploadedUrl(
-        article.draft_preview_image ?? article.preview_image ?? undefined,
-      );
-    }
-  }, [
-    article.draft_preview_image,
-    article.preview_image,
-    imageUrl,
-    image_data,
-    onImageUrlChange,
-    uploadedUrl,
-  ]); */
+  if (!editor) return null; */
 
   return (
     <Carousel

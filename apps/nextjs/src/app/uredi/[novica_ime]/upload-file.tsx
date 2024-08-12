@@ -1,16 +1,13 @@
 "use client";
 
-import type EditorJS from "@editorjs/editorjs";
 import mime from "mime/lite";
-
-import type { useToast } from "@acme/ui/use-toast";
 
 import type { FileUploadResponse } from "~/app/api/upload_file_to_s3/route";
 import { settings_store } from "./settings-store";
 
 export async function upload_image_by_file(
   file: File,
-  toast: ReturnType<typeof useToast>,
+  // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
   const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
   const error_response = {
@@ -36,12 +33,12 @@ export async function upload_image_by_file(
     body: formData,
   });
 
-  return await parse_s3_response(file_data, toast, novica_url, file.name);
+  return await parse_s3_response(file_data /* novica_url, file.name, toast */);
 }
 
 export async function upload_image_by_url(
   url: string,
-  toast: ReturnType<typeof useToast>,
+  // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
   const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
   const title = url.split("/").pop();
@@ -62,14 +59,14 @@ export async function upload_image_by_url(
     body: formData,
   });
 
-  return await parse_s3_response(file_data, toast, novica_url, title, editor);
+  return await parse_s3_response(file_data /* novica_url, title, toast */);
 }
 
 export async function parse_s3_response(
   file_data: Response,
-  toast: ReturnType<typeof useToast>,
-  novica_url: string,
+  /* novica_url: string,
   filename: string,
+  toast: ReturnType<typeof useToast>, */
 ): Promise<FileUploadResponse> {
   const error_response = {
     success: 0,
@@ -112,11 +109,11 @@ export async function parse_s3_response(
 
   if (file_data.ok) {
     if (file_json.error == "File exists") {
-      toast.toast({
+      /* toast.toast({
         title: "Slika s takim imenom že obstaja",
         description: `Novica: ${novica_url}, ime: ${filename}`,
         // action: <InsertImageToast />, // TODO, maybe alert better
-      });
+      }); */
 
       return {
         success: 0,

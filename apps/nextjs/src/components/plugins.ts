@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ToolConstructable, ToolSettings } from "@editorjs/editorjs";
-
 // @ts-expect-error no types
 import AttachesTool from "@editorjs/attaches";
 // @ts-expect-error no types
@@ -31,13 +30,18 @@ import {
   UnderlineInlineTool,
 } from "editorjs-inline-tool";
 
-import type { useToast } from "@acme/ui/use-toast";
+// import type { useToast } from "@acme/ui/use-toast";
 
-import { upload_image_by_file, upload_image_by_url } from "./upload-file";
+import {
+  upload_image_by_file,
+  upload_image_by_url,
+} from "../app/uredi/[novica_ime]/upload-file";
 
-export function EDITOR_JS_PLUGINS(
-  toast: ReturnType<typeof useToast>,
-): Record<string, ToolConstructable | ToolSettings> {
+export function EDITOR_JS_PLUGINS(): Record<
+// toast: ReturnType<typeof useToast>,
+  string,
+  ToolConstructable | ToolSettings
+> {
   return {
     paragraph: {
       class: Paragraph,
@@ -83,9 +87,8 @@ export function EDITOR_JS_PLUGINS(
           byUrl: "/api/upload_image_by_url",
         }, */
         uploader: {
-          uploadByFile: (file: File) =>
-            upload_image_by_file(file, toast),
-          uploadByUrl: (url: string) => upload_image_by_url(url, toast),
+          uploadByFile: (file: File) => upload_image_by_file(file),
+          uploadByUrl: (url: string) => upload_image_by_url(url),
         },
       },
     },
