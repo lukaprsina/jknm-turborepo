@@ -96,13 +96,19 @@ export const articleRouter = {
   create_article: protectedProcedure
     .input(CreateArticleSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.db.insert(Article).values(input).returning({ id: Article.id });
+      return ctx.db
+        .insert(Article)
+        .values({ updated_at: new Date(), created_at: new Date(), ...input })
+        .returning({ id: Article.id, url: Article.url });
     }),
 
   create_article_with_date: protectedProcedure
     .input(CreateArticleWithDateSchema)
     .mutation(({ ctx, input }) => {
-      return ctx.db.insert(Article).values(input).returning({ id: Article.id });
+      return ctx.db
+        .insert(Article)
+        .values({ updated_at: new Date(), created_at: new Date(), ...input })
+        .returning({ id: Article.id, url: Article.url });
     }),
 
   create_draft: protectedProcedure
@@ -142,18 +148,16 @@ export const articleRouter = {
       if (!input.id) return;
       return ctx.db
         .update(Article)
-        .set({
-          draft_content: input.draft_content,
-          draft_preview_image: input.draft_preview_image,
-        })
+        .set(input)
         .where(eq(Article.id, input.id))
         .returning({ id: Article.id });
     }),
 
-  publish_draft: protectedProcedure
+  publish: protectedProcedure
     .input(
       z.object({
         id: z.number(),
+        created_at: z.date(),
         content: content_validator,
         preview_image: z.string(),
         title: z.string(),
@@ -166,13 +170,10 @@ export const articleRouter = {
       return ctx.db
         .update(Article)
         .set({
-          content: input.content,
-          preview_image: input.preview_image,
-          title: input.title,
-          url: input.url,
-          published: input.published,
+          ...input,
           draft_content: null,
           draft_preview_image: null,
+          updated_at: new Date(),
         })
         .where(eq(Article.id, input.id))
         .returning({ id: Article.id, url: Article.url });

@@ -329,10 +329,10 @@ function MyToolbar({
     <div className="flex w-full items-baseline justify-between p-4">
       <div>{dirty ? <p>Ni shranjeno</p> : null}</div>
       <div className="flex">
-        <SaveButton saving={saving} save_callback={save_callback} />
-        <UploadDialog save_callback={save_callback} />
-        <SettingsDialog article={article} save_callback={save_callback} />
-        <ClearButton save_callback={save_callback} />
+        <SaveButton saving={saving} />
+        <UploadDialog />
+        <SettingsDialog article={article} />
+        <ClearButton />
       </div>
     </div>
   );
@@ -403,13 +403,7 @@ async function rename_images(
   }
 }
 
-function SaveButton({
-  saving,
-  save_callback,
-}: {
-  saving: boolean;
-  save_callback: SaveCallbackType;
-}) {
+function SaveButton({ saving }: { saving: boolean }) {
   return (
     <div className="not-prose flex gap-1 text-sm">
       <p hidden={!saving} className="h-full pt-3">
@@ -420,7 +414,8 @@ function SaveButton({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => save_callback({ update: { draft: true } })}
+            // TODO
+            // onClick={() => save_callback({ update: { draft: true } })}
           >
             <SaveIcon />
           </Button>
@@ -433,7 +428,7 @@ function SaveButton({
   );
 }
 
-function ClearButton({ save_callback }: { save_callback: SaveCallbackType }) {
+function ClearButton() {
   return (
     <AlertDialog>
       <Tooltip>
@@ -458,16 +453,9 @@ function ClearButton({ save_callback }: { save_callback: SaveCallbackType }) {
         </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogAction
-            onClick={() =>
-              save_callback({
-                update: { draft: true },
-                redirect_to: "novica",
-                variables: {
-                  /* TODO: do I need to update title, url */
-                  draft_content: null,
-                },
-              })
-            }
+            onClick={() => {
+              // TODO
+            }}
           >
             Ponastavi osnutek
           </AlertDialogAction>

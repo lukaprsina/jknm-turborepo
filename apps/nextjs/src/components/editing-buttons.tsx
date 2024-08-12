@@ -20,6 +20,8 @@ export default function EditingButtons({
   article?: typeof Article.$inferSelect;
 }) {
   const editable = useContext(EditableContext);
+  const router = useRouter();
+
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: (data) => {
       const returned_data = data?.at(0);
@@ -28,7 +30,6 @@ export default function EditingButtons({
       router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
     },
   });
-  const router = useRouter();
 
   if (!session?.user) return null;
 

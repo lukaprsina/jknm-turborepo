@@ -16,13 +16,7 @@ import {
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import type { SaveCallbackType } from "./editor";
-
-export function UploadDialog({
-  save_callback,
-}: {
-  save_callback: SaveCallbackType;
-}) {
+export function UploadDialog() {
   return (
     <AlertDialog>
       <Tooltip>
@@ -47,16 +41,17 @@ export function UploadDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Ne objavi</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() =>
-              save_callback({
+            onClick={() => {
+              // TODO
+              /* save_callback({
                 variables: {
                   published: true,
                   draft_content: null,
                 },
                 update: { content: true },
                 redirect_to: "novica",
-              })
-            }
+              }) */
+            }}
           >
             Objavi
           </AlertDialogAction>

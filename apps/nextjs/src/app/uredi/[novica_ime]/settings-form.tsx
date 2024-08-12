@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -19,7 +18,6 @@ import {
   FormMessage,
 } from "@acme/ui/form";
 
-import type { SaveCallbackType } from "./editor";
 import { api } from "~/trpc/react";
 import { ImageCarousel } from "./image-carousel";
 import { settings_store } from "./settings-store";
@@ -35,14 +33,25 @@ export const form_schema = z.object({
 
 export function SettingsForm({
   article,
-  save_callback,
   closeDialog,
 }: {
   article: typeof Article.$inferInsert;
-  save_callback: SaveCallbackType;
   closeDialog: () => void;
 }) {
   const router = useRouter();
+
+  const article_save_draft = api.article.save_draft.useMutation();
+
+  const article_publish = api.article.publish.useMutation({
+    onSuccess: (data) => {
+      const returned_data = data?.at(0);
+      if (!returned_data) return;
+
+      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
+    },
+  });
+
+  const article_unpublish = api.article.unpublish.useMutation();
 
   const article_delete = api.article.delete.useMutation({
     onSuccess: () => {
@@ -98,20 +107,15 @@ export function SettingsForm({
         <div className="mt-6 flex flex-col gap-4">
           <Button
             onClick={form.handleSubmit(
-              async (values: z.infer<typeof form_schema>) => {
-                await save_callback({
-                  variables: {
-                    ...values,
-                    published: true,
-                    draft_content: null,
-                    draft_preview_image: null,
-                    preview_image:
-                      values.preview_image ||
-                      article.draft_preview_image ||
-                      article.preview_image,
-                  },
-                  update: { content: true },
-                  redirect_to: "novica",
+              (values: z.infer<typeof form_schema>) => {
+                if (!article.id) {
+                  console.error("Article ID is missing.");
+                  return;
+                }
+
+                article_publish.mutate({
+                  id: article.id,
+                  created_at: values.created_at,
                 });
 
                 closeDialog();
@@ -123,19 +127,18 @@ export function SettingsForm({
           </Button>
           {article.published ? (
             <Button
-              onClick={form.handleSubmit(
-                async (values: z.infer<typeof form_schema>) => {
-                  await save_callback({
-                    variables: {
-                      ...values,
-                      published: false,
-                    },
-                    update: { draft: true, content: true },
-                  });
+              onClick={form.handleSubmit((_: z.infer<typeof form_schema>) => {
+                if (!article.id) {
+                  console.error("Article ID is missing.");
+                  return;
+                }
 
-                  closeDialog();
-                },
-              )}
+                article_unpublish.mutate({
+                  id: article.id,
+                });
+
+                closeDialog();
+              })}
               variant="secondary"
             >
               Skrij novičko
@@ -159,13 +162,16 @@ export function SettingsForm({
           <hr />
           <Button
             onClick={form.handleSubmit(
-              async (values: z.infer<typeof form_schema>) => {
-                await save_callback({
-                  variables: {
-                    ...values,
-                    draft_preview_image: values.preview_image,
-                  },
-                  update: { draft: true },
+              (values: z.infer<typeof form_schema>) => {
+                if (!article.id) {
+                  console.error("Article ID is missing.");
+                  return;
+                }
+
+                article_save_draft.mutate({
+                  id: article.id,
+                  draft_content: article.draft_content,
+                  draft_preview_image: values.preview_image,
                 });
 
                 closeDialog();

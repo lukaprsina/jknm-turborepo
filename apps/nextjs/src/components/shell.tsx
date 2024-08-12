@@ -18,6 +18,7 @@ import {
 import { ThemeToggle } from "@acme/ui/theme";
 
 import logo from "~/../assets/logo.png";
+import { Background } from "~/components/backgrounds";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import { NoviceAutocomplete } from "./autocomplete";
@@ -33,6 +34,7 @@ interface ShellProps {
 export function Shell({ children, article }: ShellProps) {
   return (
     <HydrateClient>
+      <Background />
       <div className="w-full">
         <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
           <Header article={article} />

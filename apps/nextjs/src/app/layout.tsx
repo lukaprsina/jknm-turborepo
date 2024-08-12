@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Open_Sans } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 
@@ -16,7 +17,7 @@ import { env } from "~/env";
 export const metadata: Metadata = {
   metadataBase: new URL(
     env.VERCEL_ENV === "production"
-      ? "https://turbo.t3.gg"
+      ? "https://jknm.si"
       : "http://localhost:3000",
   ),
   title: "Jamarski klub Novo mesto",
@@ -29,8 +30,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@jullerino",
-    creator: "@jullerino",
+    site: "@lukaprsina",
+    creator: "@lukaprsina",
   },
 };
 
@@ -41,14 +42,20 @@ export const viewport: Viewport = {
   ],
 };
 
+const open_sans = Open_Sans({
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export default function RootLayout(props: { children: React.ReactNode }) {
   return (
     <html lang="sl" suppressHydrationWarning>
       <body
         className={cn(
           "min-h-screen bg-background font-sans text-foreground antialiased",
-          GeistSans.variable,
-          GeistMono.variable,
+          open_sans.className,
+          /* GeistSans.variable,
+          GeistMono.variable, */
         )}
       >
         <TooltipProvider>

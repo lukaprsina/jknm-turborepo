@@ -21,8 +21,7 @@ import { iterate_over_articles } from "./converter-spaghetti";
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
-  const article_update = api.article.createWithDate.useMutation();
-  // const article_all = api.article.all_protected.useQuery();
+  const article_update = api.article.create_article_with_date.useMutation();
 
   return (
     <div className="prose container mx-auto py-8">

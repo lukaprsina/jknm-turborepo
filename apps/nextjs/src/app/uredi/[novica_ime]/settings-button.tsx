@@ -15,15 +15,12 @@ import {
 } from "@acme/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import type { SaveCallbackType } from "./editor";
 import { SettingsForm } from "./settings-form";
 
 export function SettingsDialog({
   article,
-  save_callback,
 }: {
   article: typeof Article.$inferInsert;
-  save_callback: SaveCallbackType;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -33,7 +30,8 @@ export function SettingsDialog({
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              onClick={() => save_callback({ update: false })}
+              // TODO
+              // onClick={() => save_callback({ update: false })}
               variant="ghost"
               size="icon"
             >
@@ -56,7 +54,6 @@ export function SettingsDialog({
         <SettingsForm
           closeDialog={() => setDialogOpen(false)}
           article={article}
-          save_callback={save_callback}
         />
       </DialogContent>
     </Dialog>

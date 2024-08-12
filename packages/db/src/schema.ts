@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -97,7 +97,7 @@ export const Article = pgTable("article", {
   updated_at: timestamp("updated_at", {
     mode: "date",
     withTimezone: true,
-  }).$onUpdateFn(() => sql`now()`),
+  }),
   content: json("content").$type<ArticleContentType>(),
   draft_content: json("draft_content").$type<ArticleContentType>(),
   text_content: text("text_content"),

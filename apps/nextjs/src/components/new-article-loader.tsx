@@ -21,21 +21,12 @@ export default function NewArticleLoader({
   ...props
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
-  const article_create = api.article.create.useMutation({
-    onSuccess: (data, variables) => {
-      if (!data[0]?.id) {
-        console.log("No article ID returned", data);
-        return;
-      }
+  const article_create = api.article.create_article.useMutation({
+    onSuccess: (data) => {
+      const returned_data = data.at(0);
+      if (!returned_data) return;
 
-      /* settings_store.set.id(data[0].id);
-      settings_store.set.title(variables.title);
-      settings_store.set.url(variables.url);
-      settings_store.set.preview_image(
-        variables.draft_preview_image ?? variables.preview_image ?? undefined,
-      ); */
-
-      router.replace(`/uredi/${variables.url}-${data[0].id}`);
+      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
     },
   });
 

@@ -22,7 +22,7 @@ import {
 let wrong_divs = 0;
 let videos = 0;
 type ArticleUpdateType = ReturnType<
-  typeof api.article.createWithDate.useMutation
+  typeof api.article.create_article_with_date.useMutation
 >;
 
 export async function iterate_over_articles(
