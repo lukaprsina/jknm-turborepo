@@ -12,7 +12,6 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
-// import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
 import { api } from "~/trpc/react";
 
 export default function NewArticleLoader({

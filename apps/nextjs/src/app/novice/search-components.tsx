@@ -4,11 +4,13 @@ import type { Hit as SearchHit } from "instantsearch.js";
 import type { UseSearchBoxProps, UseSortByProps } from "react-instantsearch";
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchBox, useSortBy } from "react-instantsearch";
+import { useSearchBox, useSortBy, useStats } from "react-instantsearch";
 
+import type { ArticleHit } from "@acme/validators";
 // import { InstantSearchNext } from "react-instantsearch-nextjs";
 
 import { AspectRatio } from "@acme/ui/aspect-ratio";
+import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import {
@@ -19,15 +21,14 @@ import {
   SelectValue,
 } from "@acme/ui/select";
 
-import type { NoviceHit } from "~/components/autocomplete";
 import { EditorToReact } from "~/components/editor-to-react";
 
-export function CustomSortBy(props: UseSortByProps) {
+export function MySortBy(props: UseSortByProps) {
   const { currentRefinement, options, refine } = useSortBy(props);
 
   return (
     <Select onValueChange={(value) => refine(value)} value={currentRefinement}>
-      <SelectTrigger className="flex flex-1">
+      <SelectTrigger className="">
         <SelectValue placeholder="Sortiraj po ..." />
       </SelectTrigger>
       <SelectContent>
@@ -45,22 +46,19 @@ const queryHook: UseSearchBoxProps["queryHook"] = (query, search) => {
   search(query);
 };
 
-export function CustomSearchBox() {
+export function MySearchBox() {
   const search_api = useSearchBox({ queryHook });
 
   return (
-    <div className="pb-4">
-      <Input
-        // type="submit"
-        placeholder="Iskanje ..."
-        value={search_api.query}
-        onChange={(e) => search_api.refine(e.target.value)}
-      />
-    </div>
+    <Input
+      placeholder="Iskanje ..."
+      value={search_api.query}
+      onChange={(e) => search_api.refine(e.target.value)}
+    />
   );
 }
 
-export function ArticleHit({ hit }: { hit: SearchHit<NoviceHit> }) {
+export function ArticleHit({ hit }: { hit: SearchHit<ArticleHit> }) {
   return (
     <Link
       href={`/novica/${hit.url}-${hit.objectID}`}
@@ -93,25 +91,46 @@ export function ArticleHit({ hit }: { hit: SearchHit<NoviceHit> }) {
   );
 }
 
+export function MyStats() {
+  const stats = useStats();
+
+  return (
+    <span>
+      {stats.processingTimeMS} ms, {stats.nbHits} novic
+    </span>
+  );
+}
+
 export function Timeline({ children }: { children: React.ReactNode }) {
   return <ol className="items-center pb-8 sm:flex">{children}</ol>;
 }
 
 export function TimelineItem({ year }: { year: number }) {
   return (
-    <li className="relative mb-6 sm:mb-0">
-      <div className="mb-2 mt-3 sm:pe-8">{year}</div>
+    <li className="relative mb-6 pl-2 sm:mb-0">
+      <Button
+        variant="link"
+        className="-ml-2 mb-0 mr-5 p-0 sm:pe-8"
+        style={{ paddingInlineEnd: "0px" }}
+        onClick={() => {
+          /*  */
+        }}
+      >
+        <span>{year}</span>
+      </Button>
       <div className="flex items-center">
-        <div className="z-10 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 ring-0 ring-white dark:bg-blue-900 dark:ring-gray-900 sm:ring-8">
-          <svg
-            className="h-2.5 w-2.5 text-blue-800 dark:text-blue-300"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-          </svg>
+        <div className="z-10 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-blue-200 ring-0 ring-background dark:bg-blue-900 dark:ring-background sm:ring-8">
+          <button>
+            <svg
+              className="h-2.5 w-2.5"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              {/* <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" /> */}
+            </svg>
+          </button>
         </div>
         <div className="hidden h-0.5 w-full bg-gray-200 dark:bg-gray-700 sm:flex"></div>
       </div>

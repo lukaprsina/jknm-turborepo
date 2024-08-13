@@ -1,7 +1,7 @@
 import type { SearchClient } from "algoliasearch";
 import algoliasearch from "algoliasearch";
 
-import { env } from "~/env";
+import { env } from "../env";
 
 class AlgoliaElevatedClient {
   private static instance: AlgoliaElevatedClient | undefined = undefined;
@@ -28,4 +28,4 @@ class AlgoliaElevatedClient {
   }
 }
 
-export const algoliaElevatedInstance = AlgoliaElevatedClient.getInstance();
+export const algolia_protected = AlgoliaElevatedClient.getInstance();

@@ -9,7 +9,7 @@ import React, { createElement, Fragment, useEffect, useRef } from "react";
 import { autocomplete, getAlgoliaResults } from "@algolia/autocomplete-js";
 import { createRoot } from "react-dom/client";
 
-import { algoliaInstance } from "~/lib/algolia";
+import { algolia } from "~/lib/algolia";
 
 import "@algolia/autocomplete-theme-classic";
 
@@ -17,20 +17,10 @@ import Link from "next/link";
 
 import "./autocomplete.css";
 
-import type { ArticleContentType } from "@acme/db/schema";
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type NoviceHit = {
-  objectID: string;
-  title: string;
-  url: string;
-  created_at: Date;
-  content?: ArticleContentType;
-  image?: string;
-};
+import type { ArticleHit } from "@acme/validators";
 
 export function NoviceAutocomplete({ detached }: { detached?: string }) {
-  const searchClient = algoliaInstance.getClient();
+  const searchClient = algolia.getClient();
 
   return (
     <Autocomplete
@@ -78,7 +68,7 @@ export function NoviceAutocomplete({ detached }: { detached?: string }) {
 interface AutocompleteProps {
   detached?: string;
   openOnFocus: boolean;
-  getSources: (props: { query: string }) => AutocompleteSource<NoviceHit>[];
+  getSources: (props: { query: string }) => AutocompleteSource<ArticleHit>[];
 }
 
 // https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
@@ -119,7 +109,7 @@ export function Autocomplete({ detached, ...props }: AutocompleteProps) {
 }
 
 interface ProductItemProps {
-  hit: NoviceHit;
+  hit: ArticleHit;
   components: AutocompleteComponents;
 }
 

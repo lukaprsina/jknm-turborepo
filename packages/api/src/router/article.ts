@@ -1,7 +1,7 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, count, desc, eq } from "@acme/db";
+import { and, desc, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -12,23 +12,6 @@ import { content_validator } from "@acme/validators";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
-  count: publicProcedure.query(({ ctx }) => {
-    return ctx.db
-      .select({
-        count: count(Article.id),
-      })
-      .from(Article)
-      .where(eq(Article.published, true));
-  }),
-
-  count_protected: protectedProcedure.query(({ ctx }) => {
-    return ctx.db
-      .select({
-        count: count(Article.id),
-      })
-      .from(Article);
-  }),
-
   all: publicProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({

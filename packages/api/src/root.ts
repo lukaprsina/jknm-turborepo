@@ -1,12 +1,12 @@
+import { algoliaRouter } from "./router/algolia";
 import { articleRouter } from "./router/article";
 import { authRouter } from "./router/auth";
-// import { awsRouter } from "./router/aws";
 import { createTRPCRouter } from "./trpc";
 
 export const appRouter = createTRPCRouter({
   auth: authRouter,
   article: articleRouter,
-  // aws: awsRouter,
+  algolia: algoliaRouter,
 });
 
 // export type definition of API

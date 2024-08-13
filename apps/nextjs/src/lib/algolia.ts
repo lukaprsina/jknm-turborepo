@@ -28,4 +28,4 @@ class AlgoliaClient {
   }
 }
 
-export const algoliaInstance = AlgoliaClient.getInstance();
+export const algolia = AlgoliaClient.getInstance();

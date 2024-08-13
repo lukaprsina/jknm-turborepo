@@ -21,6 +21,7 @@ export default function EditingButtons({
 }) {
   const editable = useContext(EditableContext);
   const router = useRouter();
+  // const create_algolia_article = api.algolia
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: (data) => {

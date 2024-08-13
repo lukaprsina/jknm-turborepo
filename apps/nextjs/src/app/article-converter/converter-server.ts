@@ -7,12 +7,6 @@ import { parse as csv_parse } from "csv-parse";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
-import type { NoviceHit } from "~/components/autocomplete";
-import { algoliaElevatedInstance } from "~/lib/algolia_elevated";
-
-/* import { db } from "@acme/db/client";
-import { Article } from "@acme/db/schema"; */
-
 export interface CSVType {
   title: string;
   content: string;
@@ -49,9 +43,8 @@ export async function read_articles() {
 
 // sync just the published articles
 export async function sync_with_algolia() {
-  const articles = await db.query.Article.findMany({});
-
-  const algolia = algoliaElevatedInstance.getClient();
+  // const articles = await db.query.Article.findMany({});
+  /* const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");
 
   const empty_query_results = await index.search("", {
@@ -60,16 +53,17 @@ export async function sync_with_algolia() {
 
   index.deleteObjects(empty_query_results.hits.map((hit) => hit.objectID));
 
-  const objects: NoviceHit[] = articles.map((article) => ({
+  const objects: ArticleHit[] = articles.map((article) => ({
     objectID: article.id.toString(),
     title: article.title,
     url: article.url,
     created_at: article.created_at,
     image: article.preview_image ?? undefined,
     content: article.content ?? undefined,
+    published: true,
   }));
 
   console.log("Syncing articles:", objects.length);
 
-  await index.saveObjects(objects);
+  await index.saveObjects(objects); */
 }

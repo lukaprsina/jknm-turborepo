@@ -2,13 +2,13 @@
 
 import { Hits, InstantSearch } from "react-instantsearch";
 
-import { PaginationWithLinks } from "@acme/ui/pagination-with-links";
-
-import { algoliaInstance } from "~/lib/algolia";
+import { algolia } from "~/lib/algolia";
+import { MyPagination } from "./pagination";
 import {
   ArticleHit,
-  CustomSearchBox,
-  CustomSortBy,
+  MySearchBox,
+  MySortBy,
+  MyStats,
   Timeline,
   TimelineItem,
 } from "./search-components";
@@ -18,16 +18,19 @@ export function Search() {
     <InstantSearch
       future={{ preserveSharedStateOnUnmount: true }}
       indexName="novice"
-      searchClient={algoliaInstance.getClient()}
+      searchClient={algolia.getClient()}
     >
-      <div className="flex flex-col pb-4 sm:flex-row">
-        <CustomSearchBox />
-        <CustomSortBy
-          items={[
-            { value: "novice", label: "Najnovejše" },
-            { value: "novice_date_asc", label: "Najstarejše" },
-          ]}
-        />
+      <div className="flex flex-col items-center justify-between gap-2 py-6 sm:flex-row">
+        <div className="flex items-center justify-between space-x-2">
+          <MySearchBox />
+          <MySortBy
+            items={[
+              { value: "novice", label: "Najnovejše" },
+              { value: "novice_date_asc", label: "Najstarejše" },
+            ]}
+          />
+        </div>
+        <MyStats />
       </div>
       <Timeline>
         <TimelineItem year={2022} />
@@ -37,10 +40,10 @@ export function Search() {
       <Hits
         hitComponent={ArticleHit}
         classNames={{
-          list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
+          list: "grid grid-cols-1 gap-4 sm:grid-cols-2 mb-6",
         }}
       />
-      <PaginationWithLinks page={1} pageSize={20} totalCount={500} />
+      <MyPagination />
     </InstantSearch>
   );
 }

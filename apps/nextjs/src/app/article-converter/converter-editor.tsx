@@ -67,7 +67,7 @@ export function TempEditor({
   const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({
       holder: "editorjs",
-      tools: EDITOR_JS_PLUGINS,
+      tools: EDITOR_JS_PLUGINS(),
       // data: content,
       autofocus: true,
     });
@@ -96,7 +96,7 @@ export function SampleArticle({
         <CardTitle>{article.title}</CardTitle>
         <CardDescription>
           <p>Created at {article.created_at.toISOString()}</p>
-          <p>Updated at {article.updated_at.toISOString()}</p>
+          <p>Updated at {article.updated_at?.toISOString()}</p>
         </CardDescription>
       </CardHeader>
 
