@@ -100,7 +100,6 @@ export const Article = pgTable("article", {
   }),
   content: json("content").$type<ArticleContentType>(),
   draft_content: json("draft_content").$type<ArticleContentType>(),
-  text_content: text("text_content"),
   preview_image: varchar("preview_image", { length: 255 }),
   draft_preview_image: varchar("draft_preview_image", { length: 255 }),
 });

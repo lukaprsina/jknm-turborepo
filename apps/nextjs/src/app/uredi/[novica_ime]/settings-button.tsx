@@ -28,7 +28,16 @@ export function SettingsDialog() {
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              onClick={() => editor.update_settings_from_editor()}
+              onClick={async () => {
+                if (!editor.editor || !editor.article) return;
+                const editor_content = await editor.editor.save();
+
+                editor.update_settings_from_editor(
+                  editor_content,
+                  editor.article.title,
+                  editor.article.url,
+                );
+              }}
               variant="ghost"
               size="icon"
             >

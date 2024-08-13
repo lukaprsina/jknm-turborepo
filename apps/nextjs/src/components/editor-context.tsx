@@ -1,5 +1,6 @@
 "use client";
 
+import type { OutputData } from "@editorjs/editorjs";
 import type { ReactNode } from "react";
 import React, {
   createContext,
@@ -22,7 +23,6 @@ import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
-import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import {
   article_title_to_url,
   get_heading_from_editor,
@@ -34,6 +34,7 @@ import { EDITOR_JS_PLUGINS } from "./plugins";
 
 import "~/server/algolia";
 
+import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import {
   delete_algolia_article,
   update_algolia_article,
@@ -49,7 +50,11 @@ export interface EditorContextType {
       }
     | undefined
   >;
-  update_settings_from_editor: () => Promise<void>;
+  update_settings_from_editor: (
+    editor_content: OutputData,
+    title: string,
+    url: string,
+  ) => void;
   savingText: string | undefined;
   setSavingText: (value: string | undefined) => void;
   dirty: boolean;
@@ -93,31 +98,30 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     setDirty(true);
   }, []);
 
-  const update_settings_from_editor = useCallback(async () => {
-    if (!editorJS.current || !article) return;
+  const update_settings_from_editor = useCallback(
+    (editor_content: OutputData, title: string, url: string) => {
+      if (!editorJS.current || !article) return;
+      const image_data = get_image_data_from_editor(editor_content);
+      settings_store.set.image_data(image_data);
 
-    const editor_content = await editorJS.current.save();
-    const image_data = get_image_data_from_editor(editor_content);
-    settings_store.set.image_data(image_data);
+      const preview_image =
+        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+        settings_store.get.preview_image() || image_data.at(0)?.url;
 
-    const preview_image =
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      article.draft_preview_image ||
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      article.preview_image ||
-      image_data.at(0)?.url;
+      settings_store.set.id(article.id);
+      settings_store.set.title(title);
+      settings_store.set.url(url);
+      settings_store.set.preview_image(preview_image);
 
-    settings_store.set.id(article.id);
-    settings_store.set.title(article.title);
-    settings_store.set.url(article.url);
-    settings_store.set.preview_image(preview_image);
-
-    console.log("preview image", {
-      draft: article.draft_preview_image,
-      published: article.preview_image,
-      image_data_first: image_data[0]?.url,
-    });
-  }, [article]);
+      console.log("preview image", {
+        draft: article.draft_preview_image,
+        published: article.preview_image,
+        image_data_first: image_data[0]?.url,
+        preview_image,
+      });
+    },
+    [article],
+  );
 
   const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({
@@ -144,7 +148,18 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
           return;
         }
 
-        void update_settings_from_editor();
+        async function update_article() {
+          const editor_content = await editorJS.current?.save();
+          if (!editor_content || !article) return;
+
+          update_settings_from_editor(
+            editor_content,
+            article.title,
+            article.url,
+          );
+        }
+
+        void update_article();
       },
       onChange: (_, event) => {
         if (Array.isArray(event)) {
@@ -161,34 +176,66 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   }, [content, article, update_settings_from_editor, onChange]);
 
   const save_draft = api.article.save_draft.useMutation({
-    onSuccess: () => {
+    onMutate: () => {
+      if (!article?.id) {
+        console.error("Article ID is missing.");
+        return;
+      }
+
+      setSavingText("Shranjujem osnutek ...");
+    },
+    onSuccess: async () => {
+      if (!editorJS.current || !article) return;
+      const editor_content = await editorJS.current.save();
+
+      update_settings_from_editor(editor_content, article.title, article.url);
+
       setSavingText(undefined);
     },
   });
 
   const publish = api.article.publish.useMutation({
+    onMutate: () => {
+      if (!article?.id) {
+        console.error("Article ID is missing.");
+        return;
+      }
+
+      setSavingText("Objavljam spremembe ...");
+    },
     onSuccess: async (data) => {
       const returned_data = data.at(0);
-      if (!editorJS.current || !returned_data) return;
-
-      const navigate_to_redirect = () => {
-        router.replace(`/novica/${returned_data.url}-${returned_data.id}`);
-      };
+      if (!editorJS.current || !returned_data || !article) return;
+      console.warn("published", returned_data);
 
       await update_algolia_article({
         objectID: returned_data.id.toString(),
+        published: true,
+        title: returned_data.title,
+        url: returned_data.url,
+        created_at: returned_data.created_at,
+        content: returned_data.content ?? undefined,
+        image: returned_data.preview_image ?? undefined,
       });
 
       setSavingText(undefined);
 
-      if (urls.new_article_url !== urls.old_article_url)
-        await rename_s3_directory(urls.old_article_url, urls.new_article_url);
+      const old_article_url = `${article.url}-${article.id}`;
+      const new_article_url = `${returned_data.url}-${returned_data.id}`;
 
-      navigate_to_redirect();
+      if (old_article_url !== new_article_url) {
+        console.log("Renaming S3 directory", old_article_url, new_article_url);
+        await rename_s3_directory(old_article_url, new_article_url);
+      }
+
+      router.replace(`/novica/${returned_data.url}-${returned_data.id}`);
     },
   });
 
   const unpublish = api.article.unpublish.useMutation({
+    onMutate: () => {
+      setSavingText("Skrivam novičko ...");
+    },
     onSuccess: async (data) => {
       const returned_data = data?.at(0);
       if (!returned_data) return;
@@ -203,6 +250,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   });
 
   const delete_by_id = api.article.delete.useMutation({
+    onMutate: () => {
+      setSavingText("Brišem novičko ...");
+    },
     onSuccess: async (data) => {
       const returned_data = data.at(0);
       if (!returned_data) return;
@@ -250,8 +300,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     const new_article_url = `${new_url}-${article.id}`;
 
     await rename_images(editorJS.current, old_article_url, new_article_url);
-
-    await update_settings_from_editor();
+    update_settings_from_editor(editor_content, new_title, new_url);
 
     return { old_article_url, new_article_url };
   };

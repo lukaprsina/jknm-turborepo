@@ -1,3 +1,16 @@
 store update instead of image duplicate toast
 Objave.txt 21518 youtube
-daj api.article. mutation v editor context
+
+ko shranjuješ url, ga zakodiraj
+- vprašaj v url pokvari vse
+
+- ne preimujem slik
+ ⨯ upstream image response failed for https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/nova-novica-237/Screenshot%202024-08-12%20221210.png 403
+ImageError: "url" parameter is valid but upstream response is invalid
+    at fetchExternalImage (D:\dev\js\jknm-turborepo\node_modules\next\dist\server\image-optimizer.js:583:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async DevServer.imageOptimizer (D:\dev\js\jknm-turborepo\node_modules\next\dist\server\next-server.js:650:48)
+    at async cacheEntry.imageResponseCache.get.incrementalCache (D:\dev\js\jknm-turborepo\node_modules\next\dist\server\next-server.js:182:65)
+    at async D:\dev\js\jknm-turborepo\node_modules\next\dist\server\response-cache\index.js:90:36
+    at async D:\dev\js\jknm-turborepo\node_modules\next\dist\lib\batcher.js:45:32 {
+  statusCode: 403

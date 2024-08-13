@@ -54,12 +54,13 @@ export function UploadDialog() {
                 return;
               }
 
-              editor.setSavingText("Objavljam spremembe ...");
+              await editor.configure_article_before_publish();
 
               const editor_content = await editor.editor?.save();
 
               editor.mutations.publish({
-                ...editor.article,
+                id: editor.article.id,
+                created_at: editor.article.created_at,
                 content: editor_content,
                 title: settings_store.get.title(),
                 url: settings_store.get.url(),

@@ -20,7 +20,7 @@ interface ImageCarouselProps {
   imageUrl?: string;
 }
 
-const ImageCarousel = React.forwardRef<
+export const ImageCarousel = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & ImageCarouselProps
 >(({ onImageUrlChange, imageUrl, ...props }, ref) => {
@@ -126,5 +126,3 @@ const ImageCarousel = React.forwardRef<
     </Carousel>
   );
 });
-
-export { ImageCarousel };

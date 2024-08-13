@@ -31,7 +31,7 @@ export default function EditingButtons({
       const new_url = `${returned_data.url}-${returned_data.id}`;
 
       await create_algolia_article({
-        objectID: new_url,
+        objectID: returned_data.id.toString(),
         title: returned_data.title,
         url: returned_data.url,
         content: returned_data.content ?? undefined,

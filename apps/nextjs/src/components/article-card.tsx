@@ -12,11 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
 import { EditorToReact } from "./editor-to-react";
 
-/* <ShineBorder
-              className="text-2xl font-bold"
-              color={theme.resolvedTheme === "dark" ? "white" : "black"}
-            > */
-
 export function FeaturedArticleCard({
   article,
 }: {
@@ -30,10 +25,11 @@ export function FeaturedArticleCard({
       className="col-span-1 overflow-hidden rounded-md no-underline shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
     >
       <Card className="h-full">
-        {article.preview_image && (
+        {article.draft_preview_image || article.preview_image ? (
           <AspectRatio ratio={16 / 9} className="relative rounded-md">
             <Image
-              src={article.preview_image}
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+              src={article.draft_preview_image || article.preview_image || ""}
               alt="Photo by Drew Beamer"
               fill
               className="rounded-md object-cover"
@@ -51,7 +47,7 @@ export function FeaturedArticleCard({
               </Badge>
             )}
           </AspectRatio>
-        )}
+        ) : null}
         <div>
           <CardHeader>
             <CardTitle className="text-blue-800">{article.title}</CardTitle>
@@ -59,7 +55,11 @@ export function FeaturedArticleCard({
 
           <CardContent>
             <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact just_text content={article.content ?? undefined} />
+              <EditorToReact
+                just_text
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                content={article.draft_content || article.content || undefined}
+              />
             </div>
           </CardContent>
         </div>
@@ -81,10 +81,11 @@ export function ArticleCard({
       className="overflow-hidden rounded-md bg-card no-underline shadow-lg transition-transform hover:scale-[1.01]"
     >
       <Card className="h-full">
-        {article.preview_image && (
+        {article.draft_preview_image || article.preview_image ? (
           <AspectRatio ratio={16 / 9} className="relative rounded-md">
             <Image
-              src={article.preview_image}
+              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+              src={article.draft_preview_image || article.preview_image || ""}
               alt={article.title}
               fill
               className="rounded-md object-cover"
@@ -102,7 +103,7 @@ export function ArticleCard({
               </Badge>
             )}
           </AspectRatio>
-        )}
+        ) : null}
         {/* TODO: če sta dve vrstici, ni poravnano */}
         <div className="flex flex-col justify-between">
           <CardHeader>

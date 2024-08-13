@@ -22,7 +22,6 @@ import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
-import { api } from "~/trpc/react";
 import { SettingsDialog } from "./settings-button";
 import { settings_store } from "./settings-store";
 import { UploadDialog } from "./upload-dialog";
@@ -48,7 +47,11 @@ export default function MyEditor({
 
 function SettingsSummary() {
   const data = settings_store.useStore();
-  return <pre className="my-8">{JSON.stringify(data, null, 2)}</pre>;
+  return (
+    <pre className="my-8 h-full overflow-auto">
+      {JSON.stringify(data, null, 2)}
+    </pre>
+  );
 }
 
 export interface SaveCallbackProps {
@@ -186,11 +189,14 @@ function MyToolbar() {
 
   const editor = useEditor();
 
-  if (!editor) return null;
+  useEffect(() => {
+    console.log("editor dirty:", editor?.dirty);
+  }, [editor?.dirty]);
 
+  if (!editor) return null;
   return (
     <div className="flex w-full items-baseline justify-between p-4">
-      <div>{editor.dirty ? <p>Ni shranjeno</p> : null}</div>
+      <div>{editor.savingText}</div>
       <div className="flex">
         <SaveButton />
         <UploadDialog />
@@ -203,13 +209,6 @@ function MyToolbar() {
 
 function SaveButton() {
   const editor = useEditor();
-  const article_save_draft = api.article.save_draft.useMutation({
-    onSuccess: () => {
-      if (!editor) return;
-
-      editor.setSavingText(undefined);
-    },
-  });
 
   const save_callback = useCallback(async () => {
     if (!editor?.article?.id) {
@@ -217,16 +216,14 @@ function SaveButton() {
       return;
     }
 
-    editor.setSavingText("Shranjujem osnutek ...");
-
     const editor_content = await editor.editor?.save();
 
-    article_save_draft.mutate({
+    editor.mutations.save_draft({
       id: editor.article.id,
       draft_content: editor_content,
       draft_preview_image: settings_store.get.preview_image() ?? "",
     });
-  }, [article_save_draft, editor]);
+  }, [editor]);
 
   const handleKeyPress = useCallback(
     (event: KeyboardEvent) => {

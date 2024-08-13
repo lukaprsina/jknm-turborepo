@@ -4,8 +4,11 @@ import fs from "node:fs";
 import { finished } from "node:stream/promises";
 import { parse as csv_parse } from "csv-parse";
 
+import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
+
+import { algolia_protected } from "~/lib/algolia-protected";
 
 export interface CSVType {
   title: string;
@@ -43,8 +46,8 @@ export async function read_articles() {
 
 // sync just the published articles
 export async function sync_with_algolia() {
-  // const articles = await db.query.Article.findMany({});
-  /* const algolia = algolia_protected.getClient();
+  const articles = await db.query.Article.findMany({});
+  const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");
 
   const empty_query_results = await index.search("", {
@@ -65,5 +68,5 @@ export async function sync_with_algolia() {
 
   console.log("Syncing articles:", objects.length);
 
-  await index.saveObjects(objects); */
+  await index.saveObjects(objects);
 }

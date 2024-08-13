@@ -31,6 +31,7 @@ export const form_schema = z.object({
 
 export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
   const editor = useEditor();
+  const preview_image = settings_store.use.preview_image();
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
@@ -47,7 +48,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
       <form className="space-y-4">
         <FormField
           control={form.control}
-          defaultValue={settings_store.get.preview_image()}
+          defaultValue={preview_image}
           name="preview_image"
           render={({ field }) => (
             <FormItem>
@@ -90,10 +91,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                   return;
                 }
 
-                editor.setSavingText("Objavljam spremembe ...");
-
-                const urls = await editor.configure_article_before_publish();
-                if (!urls) return;
+                await editor.configure_article_before_publish();
 
                 const editor_content = await editor.editor?.save();
 
@@ -121,8 +119,6 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                   return;
                 }
 
-                editor.setSavingText("Skrivam novičko ...");
-
                 editor.mutations.unpublish({
                   id: editor.article.id,
                 });
@@ -141,8 +137,6 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                 return;
               }
 
-              editor.setSavingText("Brišem novičko ...");
-
               editor.mutations.delete_by_id(editor.article.id);
 
               closeDialog();
@@ -159,8 +153,6 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                   console.error("Article ID is missing.");
                   return;
                 }
-
-                editor.setSavingText("Shranjujem osnutek ...");
 
                 const editor_content = await editor.editor?.save();
 

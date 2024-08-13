@@ -165,10 +165,7 @@ export const articleRouter = {
           updated_at: new Date(),
         })
         .where(eq(Article.id, input.id))
-        .returning({
-          id: Article.id,
-          url: Article.url,
-        });
+        .returning();
     }),
 
   unpublish: protectedProcedure
