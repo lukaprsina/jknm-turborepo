@@ -92,6 +92,9 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
 
                 editor.setSavingText("Objavljam spremembe ...");
 
+                const urls = await editor.configure_article_before_publish();
+                if (!urls) return;
+
                 const editor_content = await editor.editor?.save();
 
                 editor.mutations.publish({

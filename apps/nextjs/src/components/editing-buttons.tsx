@@ -9,6 +9,7 @@ import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 
 import { EditableContext } from "~/components/editable-context";
+import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
 import NewArticleLoader from "./new-article-loader";
 
@@ -21,14 +22,24 @@ export default function EditingButtons({
 }) {
   const editable = useContext(EditableContext);
   const router = useRouter();
-  // const create_algolia_article = api.algolia
 
   const article_create_draft = api.article.create_draft.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const returned_data = data?.at(0);
       if (!returned_data) return;
 
-      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
+      const new_url = `${returned_data.url}-${returned_data.id}`;
+
+      await create_algolia_article({
+        objectID: new_url,
+        title: returned_data.title,
+        url: returned_data.url,
+        content: returned_data.content ?? undefined,
+        created_at: returned_data.created_at,
+        published: !!returned_data.published,
+      });
+
+      router.push(`/uredi/${new_url}`);
     },
   });
 

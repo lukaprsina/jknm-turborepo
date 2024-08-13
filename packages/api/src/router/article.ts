@@ -82,7 +82,7 @@ export const articleRouter = {
       return ctx.db
         .insert(Article)
         .values({ updated_at: new Date(), created_at: new Date(), ...input })
-        .returning({ id: Article.id, url: Article.url });
+        .returning();
     }),
 
   create_article_with_date: protectedProcedure
@@ -91,7 +91,7 @@ export const articleRouter = {
       return ctx.db
         .insert(Article)
         .values({ updated_at: new Date(), created_at: new Date(), ...input })
-        .returning({ id: Article.id, url: Article.url });
+        .returning();
     }),
 
   create_draft: protectedProcedure
@@ -112,7 +112,7 @@ export const articleRouter = {
       if (article.draft_content && article.draft_preview_image) {
         // draft already exists, edit it
         console.log("Draft already exists, edit it");
-        return [{ id: article.id, url: article.url }];
+        return [article];
       } else {
         // draft was deleted when the article was published
         console.log("Draft was deleted when the article was published");
@@ -123,7 +123,7 @@ export const articleRouter = {
             draft_preview_image: article.preview_image,
           })
           .where(eq(Article.id, input.id))
-          .returning({ id: Article.id, url: Article.url });
+          .returning();
       }
     }),
 
@@ -192,6 +192,9 @@ export const articleRouter = {
     }),
 
   delete: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {
-    return ctx.db.delete(Article).where(eq(Article.id, input));
+    return ctx.db
+      .delete(Article)
+      .where(eq(Article.id, input))
+      .returning({ id: Article.id, url: Article.url });
   }),
 } satisfies TRPCRouterRecord;

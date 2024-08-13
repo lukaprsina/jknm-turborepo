@@ -23,7 +23,6 @@
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
     "@trpc/server": "catalog:",
-    "algoliasearch": "^4.24.0",
     "superjson": "2.2.1",
     "zod": "catalog:"
   },

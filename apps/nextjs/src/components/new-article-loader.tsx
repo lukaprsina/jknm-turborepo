@@ -12,6 +12,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
+import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
 
 export default function NewArticleLoader({
@@ -21,11 +22,22 @@ export default function NewArticleLoader({
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
   const article_create = api.article.create_article.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const returned_data = data.at(0);
       if (!returned_data) return;
 
-      router.push(`/uredi/${returned_data.url}-${returned_data.id}`);
+      const new_url = `${returned_data.url}-${returned_data.id}`;
+
+      await create_algolia_article({
+        objectID: returned_data.id.toString(),
+        title: returned_data.title,
+        url: returned_data.url,
+        content: returned_data.content ?? undefined,
+        created_at: returned_data.created_at,
+        published: !!returned_data.published,
+      });
+
+      router.push(`/uredi/${new_url}`);
     },
   });
 

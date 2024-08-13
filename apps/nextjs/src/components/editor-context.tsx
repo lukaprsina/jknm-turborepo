@@ -32,6 +32,13 @@ import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
+import "~/server/algolia";
+
+import {
+  delete_algolia_article,
+  update_algolia_article,
+} from "~/server/algolia";
+
 export interface EditorContextType {
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
@@ -153,24 +160,24 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     return temp_editor;
   }, [content, article, update_settings_from_editor, onChange]);
 
-  const hide_save_text = {
+  const save_draft = api.article.save_draft.useMutation({
     onSuccess: () => {
       setSavingText(undefined);
     },
-  };
-
-  const save_draft = api.article.save_draft.useMutation(hide_save_text);
+  });
 
   const publish = api.article.publish.useMutation({
-    onSuccess: async () => {
-      if (!editorJS.current) return;
-
-      const urls = await configure_article_before_publish();
-      if (!urls) return;
+    onSuccess: async (data) => {
+      const returned_data = data.at(0);
+      if (!editorJS.current || !returned_data) return;
 
       const navigate_to_redirect = () => {
-        router.replace(`/novica/${urls.new_article_url}`);
+        router.replace(`/novica/${returned_data.url}-${returned_data.id}`);
       };
+
+      await update_algolia_article({
+        objectID: returned_data.id.toString(),
+      });
 
       setSavingText(undefined);
 
@@ -181,10 +188,27 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     },
   });
 
-  const unpublish = api.article.unpublish.useMutation(hide_save_text);
+  const unpublish = api.article.unpublish.useMutation({
+    onSuccess: async (data) => {
+      const returned_data = data?.at(0);
+      if (!returned_data) return;
+
+      setSavingText(undefined);
+
+      await update_algolia_article({
+        objectID: returned_data.id.toString(),
+        published: false,
+      });
+    },
+  });
 
   const delete_by_id = api.article.delete.useMutation({
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      const returned_data = data.at(0);
+      if (!returned_data) return;
+
+      await delete_algolia_article(returned_data.id.toString());
+
       router.replace(`/`);
     },
   });
@@ -226,7 +250,6 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     const new_article_url = `${new_url}-${article.id}`;
 
     await rename_images(editorJS.current, old_article_url, new_article_url);
-    // editor_content = await editorJS.current.save();
 
     await update_settings_from_editor();
 
