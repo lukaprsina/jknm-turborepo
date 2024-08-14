@@ -16,7 +16,7 @@ import NewArticleLoader from "./new-article-loader";
 
 export default function EditingButtons({
   session,
-  article: article,
+  article,
 }: {
   session?: Session;
   article?: typeof Article.$inferSelect;
@@ -42,7 +42,10 @@ export default function EditingButtons({
     },
   });
 
-  if (!session?.user) return null;
+  if (!session?.user) {
+    console.error("ALDFNOADNF");
+    return null;
+  }
 
   return (
     <>

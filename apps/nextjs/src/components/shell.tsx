@@ -35,7 +35,8 @@ export function Shell({ children, article }: ShellProps) {
     <HydrateClient>
       <Background />
       <div className="w-full">
-        <header className="sticky top-0 z-50 bg-primary/80 px-6 py-4 text-primary-foreground backdrop-blur-sm md:px-12 md:py-6">
+        {/* py-4 md:py-6 */}
+        <header className="sticky top-0 z-50 bg-primary/80 text-primary-foreground backdrop-blur-sm">
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>
@@ -54,10 +55,43 @@ function Header({
 }) {
   return (
     <>
-      <DesktopHeader className="hidden xl:flex" article={article} />
+      <TestHeader article={article} />
+      {/* <DesktopHeader className="hidden xl:flex" article={article} />
       <TabletHeader className="hidden md:flex xl:hidden" article={article} />
-      <MobileHeader className="md:hidden" />
+      <MobileHeader className="md:hidden" /> */}
     </>
+  );
+}
+
+async function TestHeader({
+  article,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
+  const session = await auth();
+
+  return (
+    <div>
+      <div
+        className={cn(
+          "container flex items-center justify-between px-6 py-4 md:px-12",
+          className,
+        )}
+        {...props}
+      >
+        <LogoAndTitle />
+        <div className="flex items-center justify-between gap-4">
+          <NoviceAutocomplete /* detached="" */ />
+          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+          <EditingButtons article={article} session={session ?? undefined} />
+          <ShowDraftsSwitch />
+        </div>
+      </div>
+      <div className="h-0.5 w-full bg-primary/40" />
+      <div className="justify-left container flex items-center px-6 py-4 md:px-12">
+        <LinksMenu />
+      </div>
+    </div>
   );
 }
 
@@ -78,13 +112,6 @@ async function DesktopHeader({
         <LinksMenu />
         <div className="flex gap-1">
           <EditingButtons article={article} session={session ?? undefined} />
-          {/* <Button
-            className="dark:bg-primary/80 dark:text-primary-foreground"
-            variant="ghost"
-            size="icon"
-          >
-            <SearchIcon size={18} />
-          </Button> */}
           <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
           <ShowDraftsSwitch />
           <NoviceAutocomplete detached="" />
@@ -114,13 +141,6 @@ async function TabletHeader({
         <div className="flex gap-4">
           <NoviceAutocomplete />
           <EditingButtons article={article} session={session ?? undefined} />
-          {/* <Button
-              className="dark:bg-primary/80 dark:text-primary-foreground"
-              variant="ghost"
-              size="icon"
-              >
-              <SearchIcon size={18} />
-              </Button> */}
           <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
           <ShowDraftsSwitch />
         </div>
@@ -176,22 +196,9 @@ function LinksMenu() {
 
 function LogoAndTitle() {
   return (
-    <Link
-      href="/"
-      className="flex w-full items-center gap-4 text-2xl font-bold"
-    >
-      {/* <Image
-        src={logo}
-        alt="logo"
-        sizes="100vw" // TODO: Modify the sizes prop here
-        placeholder="empty"
-        className="w-24" // object-contain
-      /> */}
+    <Link href="/" className="flex items-center gap-6 text-2xl font-bold">
       <Logo className="w-24" />
-      <div>
-        <p>Jamarski klub</p>
-        <p>Novo mesto</p>
-      </div>
+      <p>Jamarski klub Novo mesto</p>
     </Link>
   );
 }

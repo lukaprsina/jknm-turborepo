@@ -45,13 +45,7 @@ import { clean_directory } from "~/server/image-s3";
 export interface EditorContextType {
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
-  configure_article_before_publish: () => Promise<
-    | {
-        old_article_url: string;
-        new_article_url: string;
-      }
-    | undefined
-  >;
+  configure_article_before_publish: () => Promise<void>;
   update_settings_from_editor: (
     editor_content: OutputData,
     title: string,
@@ -106,21 +100,13 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       const image_data = get_image_data_from_editor(editor_content);
       settings_store.set.image_data(image_data);
 
-      const preview_image =
-        // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        settings_store.get.preview_image() || image_data.at(0)?.url;
+      if (settings_store.get.preview_image()?.length == 0) {
+        settings_store.set.preview_image(image_data.at(0)?.url);
+      }
 
       settings_store.set.id(article.id);
       settings_store.set.title(title);
       settings_store.set.url(url);
-      settings_store.set.preview_image(preview_image);
-
-      console.log("preview image", {
-        draft: article.draft_preview_image,
-        published: article.preview_image,
-        image_data_first: image_data[0]?.url,
-        preview_image,
-      });
     },
     [article],
   );
@@ -302,7 +288,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const configure_article_before_publish = async () => {
     if (!editorJS.current || !article) return;
 
-    const editor_content = await editorJS.current.save();
+    let editor_content = await editorJS.current.save();
 
     const { title: new_title, error } = get_heading_from_editor(editor_content);
 
@@ -325,28 +311,19 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     if (!new_title) return;
     const new_url = get_clean_url(new_title);
 
-    /* const old_article_url = generate_encoded_url(article);
-    const new_article_url = generate_encoded_url({
-      id: article.id,
-      url: new_url,
-    }); */
-    const old_article_url = `${get_clean_url(article.url)}-${article.id}`;
     const new_article_url = `${new_url}-${article.id}`;
 
-    console.log("Renaming images", {
-      old_article_url,
+    await rename_images_in_editor(editorJS.current, new_article_url);
+
+    const new_preview_image = rename_image(
+      settings_store.get.preview_image() ?? "",
       new_article_url,
-      article,
-      new_url,
-      new_title,
-    });
+    );
 
-    await rename_images(editorJS.current, new_article_url);
+    editor_content = await editorJS.current.save();
+    update_settings_from_editor(editor_content, new_title, new_url);
 
-    // editor_content = await editorJS.current.save();
-    // update_settings_from_editor(editor_content, new_title, new_url);
-
-    return { old_article_url, new_article_url };
+    settings_store.set.preview_image(new_preview_image);
   };
 
   return (
@@ -417,7 +394,7 @@ function WrongHeadingButton({
   );
 }
 
-async function rename_images(editor: EditorJS, new_dir: string) {
+async function rename_images_in_editor(editor: EditorJS, new_dir: string) {
   const editor_content = await editor.save();
 
   for (const block of editor_content.blocks) {
@@ -425,21 +402,26 @@ async function rename_images(editor: EditorJS, new_dir: string) {
     if (!block.id || block.type !== "image") continue;
 
     const image_data = block.data as { file: { url: string } };
-    const url_parts = new URL(image_data.file.url);
-    const file_name = url_parts.pathname.split("/").pop();
-    if (!file_name) {
-      console.error("No name in URL", image_data.file.url);
-      continue;
-    }
-
-    console.log(url_parts.toJSON());
-    const new_url = `${url_parts.protocol}//${url_parts.hostname}/${new_dir}/${file_name}`;
+    const new_url = rename_image(image_data.file.url, new_dir);
     image_data.file.url = new_url;
+    console.log("Renaming image", { old_url: image_data.file.url, new_url });
 
     await editor.blocks.update(block.id, {
       data: image_data,
     });
   }
+}
+
+function rename_image(old_url: string, new_dir: string) {
+  const url_parts = new URL(old_url);
+  const file_name = url_parts.pathname.split("/").pop();
+  if (!file_name) {
+    console.error("No name in URL", old_url);
+    return old_url;
+  }
+
+  const new_url = `${url_parts.protocol}//${url_parts.hostname}/${new_dir}/${file_name}`;
+  return new_url;
 }
 
 const DEFAULT_VALUE = {
