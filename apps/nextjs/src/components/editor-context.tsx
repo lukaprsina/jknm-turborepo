@@ -24,7 +24,7 @@ import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
 import {
-  article_title_to_url,
+  get_clean_url,
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
@@ -35,6 +35,7 @@ import { EDITOR_JS_PLUGINS } from "./plugins";
 import "~/server/algolia";
 
 import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import {
   delete_algolia_article,
   update_algolia_article,
@@ -151,6 +152,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         async function update_article() {
           const editor_content = await editorJS.current?.save();
           if (!editor_content || !article) return;
+          settings_store.set.preview_image(undefined);
 
           update_settings_from_editor(
             editor_content,
@@ -220,15 +222,22 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       setSavingText(undefined);
 
-      const old_article_url = `${article.url}-${article.id}`;
-      const new_article_url = `${returned_data.url}-${returned_data.id}`;
+      // const old_article_url = generate_encoded_url(article);
+      // const new_article_url = generate_encoded_url(returned_data);
+      const old_article_url = `${get_clean_url(article.url)}-${article.id}`;
+      const new_article_url = `${get_clean_url(returned_data.url)}-${returned_data.id}`;
 
+      console.log("Renaming S3 directory", {
+        old_article_url,
+        new_article_url,
+        article,
+        returned_data,
+      });
       if (old_article_url !== new_article_url) {
-        console.log("Renaming S3 directory", old_article_url, new_article_url);
         await rename_s3_directory(old_article_url, new_article_url);
       }
 
-      router.replace(`/novica/${returned_data.url}-${returned_data.id}`);
+      router.replace(`/novica/${generate_encoded_url(returned_data)}`);
     },
   });
 
@@ -294,11 +303,23 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     }
 
     if (!new_title) return;
-    const new_url = article_title_to_url(new_title);
+    const new_url = get_clean_url(new_title);
 
-    const old_article_url = `${article.url}-${article.id}`;
+    /* const old_article_url = generate_encoded_url(article);
+    const new_article_url = generate_encoded_url({
+      id: article.id,
+      url: new_url,
+    }); */
+    const old_article_url = `${get_clean_url(article.url)}-${article.id}`;
     const new_article_url = `${new_url}-${article.id}`;
 
+    console.log("Renaming images", {
+      old_article_url,
+      new_article_url,
+      article,
+      new_url,
+      new_title,
+    });
     await rename_images(editorJS.current, old_article_url, new_article_url);
     update_settings_from_editor(editor_content, new_title, new_url);
 

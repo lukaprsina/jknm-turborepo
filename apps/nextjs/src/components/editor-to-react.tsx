@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import DOMPurify from "dompurify";
 import Blocks from "editorjs-blocks-react-renderer";
+import DOMPurify from "isomorphic-dompurify";
 
 import type { ArticleContentType } from "@acme/db/schema";
 

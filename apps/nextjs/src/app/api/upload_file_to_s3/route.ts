@@ -104,8 +104,11 @@ export async function POST(request: NextRequest) {
   const image_metadata = await sharp(image_buffer).metadata();
   const image_width = image_metadata.width;
   const image_height = image_metadata.height;
+
+  if (!fields.key) return NextResponse.error();
   const file_data = {
     url: `${url}${fields.key}`,
+    // url: encodeURI(`${url}${fields.key}`),
     width: image_width,
     height: image_height,
   };

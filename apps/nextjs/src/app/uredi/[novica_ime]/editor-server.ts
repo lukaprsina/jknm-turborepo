@@ -11,6 +11,7 @@ import {
 import { env } from "~/env";
 
 export async function rename_s3_directory(old_dir: string, new_dir: string) {
+  console.log("renaming from ", old_dir, " to ", new_dir);
   const client = new S3Client({ region: env.AWS_REGION });
   let objects: _Object[] | undefined;
 
@@ -64,4 +65,6 @@ export async function rename_s3_directory(old_dir: string, new_dir: string) {
   } catch (error) {
     console.error("Error deleting object:", error);
   }
+
+  console.log("renamed from ", old_dir, " to ", new_dir);
 }

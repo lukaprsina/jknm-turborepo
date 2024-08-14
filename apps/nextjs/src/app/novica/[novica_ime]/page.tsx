@@ -37,6 +37,24 @@ export default async function NovicaPage({
 
   const novica_id = parseInt(novica_id_string);
 
+  if (isNaN(novica_id)) {
+    console.error("Invalid article ID", {
+      novica_ime_raw,
+      novica_parts,
+      novica_id_string,
+      novica_id,
+    });
+    return (
+      <Shell>
+        <Card>
+          <CardHeader>
+            <CardTitle>Novica ID je NAN</CardTitle>
+          </CardHeader>
+        </Card>
+      </Shell>
+    );
+  }
+
   const article_by_url = session
     ? await api.article.by_id_protected({
         id: novica_id,

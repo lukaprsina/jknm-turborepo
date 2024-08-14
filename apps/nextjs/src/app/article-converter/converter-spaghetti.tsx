@@ -15,7 +15,7 @@ import {
 import type { CSVType } from "./converter-server";
 import type { api } from "~/trpc/react";
 import {
-  article_title_to_url,
+  get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
 
@@ -98,7 +98,7 @@ export async function iterate_over_articles(
       preview_image,
       content,
       draft_content: null,
-      url: article_title_to_url(csv_article.title),
+      url: get_clean_url(csv_article.title),
       created_at,
       updated_at,
       published: true,

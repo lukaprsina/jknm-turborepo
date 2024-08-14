@@ -10,6 +10,11 @@ export async function upload_image_by_file(
   // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
   const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
+  /* const novica_url = generate_encoded_url({
+    url: settings_store.get.url(),
+    id: settings_store.get.id(),
+  }); */
+
   const error_response = {
     success: 0,
   } as const;
@@ -41,6 +46,11 @@ export async function upload_image_by_url(
   // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
   const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
+  /* const novica_url = generate_encoded_url({
+    url: settings_store.get.url(),
+    id: settings_store.get.id(),
+  }); */
+
   const title = url.split("/").pop();
   if (!title) {
     console.error("Image doesn't have a title", url);

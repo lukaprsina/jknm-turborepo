@@ -1,7 +1,9 @@
 import type { OutputData } from "@editorjs/editorjs";
+import sanitize_filename from "sanitize-filename";
 
-export function article_title_to_url(title: string) {
-  return title.toLowerCase().replace(/\s+/g, "-");
+export function get_clean_url(dangerous_url: string) {
+  const sanitized = sanitize_filename(dangerous_url, { replacement: "-" });
+  return sanitized.toLowerCase();
 }
 
 interface HeadingReturnType {

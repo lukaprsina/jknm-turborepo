@@ -19,6 +19,8 @@ import "./autocomplete.css";
 
 import type { ArticleHit } from "@acme/validators";
 
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
+
 export function NoviceAutocomplete({ detached }: { detached?: string }) {
   const searchClient = algolia.getClient();
 
@@ -116,7 +118,10 @@ interface ProductItemProps {
 function ProductItem({ hit, components }: ProductItemProps) {
   return (
     <Link
-      href={`/novica/${hit.url}-${hit.objectID}`}
+      href={`/novica/${generate_encoded_url({
+        id: parseInt(hit.objectID),
+        url: hit.url,
+      })}`}
       className="aa-ItemLink text-inherit"
     >
       <div className="aa-ItemContent h-12 overflow-hidden">

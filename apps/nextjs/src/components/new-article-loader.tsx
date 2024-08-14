@@ -12,6 +12,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
 
@@ -26,8 +27,6 @@ export default function NewArticleLoader({
       const returned_data = data.at(0);
       if (!returned_data) return;
 
-      const new_url = `${returned_data.url}-${returned_data.id}`;
-
       await create_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
@@ -37,7 +36,7 @@ export default function NewArticleLoader({
         published: !!returned_data.published,
       });
 
-      router.push(`/uredi/${new_url}`);
+      router.push(`/uredi/${generate_encoded_url(returned_data)}`);
     },
   });
 

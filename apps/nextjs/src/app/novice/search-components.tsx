@@ -22,6 +22,7 @@ import {
 } from "@acme/ui/select";
 
 import { EditorToReact } from "~/components/editor-to-react";
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 
 export function MySortBy(props: UseSortByProps) {
   const { currentRefinement, options, refine } = useSortBy(props);
@@ -61,7 +62,10 @@ export function MySearchBox() {
 export function ArticleHit({ hit }: { hit: SearchHit<ArticleHit> }) {
   return (
     <Link
-      href={`/novica/${hit.url}-${hit.objectID}`}
+      href={`/novica/${generate_encoded_url({
+        url: hit.url,
+        id: parseInt(hit.objectID),
+      })}`}
       className="overflow-hidden rounded-md bg-card no-underline shadow-lg transition-transform hover:scale-[1.01]"
     >
       <Card className="h-full">

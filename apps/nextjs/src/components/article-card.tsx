@@ -10,6 +10,7 @@ import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Badge } from "@acme/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { EditorToReact } from "./editor-to-react";
 
 export function FeaturedArticleCard({
@@ -21,7 +22,7 @@ export function FeaturedArticleCard({
 
   return (
     <Link
-      href={`/novica/${article.url}-${article.id}`}
+      href={`/novica/${generate_encoded_url(article)}`}
       className="col-span-1 overflow-hidden rounded-md no-underline shadow-lg transition-transform hover:scale-[1.01] md:col-span-2 lg:col-span-3"
     >
       <Card className="h-full">
@@ -77,7 +78,7 @@ export function ArticleCard({
 
   return (
     <Link
-      href={`/novica/${article.url}-${article.id}`}
+      href={`/novica/${generate_encoded_url(article)}`}
       className="overflow-hidden rounded-md bg-card no-underline shadow-lg transition-transform hover:scale-[1.01]"
     >
       <Card className="h-full">

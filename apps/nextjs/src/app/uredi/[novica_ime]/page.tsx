@@ -21,8 +21,9 @@ import {
 
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { api } from "~/trpc/server";
-import { article_title_to_url } from "./editor-utils";
+import { get_clean_url } from "./editor-utils";
 
 const Editor = dynamic(() => import("./editor"), {
   ssr: false,
@@ -104,7 +105,7 @@ function CreateNewArticle({ novica_ime }: { novica_ime: string }) {
             </Button>
             <NewArticleLoader
               title={novica_ime}
-              url={article_title_to_url(novica_ime)}
+              url={get_clean_url(novica_ime)}
               children="Ustvari novico"
             />
           </CardFooter>
@@ -129,7 +130,7 @@ function ArticleBreadcrumb({
         <BreadcrumbItem>Uredi</BreadcrumbItem>
         <BreadcrumbSeparator />
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/novica/${article.url}-${article.id}`}>
+          <BreadcrumbLink href={`/novica/${generate_encoded_url(article)}`}>
             {article.title}
           </BreadcrumbLink>
         </BreadcrumbItem>
