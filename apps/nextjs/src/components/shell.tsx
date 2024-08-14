@@ -55,13 +55,32 @@ function Header({
 }) {
   return (
     <>
-      <TestHeader article={article} />
-      {/* <DesktopHeader className="hidden xl:flex" article={article} />
-      <TabletHeader className="hidden md:flex xl:hidden" article={article} />
+      <TestHeader article={article} className="" />
+      {/* <DesktopHeader className="hidden xl:flex" article={article} /> */}
+      {/* <TabletHeader className="hidden md:flex xl:hidden" article={article} />
       <MobileHeader className="md:hidden" /> */}
     </>
   );
 }
+
+/* 
+<div className="relative flex h-full w-full items-center justify-between">
+      <div className="flex-shrink-0">
+        <span className="text-lg font-bold text-white">Website Name</span>
+      </div>
+
+      <div className="absolute left-1/2 -translate-x-1/2 transform">
+        <img src="logo.png" alt="Logo" className="h-10" />
+      </div>
+
+      <div className="w-92 flex-shrink-0">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="rounded border border-gray-300 p-2"
+        />
+      </div>
+*/
 
 async function TestHeader({
   article,
@@ -71,17 +90,23 @@ async function TestHeader({
   const session = await auth();
 
   return (
-    <div>
+    <>
       <div
         className={cn(
-          "container flex items-center justify-between px-6 py-4 md:px-12",
+          "container relative flex h-[182px] items-end justify-between px-6 py-4 md:px-12",
           className,
         )}
         {...props}
       >
-        <LogoAndTitle />
-        <div className="flex items-center justify-between gap-4">
-          <NoviceAutocomplete /* detached="" */ />
+        <Link href="/" className="flex-shrink-0 gap-6 text-2xl font-bold">
+          <p>Jamarski klub</p>
+          <p>Novo mesto</p>
+        </Link>
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 transform">
+          <Logo className="w-[150px]" />
+        </Link>
+        <div className="flex flex-shrink-0 items-center justify-between gap-4">
+          <NoviceAutocomplete detached="" />
           <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
           <EditingButtons article={article} session={session ?? undefined} />
           <ShowDraftsSwitch />
@@ -91,7 +116,7 @@ async function TestHeader({
       <div className="justify-left container flex items-center px-6 py-4 md:px-12">
         <LinksMenu />
       </div>
-    </div>
+    </>
   );
 }
 
