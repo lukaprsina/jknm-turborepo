@@ -3,7 +3,7 @@ import sanitize_filename from "sanitize-filename";
 
 export function get_clean_url(dangerous_url: string) {
   const sanitized = sanitize_filename(dangerous_url, { replacement: "-" });
-  return sanitized.toLowerCase();
+  return sanitized.toLowerCase().replace(/\s/g, "-");
 }
 
 interface HeadingReturnType {

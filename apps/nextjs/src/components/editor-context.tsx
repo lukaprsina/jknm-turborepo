@@ -40,6 +40,7 @@ import {
   delete_algolia_article,
   update_algolia_article,
 } from "~/server/algolia";
+import { clean_directory } from "~/server/image-s3";
 
 export interface EditorContextType {
   editor?: EditorJS;
@@ -237,6 +238,25 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         await rename_s3_directory(old_article_url, new_article_url);
       }
 
+      const editor_content = await editorJS.current.save();
+      const image_data = get_image_data_from_editor(editor_content);
+      const urls_to_keep = image_data.map((image) => image.url);
+
+      if (returned_data.preview_image)
+        urls_to_keep.push(returned_data.preview_image);
+
+      if (returned_data.draft_preview_image)
+        urls_to_keep.push(returned_data.draft_preview_image);
+
+      const spliced_urls = urls_to_keep.map((image_url) => {
+        // get the last part of the url
+        const parts = image_url.split("/");
+        const filename = parts.slice(-1).join("/");
+        return decodeURIComponent(filename);
+      });
+
+      await clean_directory(new_article_url, spliced_urls);
+
       router.replace(`/novica/${generate_encoded_url(returned_data)}`);
     },
   });
@@ -320,8 +340,11 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       new_url,
       new_title,
     });
-    await rename_images(editorJS.current, old_article_url, new_article_url);
-    update_settings_from_editor(editor_content, new_title, new_url);
+
+    await rename_images(editorJS.current, new_article_url);
+
+    // editor_content = await editorJS.current.save();
+    // update_settings_from_editor(editor_content, new_title, new_url);
 
     return { old_article_url, new_article_url };
   };
@@ -394,11 +417,7 @@ function WrongHeadingButton({
   );
 }
 
-async function rename_images(
-  editor: EditorJS,
-  old_dir: string,
-  new_dir: string,
-) {
+async function rename_images(editor: EditorJS, new_dir: string) {
   const editor_content = await editor.save();
 
   for (const block of editor_content.blocks) {
@@ -406,7 +425,15 @@ async function rename_images(
     if (!block.id || block.type !== "image") continue;
 
     const image_data = block.data as { file: { url: string } };
-    const new_url = image_data.file.url.replace(old_dir, new_dir);
+    const url_parts = new URL(image_data.file.url);
+    const file_name = url_parts.pathname.split("/").pop();
+    if (!file_name) {
+      console.error("No name in URL", image_data.file.url);
+      continue;
+    }
+
+    console.log(url_parts.toJSON());
+    const new_url = `${url_parts.protocol}//${url_parts.hostname}/${new_dir}/${file_name}`;
     image_data.file.url = new_url;
 
     await editor.blocks.update(block.id, {

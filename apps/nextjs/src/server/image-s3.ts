@@ -50,16 +50,32 @@ export async function clean_directory(
     const objects = await list_objects(directory);
     if (typeof objects === "undefined") return;
 
-    const keys_to_delete = objects
-      .map((object) => object.Key)
-      .filter(
-        (key) =>
-          key !== undefined &&
-          !filenames_to_keep.includes(key.replace(`${directory}/`, "")),
-      );
+    const object_names = objects.map((object) => {
+      const parts = object.Key?.split("/");
+      if (!parts || parts.length !== 2) {
+        throw new Error("Invalid key " + object.Key);
+      }
 
-    if (keys_to_delete.length > 0)
-      await delete_objects(keys_to_delete.filter((key) => key !== undefined));
+      return parts[parts.length - 1];
+    });
+
+    const keys_to_delete = object_names
+      .filter((key): boolean => {
+        if (typeof key === "undefined") return false;
+
+        return !filenames_to_keep.includes(key);
+      })
+      .filter((key) => key !== undefined)
+      .map((key) => `${directory}/${key}`);
+
+    console.log("keys_to_delete", keys_to_delete, {
+      directory,
+      object_names,
+      filenames_to_keep,
+      objects,
+    });
+
+    if (keys_to_delete.length > 0) await delete_objects(keys_to_delete);
   } catch (error) {
     console.error("Error cleaning directory:", error);
   }
