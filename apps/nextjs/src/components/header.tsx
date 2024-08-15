@@ -14,6 +14,7 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@acme/ui/navigation-menu";
+import { ThemeToggle } from "@acme/ui/theme";
 
 import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsSwitch } from "./drafts-provider";
@@ -77,7 +78,7 @@ export function TestHeader({
           </div>
           <div className="flex items-center justify-between gap-2">
             <NoviceAutocomplete detached="" />
-            {/* <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" /> */}
+            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
           </div>
         </div>
       </div>
@@ -90,7 +91,7 @@ export function TestHeader({
       <div
         ref={sticky_navbar}
         className={cn(
-          "z-[9999999] flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
+          "relative z-[111] flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
           sticky ? "fixed top-0 bg-white/60 transition-colors" : null,
         )}
       >

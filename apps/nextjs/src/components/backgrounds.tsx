@@ -4,7 +4,7 @@ import { cn } from "@acme/ui";
 
 export function Background() {
   return (
-    <div className="absolute top-0 z-[-2] h-screen w-screen">
+    <div className="absolute top-0 -z-10 h-screen w-screen">
       <DarkBackground className="hidden dark:fixed" />
       <LightBackground className="fixed dark:hidden" />
     </div>

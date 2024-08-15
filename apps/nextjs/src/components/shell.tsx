@@ -25,7 +25,7 @@ export function Shell({ children, article }: ShellProps) {
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>
-        <footer className="bottom-0 z-10">
+        <footer className="bottom-0">
           <Footer />
         </footer>
       </div>
