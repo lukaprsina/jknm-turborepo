@@ -1,21 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import { MenuIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
-import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
-import { ThemeToggle } from "@acme/ui/theme";
 
 import { Background } from "~/components/backgrounds";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
-import { NoviceAutocomplete } from "./autocomplete";
-import { ShowDraftsSwitch } from "./drafts-provider";
-import EditingButtons from "./editing-buttons";
-import { LinksMenu, TestHeader } from "./header";
-import { Logo } from "./logo";
+import { TestHeader } from "./header";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -27,8 +20,8 @@ export function Shell({ children, article }: ShellProps) {
     <HydrateClient>
       <Background />
       <div className="w-full">
-        {/* py-4 md:py-6 */}
-        <header className="z-50 backdrop-blur-sm">
+        {/* py-4 md:py-6 backdrop-blur-sm*/}
+        <header className="z-50">
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>
@@ -40,14 +33,20 @@ export function Shell({ children, article }: ShellProps) {
   );
 }
 
-function Header({
+async function Header({
   article: article,
 }: {
   article?: typeof Article.$inferSelect;
 }) {
+  const session = await auth();
+
   return (
     <>
-      <TestHeader article={article} className="" />
+      <TestHeader
+        article={article}
+        session={session ?? undefined}
+        className=""
+      />
       {/* <DesktopHeader className="hidden xl:flex" article={article} /> */}
       {/* <TabletHeader className="hidden md:flex xl:hidden" article={article} />
       <MobileHeader className="md:hidden" /> */}
@@ -55,26 +54,7 @@ function Header({
   );
 }
 
-/* 
-<div className="relative flex h-full w-full items-center justify-between">
-      <div className="flex-shrink-0">
-        <span className="text-lg font-bold text-white">Website Name</span>
-      </div>
-
-      <div className="absolute left-1/2 -translate-x-1/2 transform">
-        <img src="logo.png" alt="Logo" className="h-10" />
-      </div>
-
-      <div className="w-92 flex-shrink-0">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="rounded border border-gray-300 p-2"
-        />
-      </div>
-*/
-
-async function DesktopHeader({
+/* async function DesktopHeader({
   article,
   className,
   ...props
@@ -143,7 +123,7 @@ function MobileHeader({
       </Button>
     </div>
   );
-}
+} */
 
 async function Footer() {
   const session = await auth();
@@ -168,11 +148,11 @@ async function Footer() {
   );
 }
 
-function LogoAndTitle() {
+/* function LogoAndTitle() {
   return (
     <Link href="/" className="flex items-center gap-6 text-2xl font-bold">
       <Logo className="w-24" />
       <p>Jamarski klub Novo mesto</p>
     </Link>
   );
-}
+} */

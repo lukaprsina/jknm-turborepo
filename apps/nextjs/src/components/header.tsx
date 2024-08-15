@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+import type { Session } from "@acme/auth";
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import {
@@ -24,48 +25,41 @@ import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 export function TestHeader({
   article,
   className,
+  session,
   ...props
-}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
+}: React.ComponentProps<"div"> & {
+  article?: typeof Article.$inferSelect;
+  session?: Session;
+}) {
   const [sticky, setSticky] = useState(false);
-  const sticky_header = useRef<HTMLDivElement | null>(null);
+  const sticky_navbar = useRef<HTMLDivElement | null>(null);
+  const header_ref = useRef<HTMLDivElement | null>(null);
 
-  const handleScroll = () => {
-    if (!sticky_header.current) return;
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sticky_navbar.current || !header_ref.current) return;
 
-    const options = {
-      root: null,
-      rootMargin: "0px",
-      threshold: 1.0,
+      // TODO
+      const new_sticky = window.scrollY > header_ref.current.clientHeight + 2;
+
+      if (new_sticky !== sticky) {
+        setSticky(new_sticky);
+      }
     };
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setSticky(true);
-        } else {
-          setSticky(false);
-        }
-      });
-    }, options);
-
-    observer.observe(sticky_header.current);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      if (!sticky_header.current) return;
-
-      observer.unobserve(sticky_header.current);
+      window.removeEventListener("scroll", handleScroll);
     };
-  };
-
-  /* useEffect(() => {
-    handleScroll();
-  }, []); */
+  }, [sticky]);
 
   return (
     <>
       <div
+        ref={header_ref}
         className={cn(
-          "container relative flex h-[182px] items-end justify-between px-6 py-4 md:px-12",
+          "container relative flex h-[182px] w-full items-end justify-between px-6 py-4 backdrop-blur-sm md:px-12",
           className,
         )}
         {...props}
@@ -77,19 +71,28 @@ export function TestHeader({
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 transform">
           <Logo className="w-[150px]" />
         </Link>
-        <div className="flex flex-shrink-0 items-center justify-between gap-2">
-          <NoviceAutocomplete detached="" />
-          <ShowDraftsSwitch />
-          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <EditingButtons article={article} />
+        <div className="flex h-full flex-shrink-0 flex-col justify-between">
+          <div className="flex justify-end">
+            <ShowDraftsSwitch />
+            <EditingButtons article={article} session={session} />
+          </div>
+          <div className="flex items-center justify-between gap-2">
+            <NoviceAutocomplete detached="" />
+            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+          </div>
         </div>
       </div>
-      <div className="h-0.5 w-full bg-blue-800" />
       <div
-        ref={sticky_header}
+        className="h-0.5 w-full bg-blue-800"
+        style={{
+          marginBottom: sticky ? sticky_navbar.current?.clientHeight : "",
+        }}
+      />
+      <div
+        ref={sticky_navbar}
         className={cn(
-          "container flex items-center justify-center px-6 py-4 md:px-12",
-          sticky ? "fixed top-0" : null,
+          "flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
+          sticky ? "fixed top-0 z-[51] bg-white/60 transition-colors" : null,
         )}
       >
         <LinksMenu />
