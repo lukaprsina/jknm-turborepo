@@ -194,4 +194,18 @@ export const articleRouter = {
       .where(eq(Article.id, input))
       .returning({ id: Article.id, url: Article.url });
   }),
+
+  get_possible_years: publicProcedure.query(async ({ ctx }) => {
+    const years = await ctx.db.query.Article.findMany({
+      where: eq(Article.published, true),
+      columns: { created_at: true },
+    });
+
+    const uniqueYears = new Set<number>();
+    years.forEach((year) => {
+      uniqueYears.add(year.created_at.getFullYear());
+    });
+
+    return Array.from(uniqueYears);
+  }),
 } satisfies TRPCRouterRecord;

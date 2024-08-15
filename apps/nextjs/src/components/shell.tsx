@@ -21,7 +21,7 @@ export function Shell({ children, article }: ShellProps) {
       <Background />
       <div className="w-full">
         {/* py-4 md:py-6 backdrop-blur-sm*/}
-        <header className="z-50">
+        <header /* className="z-50" */>
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>

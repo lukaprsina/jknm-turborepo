@@ -51,13 +51,27 @@ export default {
         ],
         mono: ["var(--font-geist-mono)", ...fontFamily.mono],
       },
-      typography: {
+      typography: (theme) => ({
         DEFAULT: {
           css: {
             maxWidth: "1280px",
+            p: {
+              fontSize: "18px",
+            },
+            h1: {
+              fontWeight: "400",
+              color: theme("colors.blue.800"),
+              fontSize: "40px",
+            },
+            h2: {
+              color: theme("colors.blue.800"),
+            },
+            h3: {
+              color: theme("colors.blue.800"),
+            },
           },
         },
-      },
+      }),
     },
   },
   plugins: [

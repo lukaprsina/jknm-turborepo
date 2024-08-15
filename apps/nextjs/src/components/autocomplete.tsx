@@ -5,7 +5,13 @@ import type {
   AutocompleteSource,
 } from "@algolia/autocomplete-js";
 import type { Root } from "react-dom/client";
-import React, { createElement, Fragment, useEffect, useRef } from "react";
+import React, {
+  createElement,
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { autocomplete, getAlgoliaResults } from "@algolia/autocomplete-js";
 import { createRoot } from "react-dom/client";
 
@@ -31,6 +37,15 @@ export function NoviceAutocomplete({ detached }: { detached?: string }) {
       getSources={({ query }) => [
         {
           sourceId: "novice",
+          getItemUrl: ({ item }) => {
+            const id = parseInt(item.objectID);
+            const generated_url = generate_encoded_url({
+              id,
+              url: item.url,
+            });
+
+            return `/novica/${generated_url}`;
+          },
           getItems() {
             return getAlgoliaResults({
               searchClient,
@@ -99,6 +114,25 @@ export function Autocomplete({ detached, ...props }: AutocompleteProps) {
 
         panelRootRef.current.render(children);
       },
+
+      navigator: {
+        navigate({ itemUrl }) {
+          console.log("navigate", itemUrl);
+          window.location.assign(itemUrl);
+        },
+        navigateNewTab({ itemUrl }) {
+          console.log("navigate new tab", itemUrl);
+          const windowReference = window.open(itemUrl, "_blank", "noopener");
+
+          if (windowReference) {
+            windowReference.focus();
+          }
+        },
+        navigateNewWindow({ itemUrl }) {
+          console.log("navigate new window", itemUrl);
+          window.open(itemUrl, "_blank", "noopener");
+        },
+      },
       ...props,
     });
 
@@ -116,14 +150,18 @@ interface ProductItemProps {
 }
 
 function ProductItem({ hit, components }: ProductItemProps) {
+  const href = useMemo(() => {
+    const id = parseInt(hit.objectID);
+    const generated_url = generate_encoded_url({
+      id,
+      url: hit.url,
+    });
+
+    return `/novica/${generated_url}`;
+  }, [hit]);
+
   return (
-    <Link
-      href={`/novica/${generate_encoded_url({
-        id: parseInt(hit.objectID),
-        url: hit.url,
-      })}`}
-      className="aa-ItemLink text-inherit"
-    >
+    <Link href={href} className="aa-ItemLink text-inherit">
       <div className="aa-ItemContent h-12 overflow-hidden">
         {/* {hit.image && (
           <div className="aa-ItemIcon aa-ItemIcon--noBorder">

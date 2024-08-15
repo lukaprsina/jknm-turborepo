@@ -92,7 +92,8 @@ function PublishedContent({
 
   return (
     <div className="container h-full min-h-screen pt-16">
-      <div className="prose lg:prose-xl dark:prose-invert mx-auto w-full">
+      {/* lg:prose-xl  */}
+      <div className="prose dark:prose-invert mx-auto w-full">
         <EditorToReact content={article.content} />
       </div>
     </div>
@@ -118,7 +119,8 @@ async function TabbedContent({
   return (
     <Tabs
       defaultValue={article.draft_content ? "draft" : "published"}
-      className="prose lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px] dark:prose-invert container mx-auto w-full pt-8"
+      /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
+      className="prose dark:prose-invert container mx-auto w-full pt-8"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content} value="draft">

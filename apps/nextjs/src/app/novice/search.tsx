@@ -2,15 +2,14 @@
 
 import { Hits, InstantSearch } from "react-instantsearch";
 
+import { ArticleAlgoliaCard } from "~/components/article-card";
 import { algolia } from "~/lib/algolia";
 import { MyPagination } from "./pagination";
 import {
-  ArticleHit,
   MySearchBox,
   MySortBy,
   MyStats,
-  Timeline,
-  TimelineItem,
+  TimelineRefinement,
 } from "./search-components";
 
 export function Search() {
@@ -32,13 +31,9 @@ export function Search() {
         </div>
         <MyStats />
       </div>
-      <Timeline>
-        <TimelineItem year={2022} />
-        <TimelineItem year={2023} />
-        <TimelineItem year={2024} />
-      </Timeline>
+      <TimelineRefinement attribute="year" />
       <Hits
-        hitComponent={ArticleHit}
+        hitComponent={ArticleAlgoliaCard}
         classNames={{
           list: "grid grid-cols-1 gap-4 sm:grid-cols-2 mb-6",
         }}

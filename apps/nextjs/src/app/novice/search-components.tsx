@@ -1,17 +1,19 @@
 "use client";
 
-import type { Hit as SearchHit } from "instantsearch.js";
-import type { UseSearchBoxProps, UseSortByProps } from "react-instantsearch";
-import Image from "next/image";
-import Link from "next/link";
-import { useSearchBox, useSortBy, useStats } from "react-instantsearch";
-
-import type { ArticleHit } from "@acme/validators";
+import type {
+  UseRefinementListProps,
+  UseSearchBoxProps,
+  UseSortByProps,
+} from "react-instantsearch";
 // import { InstantSearchNext } from "react-instantsearch-nextjs";
+import {
+  useRefinementList,
+  useSearchBox,
+  useSortBy,
+  useStats,
+} from "react-instantsearch";
 
-import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Button } from "@acme/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 import {
   Select,
@@ -21,8 +23,7 @@ import {
   SelectValue,
 } from "@acme/ui/select";
 
-import { EditorToReact } from "~/components/editor-to-react";
-import { generate_encoded_url } from "~/lib/generate-encoded-url";
+import { api } from "~/trpc/react";
 
 export function MySortBy(props: UseSortByProps) {
   const { currentRefinement, options, refine } = useSortBy(props);
@@ -59,42 +60,6 @@ export function MySearchBox() {
   );
 }
 
-export function ArticleHit({ hit }: { hit: SearchHit<ArticleHit> }) {
-  return (
-    <Link
-      href={`/novica/${generate_encoded_url({
-        url: hit.url,
-        id: parseInt(hit.objectID),
-      })}`}
-      className="overflow-hidden rounded-md bg-card no-underline shadow-lg transition-transform hover:scale-[1.01]"
-    >
-      <Card className="h-full">
-        {hit.image && (
-          <AspectRatio ratio={16 / 9} className="rounded-md">
-            <Image
-              src={hit.image}
-              alt={hit.title}
-              fill
-              className="rounded-md object-cover"
-            />
-          </AspectRatio>
-        )}
-        {/* TODO: če sta dve vrstici, ni poravnano */}
-        <div className="flex flex-col justify-between">
-          <CardHeader>
-            <CardTitle className="text-blue-800">{hit.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact just_text content={hit.content ?? undefined} />
-            </div>
-          </CardContent>
-        </div>
-      </Card>
-    </Link>
-  );
-}
-
 export function MyStats() {
   const stats = useStats();
 
@@ -105,20 +70,48 @@ export function MyStats() {
   );
 }
 
-export function Timeline({ children }: { children: React.ReactNode }) {
-  return <ol className="items-center pb-8 sm:flex">{children}</ol>;
+export function TimelineRefinement(props: UseRefinementListProps) {
+  const possible_years = api.article.get_possible_years.useQuery();
+  const {
+    items,
+    hasExhaustiveItems,
+    createURL,
+    refine,
+    sendEvent,
+    searchForItems,
+    isFromSearch,
+    canRefine,
+    canToggleShowMore,
+    isShowingMore,
+    toggleShowMore,
+  } = useRefinementList(props);
+
+  return (
+    <ol className="items-center pb-8 sm:flex">
+      {possible_years.data?.map((year) => (
+        <TimelineItem
+          onClick={() => {
+            refine(year.toString());
+          }}
+          key={year}
+          year={year}
+        />
+      ))}
+    </ol>
+  );
 }
 
-export function TimelineItem({ year }: { year: number }) {
+export function TimelineItem({
+  year,
+  ...props
+}: { year: number } & React.ComponentProps<typeof Button>) {
   return (
     <li className="relative mb-6 pl-2 sm:mb-0">
       <Button
         variant="link"
         className="-ml-2 mb-0 mr-5 p-0 sm:pe-8"
         style={{ paddingInlineEnd: "0px" }}
-        onClick={() => {
-          /*  */
-        }}
+        {...props}
       >
         <span>{year}</span>
       </Button>

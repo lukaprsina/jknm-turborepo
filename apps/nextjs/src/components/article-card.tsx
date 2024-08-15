@@ -1,11 +1,13 @@
 "use client";
 
+import type { Hit as SearchHit } from "instantsearch.js";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
-import type { Article } from "@acme/db/schema";
+import type { Article, ArticleContentType } from "@acme/db/schema";
+import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Badge } from "@acme/ui/badge";
@@ -15,17 +17,67 @@ import { MagicCard } from "@acme/ui/magic-card";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { EditorToReact } from "./editor-to-react";
 
-export function FeaturedArticleCard({
+export function ArticleDrizzleCard({
   article,
+  featured,
 }: {
   article: typeof Article.$inferSelect;
+  featured?: boolean;
+}) {
+  return featured ? (
+    <FeaturedArticleCard
+      title={article.title}
+      url={generate_encoded_url({ id: article.id, url: article.url })}
+      published={!article.draft_content}
+      preview_image={
+        article.draft_preview_image ?? article.preview_image ?? undefined
+      }
+      content={article.draft_content ?? article.content ?? undefined}
+    />
+  ) : (
+    <ArticleCard
+      title={article.title}
+      url={generate_encoded_url({ id: article.id, url: article.url })}
+      published={!article.draft_content}
+      preview_image={
+        article.draft_preview_image ?? article.preview_image ?? undefined
+      }
+      content={article.draft_content ?? article.content ?? undefined}
+    />
+  );
+}
+
+export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
+  return (
+    <ArticleCard
+      title={hit.title}
+      url={generate_encoded_url({ id: parseInt(hit.objectID), url: hit.url })}
+      published={!hit.content}
+      preview_image={hit.image ?? undefined}
+      content={hit.content ?? undefined}
+    />
+  );
+}
+
+export function FeaturedArticleCard({
+  title,
+  url,
+  published,
+  preview_image,
+  content,
+}: {
+  title: string;
+  url: string;
+  published: boolean;
+  preview_image?: string;
+  content?: ArticleContentType;
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
 
   return (
     <Link
-      href={`/novica/${generate_encoded_url(article)}`}
+      href={`/novica/${url}`}
       className="col-span-1 overflow-hidden rounded-md no-underline shadow-lg md:col-span-2 lg:col-span-3"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -34,7 +86,7 @@ export function FeaturedArticleCard({
         className="flex h-full w-full flex-col"
         gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
       >
-        {article.draft_preview_image || article.preview_image ? (
+        {preview_image ? (
           <AspectRatio
             ratio={16 / 9}
             className={cn(
@@ -43,13 +95,12 @@ export function FeaturedArticleCard({
             )}
           >
             <Image
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-              src={article.draft_preview_image || article.preview_image || ""}
-              alt="Photo by Drew Beamer"
+              src={preview_image}
+              alt={title}
               fill
               className="rounded-md object-cover"
             />
-            {!article.published && (
+            {!published && (
               <Badge
                 className={cn(
                   "absolute bottom-0 right-0 m-4 shadow-sm",
@@ -65,18 +116,12 @@ export function FeaturedArticleCard({
         ) : null}
         <div>
           <CardHeader>
-            <CardTitle className="text-blue-800">{article.title}</CardTitle>
+            <CardTitle>{title}</CardTitle>
           </CardHeader>
 
           <CardContent>
             <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact
-                just_text
-                content={
-                  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                  article.draft_content || article.content || undefined
-                }
-              />
+              <EditorToReact just_text content={content} />
             </div>
           </CardContent>
         </div>
@@ -86,16 +131,24 @@ export function FeaturedArticleCard({
 }
 
 export function ArticleCard({
-  article,
+  title,
+  url,
+  published,
+  preview_image,
+  content,
 }: {
-  article: typeof Article.$inferSelect;
+  title: string;
+  url: string;
+  published: boolean;
+  preview_image?: string;
+  content?: ArticleContentType;
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
 
   return (
     <Link
-      href={`/novica/${generate_encoded_url(article)}`}
+      href={`/novica/${url}`}
       className="overflow-hidden rounded-md bg-card no-underline shadow-lg"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -104,7 +157,7 @@ export function ArticleCard({
         className="flex h-full w-full flex-col"
         gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
       >
-        {article.draft_preview_image || article.preview_image ? (
+        {preview_image ? (
           <AspectRatio
             ratio={16 / 9}
             className={cn(
@@ -113,13 +166,12 @@ export function ArticleCard({
             )}
           >
             <Image
-              // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-              src={article.draft_preview_image || article.preview_image || ""}
-              alt={article.title}
+              src={preview_image}
+              alt={title}
               fill
               className="rounded-md object-cover"
             />
-            {!article.published && (
+            {!published && (
               <Badge
                 className={cn(
                   "absolute bottom-0 right-0 m-4 shadow-sm",
@@ -136,11 +188,11 @@ export function ArticleCard({
         {/* TODO: če sta dve vrstici, ni poravnano */}
         <div className="flex flex-col justify-between">
           <CardHeader>
-            <CardTitle className="text-blue-800">{article.title}</CardTitle>
+            <CardTitle>{title}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact just_text content={article.content ?? undefined} />
+              <EditorToReact just_text content={content} />
             </div>
           </CardContent>
         </div>

@@ -64,6 +64,7 @@ export async function sync_with_algolia() {
     image: article.preview_image ?? undefined,
     content: article.content ?? undefined,
     published: true,
+    year: article.created_at.getFullYear().toString(),
   }));
 
   console.log("Syncing articles:", objects.length);

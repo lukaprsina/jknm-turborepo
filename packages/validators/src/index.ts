@@ -22,6 +22,7 @@ export const article_hit_validator = z.object({
   content: content_validator,
   image: z.string().optional(),
   published: z.boolean(),
+  year: z.string(),
 });
 
 export type ArticleHit = z.infer<typeof article_hit_validator>;

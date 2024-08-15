@@ -14,7 +14,6 @@ import {
   NavigationMenuList,
   navigationMenuTriggerStyle,
 } from "@acme/ui/navigation-menu";
-import { ThemeToggle } from "@acme/ui/theme";
 
 import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsSwitch } from "./drafts-provider";
@@ -78,12 +77,12 @@ export function TestHeader({
           </div>
           <div className="flex items-center justify-between gap-2">
             <NoviceAutocomplete detached="" />
-            <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
+            {/* <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" /> */}
           </div>
         </div>
       </div>
       <div
-        className="h-0.5 w-full bg-blue-800"
+        className="h-0.5 w-full bg-blue-800/40"
         style={{
           marginBottom: sticky ? sticky_navbar.current?.clientHeight : "",
         }}
@@ -91,8 +90,8 @@ export function TestHeader({
       <div
         ref={sticky_navbar}
         className={cn(
-          "flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
-          sticky ? "fixed top-0 z-[51] bg-white/60 transition-colors" : null,
+          "z-[9999999] flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
+          sticky ? "fixed top-0 bg-white/60 transition-colors" : null,
         )}
       >
         <LinksMenu />
@@ -103,7 +102,7 @@ export function TestHeader({
 
 export function LinksMenu() {
   return (
-    <NavigationMenu>
+    <NavigationMenu className="z-50">
       <NavigationMenuList>
         <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
         <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
@@ -111,12 +110,16 @@ export function LinksMenu() {
         <DesktopHeaderLink href="/publiciranje">Publiciranje</DesktopHeaderLink>
         <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent focus:bg-transparent focus:text-primary-foreground dark:bg-primary/80">
+          <NavigationMenuTrigger className="bg-transparent">
             Klub
           </NavigationMenuTrigger>
-          <NavigationMenuContent className="relative">
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <ListItem title="Kataster jam" href=""></ListItem>
+          <NavigationMenuContent className="relative z-50">
+            <ul className="z-50 grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+              <ListItem
+                className="z-50"
+                title="Kataster jam"
+                href=""
+              ></ListItem>
               <ListItem title="Izobraževanje" href=""></ListItem>
               <ListItem title="Etični kodeks" href=""></ListItem>
               <ListItem title="Društvo v javnem interesu" href=""></ListItem>

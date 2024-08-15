@@ -29,10 +29,12 @@ export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
   article_create: ArticleUpdateType,
+  first_article: number,
+  last_article: number,
 ) {
   const problematic_articles: CSVType[] = [];
 
-  const spliced_csv_articles = csv_articles.slice(0, 30);
+  const spliced_csv_articles = csv_articles.slice(first_article, last_article);
   for (const csv_article of spliced_csv_articles) {
     const html = csv_article.content;
     const sanitized = fixHtml(html);

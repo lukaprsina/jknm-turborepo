@@ -37,7 +37,8 @@ export default function MyEditor({
         <MyToolbar />
         <div
           id="editorjs"
-          className="prose lg:prose-xl dark:prose-invert mx-auto"
+          /* lg:prose-xl  */
+          className="prose dark:prose-invert mx-auto"
         />
       </div>
       <SettingsSummary />

@@ -22,6 +22,8 @@ export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
   const article_update = api.article.create_article_with_date.useMutation();
+  const first_article = 20;
+  const last_article = 60;
 
   return (
     <div className="prose container mx-auto py-8">
@@ -37,6 +39,8 @@ export function ArticleConverter() {
             csv_articles,
             editorJS.current,
             article_update,
+            first_article,
+            last_article,
           );
         }}
       >

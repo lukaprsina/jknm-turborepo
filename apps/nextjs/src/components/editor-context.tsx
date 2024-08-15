@@ -23,24 +23,21 @@ import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
+import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import {
   get_clean_url,
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
 import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
-import { api } from "~/trpc/react";
-import { EDITOR_JS_PLUGINS } from "./plugins";
-
-import "~/server/algolia";
-
-import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import {
   delete_algolia_article,
   update_algolia_article,
 } from "~/server/algolia";
 import { clean_directory } from "~/server/image-s3";
+import { api } from "~/trpc/react";
+import { EDITOR_JS_PLUGINS } from "./plugins";
 
 export interface EditorContextType {
   editor?: EditorJS;
@@ -218,6 +215,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         title: returned_data.title,
         url: returned_data.url,
         created_at: returned_data.created_at,
+        year: returned_data.created_at.getFullYear().toString(),
         content: returned_data.content ?? undefined,
         image: returned_data.preview_image ?? undefined,
       });
