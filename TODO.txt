@@ -8,3 +8,5 @@ ko objaviš, zbriši druge slike
 če prilepiš enako sliko, vprašaj ali želiš samo insert narediti
 preveri če preview image obstaja, ko shraniš
 ko odpreš settings, shrani stvari "settings-button"
+
+https://trpc.io/docs/client/react/useUtils#query-invalidation

@@ -6,14 +6,6 @@ import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@acme/ui/navigation-menu";
 import { ThemeToggle } from "@acme/ui/theme";
 
 import { Background } from "~/components/backgrounds";
@@ -22,8 +14,8 @@ import { HydrateClient } from "~/trpc/server";
 import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsSwitch } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
+import { LinksMenu, TestHeader } from "./header";
 import { Logo } from "./logo";
-import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -36,7 +28,7 @@ export function Shell({ children, article }: ShellProps) {
       <Background />
       <div className="w-full">
         {/* py-4 md:py-6 */}
-        <header className="sticky top-0 z-50 bg-primary/80 text-primary-foreground backdrop-blur-sm">
+        <header className="z-50 backdrop-blur-sm">
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>
@@ -81,44 +73,6 @@ function Header({
         />
       </div>
 */
-
-async function TestHeader({
-  article,
-  className,
-  ...props
-}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
-  const session = await auth();
-
-  return (
-    <>
-      <div
-        className={cn(
-          "container relative flex h-[182px] items-end justify-between px-6 py-4 md:px-12",
-          className,
-        )}
-        {...props}
-      >
-        <Link href="/" className="flex-shrink-0 gap-6 text-2xl font-bold">
-          <p>Jamarski klub</p>
-          <p>Novo mesto</p>
-        </Link>
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 transform">
-          <Logo className="w-[150px]" />
-        </Link>
-        <div className="flex flex-shrink-0 items-center justify-between gap-4">
-          <NoviceAutocomplete detached="" />
-          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <EditingButtons article={article} session={session ?? undefined} />
-          <ShowDraftsSwitch />
-        </div>
-      </div>
-      <div className="h-0.5 w-full bg-primary/40" />
-      <div className="justify-left container flex items-center px-6 py-4 md:px-12">
-        <LinksMenu />
-      </div>
-    </>
-  );
-}
 
 async function DesktopHeader({
   article,
@@ -191,92 +145,6 @@ function MobileHeader({
   );
 }
 
-function LinksMenu() {
-  return (
-    <NavigationMenu>
-      <NavigationMenuList>
-        <DesktopHeaderLink href="/novice">Novice</DesktopHeaderLink>
-        <DesktopHeaderLink href="/zgodovina">Zgodovina</DesktopHeaderLink>
-        <DesktopHeaderLink href="/raziskovanje">Raziskovanje</DesktopHeaderLink>
-        <DesktopHeaderLink href="/publiciranje">Publiciranje</DesktopHeaderLink>
-        <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
-        <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent text-primary-foreground focus:bg-transparent focus:text-primary-foreground dark:bg-primary/80">
-            Klub
-          </NavigationMenuTrigger>
-          <NavigationMenuContent className="relative">
-            <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <ListItem title="Kataster jam" href=""></ListItem>
-              <ListItem title="Izobraževanje" href=""></ListItem>
-              <ListItem title="Etični kodeks" href=""></ListItem>
-              <ListItem title="Društvo v javnem interesu" href=""></ListItem>
-              <ListItem title="Jamarska reševalna služba" href=""></ListItem>
-            </ul>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
-  );
-}
-
-function LogoAndTitle() {
-  return (
-    <Link href="/" className="flex items-center gap-6 text-2xl font-bold">
-      <Logo className="w-24" />
-      <p>Jamarski klub Novo mesto</p>
-    </Link>
-  );
-}
-
-function DesktopHeaderLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <NavigationMenuItem>
-      <Link href={href} legacyBehavior passHref>
-        <NavigationMenuLink
-          className={cn(
-            navigationMenuTriggerStyle(),
-            "bg-transparent dark:bg-primary/80 dark:text-primary-foreground",
-          )}
-        >
-          {children}
-        </NavigationMenuLink>
-      </Link>
-    </NavigationMenuItem>
-  );
-}
-
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <a
-          ref={ref}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className,
-          )}
-          {...props}
-        >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
-        </a>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
-
 async function Footer() {
   const session = await auth();
 
@@ -297,5 +165,14 @@ async function Footer() {
         </form>
       )}
     </div>
+  );
+}
+
+function LogoAndTitle() {
+  return (
+    <Link href="/" className="flex items-center gap-6 text-2xl font-bold">
+      <Logo className="w-24" />
+      <p>Jamarski klub Novo mesto</p>
+    </Link>
   );
 }

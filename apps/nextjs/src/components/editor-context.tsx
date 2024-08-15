@@ -48,8 +48,8 @@ export interface EditorContextType {
   configure_article_before_publish: () => Promise<void>;
   update_settings_from_editor: (
     editor_content: OutputData,
-    title: string,
-    url: string,
+    title?: string,
+    url?: string,
   ) => void;
   savingText: string | undefined;
   setSavingText: (value: string | undefined) => void;
@@ -83,6 +83,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const editorJS = useRef<EditorJS | undefined>();
   const [dirty, setDirty] = useState(false);
+  const trpc_utils = api.useUtils();
 
   const content = useMemo(
     () => article?.draft_content ?? DEFAULT_VALUE,
@@ -95,18 +96,32 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   }, []);
 
   const update_settings_from_editor = useCallback(
-    (editor_content: OutputData, title: string, url: string) => {
+    (editor_content: OutputData, title?: string, url?: string) => {
       if (!editorJS.current || !article) return;
+
       const image_data = get_image_data_from_editor(editor_content);
       settings_store.set.image_data(image_data);
 
-      if (settings_store.get.preview_image()?.length == 0) {
+      const preview_image = settings_store.get.preview_image();
+      console.log("Updating settings from editor", {
+        title,
+        url,
+        image_data,
+        preview_image,
+      });
+      // TODO: check if preview image exists
+      if (!preview_image) {
+        console.log(
+          "Setting preview image as the first",
+          image_data.at(0)?.url,
+        );
         settings_store.set.preview_image(image_data.at(0)?.url);
       }
 
       settings_store.set.id(article.id);
-      settings_store.set.title(title);
-      settings_store.set.url(url);
+
+      if (typeof title !== "undefined") settings_store.set.title(title);
+      if (typeof url !== "undefined") settings_store.set.url(url);
     },
     [article],
   );
@@ -177,7 +192,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!editorJS.current || !article) return;
       const editor_content = await editorJS.current.save();
 
-      update_settings_from_editor(editor_content, article.title, article.url);
+      update_settings_from_editor(editor_content);
 
       setSavingText(undefined);
     },
@@ -273,6 +288,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!returned_data) return;
 
       await delete_algolia_article(returned_data.id.toString());
+
+      await trpc_utils.article.invalidate();
 
       router.replace(`/`);
     },

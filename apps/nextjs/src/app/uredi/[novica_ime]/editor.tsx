@@ -22,7 +22,7 @@ import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
-import { SettingsDialog } from "./settings-button";
+import { SettingsDialog } from "./settings-dialog";
 import { settings_store } from "./settings-store";
 import { UploadDialog } from "./upload-dialog";
 
@@ -144,6 +144,10 @@ function SaveButton() {
 }
 
 function ClearButton() {
+  const editor = useEditor();
+
+  if (!editor) return null;
+
   return (
     <AlertDialog>
       <Tooltip>
@@ -168,8 +172,17 @@ function ClearButton() {
         </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogAction
-            onClick={() => {
-              // TODO
+            onClick={async () => {
+              const content = editor.article?.content;
+              if (!content) {
+                throw new Error("Article content is missing.");
+              }
+
+              await editor.editor?.render(content);
+              settings_store.set.preview_image(
+                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+                editor.article?.preview_image || "",
+              );
             }}
           >
             Ponastavi osnutek

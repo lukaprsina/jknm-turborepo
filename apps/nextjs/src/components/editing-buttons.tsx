@@ -42,10 +42,7 @@ export default function EditingButtons({
     },
   });
 
-  if (!session?.user) {
-    console.error("ALDFNOADNF");
-    return null;
-  }
+  if (!session?.user) return null;
 
   return (
     <>

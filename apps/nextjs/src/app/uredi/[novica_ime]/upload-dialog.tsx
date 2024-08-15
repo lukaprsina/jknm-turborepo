@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowUpToLineIcon } from "lucide-react";
 
 import {
@@ -11,7 +12,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
@@ -20,19 +20,30 @@ import { useEditor } from "~/components/editor-context";
 import { settings_store } from "./settings-store";
 
 export function UploadDialog() {
+  const [dialogOpen, setDialogOpen] = useState(false);
   const editor = useEditor();
 
   if (!editor) return null;
 
   return (
-    <AlertDialog>
+    <AlertDialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
       <Tooltip>
         <TooltipTrigger asChild>
-          <AlertDialogTrigger asChild>
-            <Button size="icon" variant="ghost">
-              <ArrowUpToLineIcon />
-            </Button>
-          </AlertDialogTrigger>
+          {/* <AlertDialogTrigger asChild> */}
+          <Button
+            onClick={async () => {
+              const editor_content = await editor.editor?.save();
+              if (!editor_content) return;
+
+              editor.update_settings_from_editor(editor_content);
+              setDialogOpen(true);
+            }}
+            size="icon"
+            variant="ghost"
+          >
+            <ArrowUpToLineIcon />
+          </Button>
+          {/* </AlertDialogTrigger> */}
         </TooltipTrigger>
         <TooltipContent>
           <p>Shrani in objavi</p>
