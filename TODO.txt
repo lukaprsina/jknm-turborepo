@@ -3,6 +3,7 @@ Objave.txt 21518 youtube
 
 REWORK preview image, še zmeraj ni vredu
 ponastavi osnutek
+galerija
 
 ko objaviš, zbriši druge slike
 če prilepiš enako sliko, vprašaj ali želiš samo insert narediti

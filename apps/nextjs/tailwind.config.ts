@@ -10,6 +10,16 @@ export default {
   content: [...baseConfig.content, "../../packages/ui/src/**/*.{ts,tsx}"],
   presets: [baseConfig],
   theme: {
+    container: {
+      padding: "2rem",
+      center: true,
+      screens: {
+        sm: "100%",
+        md: "100%",
+        lg: "1024px",
+        xl: "1280px",
+      },
+    },
     extend: {
       animation: {
         aurora: "aurora 60s linear infinite",
@@ -35,14 +45,6 @@ export default {
           },
         },
       },
-      container: {
-        screens: {
-          sm: "100%",
-          md: "100%",
-          lg: "1024px",
-          xl: "1280px",
-        },
-      },
       fontFamily: {
         sans: [
           "var(--font-opensans)",
@@ -51,7 +53,7 @@ export default {
         ],
         mono: ["var(--font-geist-mono)", ...fontFamily.mono],
       },
-      typography: (theme) => ({
+      typography: (theme: (variable: string) => string) => ({
         DEFAULT: {
           css: {
             maxWidth: "1280px",

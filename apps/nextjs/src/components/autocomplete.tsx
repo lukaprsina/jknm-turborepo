@@ -23,7 +23,10 @@ import Link from "next/link";
 
 import "./autocomplete.css";
 
+import { PoweredBy } from "react-instantsearch";
+
 import type { ArticleHit } from "@acme/validators";
+import { Separator } from "@acme/ui/separator";
 
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 
@@ -71,6 +74,17 @@ export function NoviceAutocomplete({ detached }: { detached?: string }) {
             },
             item({ item, components }) {
               return <ProductItem hit={item} components={components} />;
+            },
+            footer() {
+              return (
+                <div className="w-full">
+                  <Separator className="w-full" />
+                  <div className="flex items-center justify-between px-6 py-8">
+                    <Link href="/novice">Vse novice</Link>
+                    <PoweredBy className="w-40" />
+                  </div>
+                </div>
+              );
             },
             noResults() {
               return "Ni ujemajočih novic.";

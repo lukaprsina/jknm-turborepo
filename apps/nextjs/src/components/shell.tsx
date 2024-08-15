@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import { Button } from "@acme/ui/button";
+import { Separator } from "@acme/ui/separator";
 
 import { Background } from "~/components/backgrounds";
 import { sign_out } from "~/server/auth";
@@ -129,30 +130,26 @@ async function Footer() {
   const session = await auth();
 
   return (
-    <div className="container mb-8 flex flex-col items-start justify-between gap-4 md:flex-row">
-      <p>
-        Footer Lorem, ipsum dolor sit amet consectetur adipisicing elit. Qui
-        ducimus ipsa, distinctio quia, tempore sapiente esse aut omnis hic earum
-        molestias illum consequatur et quo maiores labore ex magnam voluptatem?
-      </p>
-      {!session?.user ? (
-        <Button asChild variant="link">
-          <Link href="/prijava">Prijava</Link>
-        </Button>
-      ) : (
-        <form>
-          <Button formAction={sign_out}>Odjava</Button>
-        </form>
-      )}
-    </div>
+    <>
+      <Separator />
+      <footer className="py-6 md:px-8 md:py-0">
+        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
+          <p className="text-balance text-center text-sm leading-loose text-muted-foreground md:text-left">
+            Jamarski klub Novo mesto
+          </p>
+          <div>
+            {!session?.user ? (
+              <Button asChild variant="link">
+                <Link href="/prijava">Prijava</Link>
+              </Button>
+            ) : (
+              <form>
+                <Button formAction={sign_out}>Odjava</Button>
+              </form>
+            )}
+          </div>
+        </div>
+      </footer>
+    </>
   );
 }
-
-/* function LogoAndTitle() {
-  return (
-    <Link href="/" className="flex items-center gap-6 text-2xl font-bold">
-      <Logo className="w-24" />
-      <p>Jamarski klub Novo mesto</p>
-    </Link>
-  );
-} */

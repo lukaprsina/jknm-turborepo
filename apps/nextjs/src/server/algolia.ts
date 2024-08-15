@@ -6,6 +6,7 @@ import { article_hit_validator } from "@acme/validators";
 import { algolia_protected } from "~/lib/algolia-protected";
 
 export async function create_algolia_article(input: ArticleHit) {
+  console.error("create algolia input: ", input);
   const validated = article_hit_validator.parse(input);
   const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");
@@ -14,6 +15,7 @@ export async function create_algolia_article(input: ArticleHit) {
 }
 
 export async function update_algolia_article(input: Partial<ArticleHit>) {
+  console.error("update algolia input: ", input);
   const validated = article_hit_validator.partial().parse(input);
   const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");

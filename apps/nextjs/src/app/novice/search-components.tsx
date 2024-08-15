@@ -1,10 +1,12 @@
 "use client";
 
+import type { RefinementListItem } from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 import type {
   UseRefinementListProps,
   UseSearchBoxProps,
   UseSortByProps,
 } from "react-instantsearch";
+import { useMemo } from "react";
 // import { InstantSearchNext } from "react-instantsearch-nextjs";
 import {
   useRefinementList,
@@ -13,6 +15,7 @@ import {
   useStats,
 } from "react-instantsearch";
 
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 import {
@@ -22,8 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@acme/ui/select";
-
-import { api } from "~/trpc/react";
 
 export function MySortBy(props: UseSortByProps) {
   const { currentRefinement, options, refine } = useSortBy(props);
@@ -71,30 +72,24 @@ export function MyStats() {
 }
 
 export function TimelineRefinement(props: UseRefinementListProps) {
-  const possible_years = api.article.get_possible_years.useQuery();
-  const {
-    items,
-    hasExhaustiveItems,
-    createURL,
-    refine,
-    sendEvent,
-    searchForItems,
-    isFromSearch,
-    canRefine,
-    canToggleShowMore,
-    isShowingMore,
-    toggleShowMore,
-  } = useRefinementList(props);
+  // const possible_years = api.article.get_possible_years.useQuery();
+  const refinement_list = useRefinementList(props);
+
+  const sorted_list = useMemo(() => {
+    return refinement_list.items.sort((a, b) => {
+      return parseInt(a.value) - parseInt(b.value);
+    });
+  }, [refinement_list]);
 
   return (
     <ol className="items-center pb-8 sm:flex">
-      {possible_years.data?.map((year) => (
+      {sorted_list.map((item) => (
         <TimelineItem
           onClick={() => {
-            refine(year.toString());
+            refinement_list.refine(item.value);
           }}
-          key={year}
-          year={year}
+          key={item.value}
+          item={item}
         />
       ))}
     </ol>
@@ -102,18 +97,21 @@ export function TimelineRefinement(props: UseRefinementListProps) {
 }
 
 export function TimelineItem({
-  year,
+  item,
   ...props
-}: { year: number } & React.ComponentProps<typeof Button>) {
+}: { item: RefinementListItem } & React.ComponentProps<typeof Button>) {
   return (
     <li className="relative mb-6 pl-2 sm:mb-0">
       <Button
         variant="link"
-        className="-ml-2 mb-0 mr-5 p-0 sm:pe-8"
+        className={cn(
+          "-ml-2 mb-0 mr-5 p-0 sm:pe-8",
+          item.isRefined && "font-bold",
+        )}
         style={{ paddingInlineEnd: "0px" }}
         {...props}
       >
-        <span>{year}</span>
+        <span>{item.value}</span>
       </Button>
       <div className="flex items-center">
         <div className="z-10 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-blue-200 ring-0 ring-background dark:bg-blue-900 dark:ring-background sm:ring-8">

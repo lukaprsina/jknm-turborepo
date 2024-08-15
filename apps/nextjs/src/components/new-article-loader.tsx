@@ -27,6 +27,7 @@ export default function NewArticleLoader({
       const returned_data = data.at(0);
       if (!returned_data) return;
 
+      console.log("new article loader", returned_data);
       await create_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
@@ -34,6 +35,7 @@ export default function NewArticleLoader({
         content: returned_data.content ?? undefined,
         created_at: returned_data.created_at,
         published: !!returned_data.published,
+        year: returned_data.created_at.getFullYear().toString(),
       });
 
       router.push(`/uredi/${generate_encoded_url(returned_data)}`);

@@ -188,6 +188,26 @@ export const articleRouter = {
         .returning({ id: Article.id, url: Article.url });
     }),
 
+  delete_draft: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      if (!input.id) return;
+
+      return ctx.db
+        .update(Article)
+        .set({
+          content: null,
+          preview_image: null,
+          published: false,
+        })
+        .where(eq(Article.id, input.id))
+        .returning({ id: Article.id, url: Article.url });
+    }),
+
   delete: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {
     return ctx.db
       .delete(Article)

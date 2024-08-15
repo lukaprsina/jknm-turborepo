@@ -1,9 +1,13 @@
 body {
   --aa-search-input-height: 36px;
-  --aa-base-z-index: 100;
+  --aa-base-z-index: 101;
   --aa-panel-border-color-alpha: 0;
   --aa-input-border-color-alpha: 0;
   --aa-icon-size: 40px;
+}
+
+.aa-Detached {
+  overflow: visible;
 }
 
 .aa-Panel {
