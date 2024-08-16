@@ -13,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@acme/ui/carousel";
 
-import { settings_store } from "./settings-store";
+import { editor_store } from "./editor-store";
 
 interface ImageCarouselProps {
   onImageUrlChange: (value: string) => void;
@@ -26,7 +26,7 @@ export const ImageCarousel = React.forwardRef<
 >(({ onImageUrlChange, imageUrl, ...props }, ref) => {
   const file_ref = useRef<HTMLInputElement>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | undefined>(undefined);
-  const image_data = settings_store.use.image_data();
+  const image_data = editor_store.use.image_data();
   /* const editor = useEditor();
 
   if (!editor) return null; */

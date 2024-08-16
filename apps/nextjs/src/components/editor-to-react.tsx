@@ -4,31 +4,16 @@ import type { RenderFn } from "editorjs-blocks-react-renderer";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Blocks from "editorjs-blocks-react-renderer";
-// import HTMLReactParser from "html-react-parser";
+import HTMLReactParser from "html-react-parser";
 import DOMPurify from "isomorphic-dompurify";
 
 import type { Article, ArticleContentType } from "@acme/db/schema";
+import { cn } from "@acme/ui";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
 import { get_heading_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
-
-const allowed_blocks = ["paragraph", "list", "quote"];
-
-const NextImageRenderer: RenderFn<EditorJSImageData> = ({
-  data,
-  className,
-}) => {
-  return (
-    <Image
-      className={className}
-      src={data.file.url}
-      alt={data.caption}
-      width={data.file.width}
-      height={data.file.height}
-    />
-  );
-};
+import { image_store } from "./image-store";
 
 export function EditorToReact({
   article,
@@ -37,12 +22,13 @@ export function EditorToReact({
   article?: typeof Article.$inferSelect;
   draft?: boolean;
 }) {
-  const [heading, setHeading] = useState<string | undefined>(undefined);
+  const [heading, setHeading] = useState<string | undefined>();
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
     if (!content) return undefined;
 
     const heading_info = get_heading_from_editor(content);
+
     if (heading_info.error || !heading_info.title) {
       console.error("Invalid heading", heading_info);
       return;
@@ -52,7 +38,7 @@ export function EditorToReact({
 
     return {
       version: content.version ?? "unknown version",
-      blocks: content.blocks.splice(1),
+      blocks: content.blocks.splice(1), // remove heading
       time: content.time ?? Date.now(),
     };
   }, [article?.content, article?.draft_content, draft]);
@@ -76,6 +62,31 @@ export function EditorToReact({
     </Card>
   );
 }
+
+const allowed_blocks = ["paragraph", "list", "quote"];
+
+const NextImageRenderer: RenderFn<EditorJSImageData> = ({
+  data,
+  className,
+}) => {
+  // console.log(data);
+  return (
+    <figure>
+      <Image
+        onClick={() => {
+          console.log("setting gallery image", data);
+          image_store.set.gallery_image(data);
+        }}
+        className={cn("cursor-pointer", className)}
+        src={data.file.url}
+        alt={data.caption}
+        width={data.file.width ?? 100}
+        height={data.file.height ?? 100}
+      />
+      <figcaption>{HTMLReactParser(data.caption)}</figcaption>
+    </figure>
+  );
+};
 
 export function EditorToText({ content }: { content?: ArticleContentType }) {
   const filtered_text = useMemo(() => {

@@ -3,13 +3,13 @@
 import mime from "mime/lite";
 
 import type { FileUploadResponse } from "~/app/api/upload_file_to_s3/route";
-import { settings_store } from "./settings-store";
+import { editor_store } from "./editor-store";
 
 export async function upload_image_by_file(
   file: File,
   // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
-  const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
+  const novica_url = `${editor_store.get.url()}-${editor_store.get.id()}`;
   /* const novica_url = generate_encoded_url({
     url: settings_store.get.url(),
     id: settings_store.get.id(),
@@ -45,7 +45,7 @@ export async function upload_image_by_url(
   url: string,
   // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
-  const novica_url = `${settings_store.get.url()}-${settings_store.get.id()}`;
+  const novica_url = `${editor_store.get.url()}-${editor_store.get.id()}`;
   /* const novica_url = generate_encoded_url({
     url: settings_store.get.url(),
     id: settings_store.get.id(),

@@ -7,6 +7,7 @@ import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
+import { ImageGallery } from "./image-gallery";
 
 interface NovicaProps {
   params: {
@@ -92,6 +93,7 @@ function PublishedContent({
     // {/* lg:prose-xl  */}
     <div className="prose dark:prose-invert container w-full pb-6 pt-8">
       <EditorToReact article={article} />
+      <ImageGallery />
     </div>
     // </div>
   );
@@ -126,9 +128,11 @@ async function TabbedContent({
       </TabsList>
       <TabsContent value="draft" className="py-6">
         <EditorToReact draft article={article} />
+        <ImageGallery />
       </TabsContent>
       <TabsContent value="published" className="py-6">
         <EditorToReact article={article} />
+        <ImageGallery />
       </TabsContent>
     </Tabs>
   );

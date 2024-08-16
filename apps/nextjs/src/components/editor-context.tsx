@@ -24,12 +24,12 @@ import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
 import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
+import { editor_store } from "~/app/uredi/[novica_ime]/editor-store";
 import {
   get_clean_url,
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
-import { settings_store } from "~/app/uredi/[novica_ime]/settings-store";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import {
   delete_algolia_article,
@@ -97,9 +97,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!editorJS.current || !article) return;
 
       const image_data = get_image_data_from_editor(editor_content);
-      settings_store.set.image_data(image_data);
+      editor_store.set.image_data(image_data);
 
-      const preview_image = settings_store.get.preview_image();
+      const preview_image = editor_store.get.preview_image();
       console.log("Updating settings from editor", {
         title,
         url,
@@ -112,13 +112,13 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
           "Setting preview image as the first",
           image_data.at(0)?.url,
         );
-        settings_store.set.preview_image(image_data.at(0)?.url);
+        editor_store.set.preview_image(image_data.at(0)?.url);
       }
 
-      settings_store.set.id(article.id);
+      editor_store.set.id(article.id);
 
-      if (typeof title !== "undefined") settings_store.set.title(title);
-      if (typeof url !== "undefined") settings_store.set.url(url);
+      if (typeof title !== "undefined") editor_store.set.title(title);
+      if (typeof url !== "undefined") editor_store.set.url(url);
     },
     [article],
   );
@@ -151,7 +151,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         async function update_article() {
           const editor_content = await editorJS.current?.save();
           if (!editor_content || !article) return;
-          settings_store.set.preview_image(undefined);
+          editor_store.set.preview_image(undefined);
 
           update_settings_from_editor(
             editor_content,
@@ -330,7 +330,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
     await rename_images_in_editor(editorJS.current, new_article_url);
 
-    const preview_image = settings_store.get.preview_image();
+    const preview_image = editor_store.get.preview_image();
 
     const new_preview_image = preview_image
       ? rename_image(preview_image, new_article_url)
@@ -339,7 +339,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     editor_content = await editorJS.current.save();
     update_settings_from_editor(editor_content, new_title, new_url);
 
-    settings_store.set.preview_image(new_preview_image);
+    editor_store.set.preview_image(new_preview_image);
   };
 
   return (

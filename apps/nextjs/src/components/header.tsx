@@ -99,7 +99,7 @@ export function TestHeader({
       <div
         ref={sticky_navbar}
         className={cn(
-          "relative z-50 flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
+          "relative z-40 flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
           sticky ? "fixed top-0 bg-white/60 transition-colors" : null,
         )}
       >

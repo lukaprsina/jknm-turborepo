@@ -17,7 +17,7 @@ import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { useEditor } from "~/components/editor-context";
-import { settings_store } from "./settings-store";
+import { editor_store } from "./editor-store";
 
 export function UploadDialog() {
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -73,9 +73,9 @@ export function UploadDialog() {
                 id: editor.article.id,
                 created_at: editor.article.created_at,
                 content: editor_content,
-                title: settings_store.get.title(),
-                url: settings_store.get.url(),
-                preview_image: settings_store.get.preview_image() ?? "",
+                title: editor_store.get.title(),
+                url: editor_store.get.url(),
+                preview_image: editor_store.get.preview_image() ?? "",
               });
             }}
           >

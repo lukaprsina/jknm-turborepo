@@ -17,8 +17,8 @@ import {
 } from "@acme/ui/form";
 
 import { useEditor } from "~/components/editor-context";
+import { editor_store } from "./editor-store";
 import { ImageCarousel } from "./image-carousel";
-import { settings_store } from "./settings-store";
 
 export const form_schema = z.object({
   /* TODO: message to all zod fields
@@ -31,12 +31,12 @@ export const form_schema = z.object({
 
 export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
   const editor = useEditor();
-  const preview_image = settings_store.use.preview_image();
+  const preview_image = editor_store.use.preview_image();
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
     defaultValues: {
-      preview_image: settings_store.get.preview_image() ?? undefined,
+      preview_image: editor_store.get.preview_image() ?? undefined,
       created_at: editor?.article?.created_at,
     },
   });
@@ -60,7 +60,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                 <ImageCarousel
                   onImageUrlChange={(value) => {
                     field.onChange(value);
-                    settings_store.set.preview_image(value);
+                    editor_store.set.preview_image(value);
                   }}
                   imageUrl={field.value}
                 />
@@ -98,9 +98,9 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                 editor.mutations.publish({
                   id: editor.article.id,
                   created_at: values.created_at,
-                  title: settings_store.get.title(),
-                  url: settings_store.get.url(),
-                  preview_image: settings_store.get.preview_image() ?? "",
+                  title: editor_store.get.title(),
+                  url: editor_store.get.url(),
+                  preview_image: editor_store.get.preview_image() ?? "",
                   content: editor_content,
                 });
 

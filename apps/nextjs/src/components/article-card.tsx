@@ -11,12 +11,7 @@ import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Badge } from "@acme/ui/badge";
-import {
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
+import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
 import { generate_encoded_url } from "~/lib/generate-encoded-url";

@@ -9,6 +9,7 @@ import type {
 import { useMemo } from "react";
 // import { InstantSearchNext } from "react-instantsearch-nextjs";
 import {
+  useClearRefinements,
   useRefinementList,
   useSearchBox,
   useSortBy,
@@ -30,18 +31,24 @@ export function MySortBy(props: UseSortByProps) {
   const { currentRefinement, options, refine } = useSortBy(props);
 
   return (
-    <Select onValueChange={(value) => refine(value)} value={currentRefinement}>
-      <SelectTrigger className="">
-        <SelectValue placeholder="Sortiraj po ..." />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center justify-between gap-2">
+      <p>Razvrsti po</p>
+      <Select
+        onValueChange={(value) => refine(value)}
+        value={currentRefinement}
+      >
+        <SelectTrigger>
+          <SelectValue placeholder="Sortiraj po ..." />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
 
@@ -65,15 +72,17 @@ export function MyStats() {
   const stats = useStats();
 
   return (
-    <span>
+    <p>
       {stats.processingTimeMS} ms, {stats.nbHits} novic
-    </span>
+    </p>
   );
 }
 
 export function TimelineRefinement(props: UseRefinementListProps) {
-  // const possible_years = api.article.get_possible_years.useQuery();
   const refinement_list = useRefinementList(props);
+  const clear_refinements = useClearRefinements({
+    includedAttributes: [props.attribute],
+  });
 
   const sorted_list = useMemo(() => {
     return refinement_list.items.sort((a, b) => {
@@ -82,11 +91,18 @@ export function TimelineRefinement(props: UseRefinementListProps) {
   }, [refinement_list]);
 
   return (
-    <ol className="items-center pb-8 sm:flex">
+    <ol className="items-center pb-8 pl-2 sm:flex">
       {sorted_list.map((item) => (
         <TimelineItem
           onClick={() => {
+            clear_refinements.refine();
             refinement_list.refine(item.value);
+
+            for (const t of refinement_list.items) {
+              if (t.value === item.value) {
+                // t.isRefined = true;
+              }
+            }
           }}
           key={item.value}
           item={item}

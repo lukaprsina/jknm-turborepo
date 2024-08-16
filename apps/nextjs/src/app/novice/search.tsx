@@ -4,6 +4,7 @@ import { Hits, InstantSearch } from "react-instantsearch";
 
 import { ArticleAlgoliaCard } from "~/components/article-card";
 import { algolia } from "~/lib/algolia";
+import { articles_variants } from "../articles";
 import { MyPagination } from "./pagination";
 import {
   MySearchBox,
@@ -19,22 +20,29 @@ export function Search() {
       indexName="novice"
       searchClient={algolia.getClient()}
     >
-      <div className="flex flex-col items-center justify-between gap-2 py-6 sm:flex-row">
-        <div className="flex items-center justify-between space-x-2">
-          <MySearchBox />
-          <MySortBy
-            items={[
-              { value: "novice", label: "Najnovejše" },
-              { value: "novice_date_asc", label: "Najstarejše" },
-            ]}
-          />
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+          <div className="flex items-center justify-between space-x-2">
+            <MySearchBox />
+          </div>
+          <div className="flex flex-col items-center justify-between gap-6 text-nowrap sm:flex-row">
+            <MySortBy
+              items={[
+                { value: "novice", label: "Najnovejše" },
+                { value: "novice_date_asc", label: "Najstarejše" },
+              ]}
+            />
+          </div>
         </div>
-        <MyStats />
+        <div className="flex w-full items-start justify-between">
+          <TimelineRefinement attribute="year" />
+          <MyStats />
+        </div>
       </div>
-      <TimelineRefinement attribute="year" />
       <Hits
         hitComponent={ArticleAlgoliaCard}
         classNames={{
+          item: articles_variants(),
           list: "grid grid-cols-1 gap-4 sm:grid-cols-2 mb-6",
         }}
       />

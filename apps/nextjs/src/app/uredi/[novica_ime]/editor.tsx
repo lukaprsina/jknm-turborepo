@@ -22,8 +22,8 @@ import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
+import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
-import { settings_store } from "./settings-store";
 import { UploadDialog } from "./upload-dialog";
 
 export default function MyEditor({
@@ -47,7 +47,7 @@ export default function MyEditor({
 }
 
 function SettingsSummary() {
-  const data = settings_store.useStore();
+  const data = editor_store.useStore();
   return (
     <pre className="my-8 h-full overflow-auto">
       {JSON.stringify(data, null, 2)}
@@ -98,7 +98,7 @@ function SaveButton() {
     editor.mutations.save_draft({
       id: editor.article.id,
       draft_content: editor_content,
-      draft_preview_image: settings_store.get.preview_image() ?? "",
+      draft_preview_image: editor_store.get.preview_image() ?? "",
     });
   }, [editor]);
 
@@ -180,7 +180,7 @@ function ClearButton() {
               }
 
               await editor.editor?.render(content);
-              settings_store.set.preview_image(
+              editor_store.set.preview_image(
                 // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
                 editor.article?.preview_image || "",
               );

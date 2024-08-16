@@ -41,12 +41,12 @@ export interface EditorJSImageData {
   caption: string;
   file: {
     url: string;
-    width: number;
-    height: number;
+    width?: number;
+    height?: number;
   };
-  stretched: boolean;
-  withBackground: boolean;
-  withBorder: boolean;
+  stretched?: boolean;
+  withBackground?: boolean;
+  withBorder?: boolean;
 }
 
 export function EDITOR_JS_PLUGINS(): Record<
