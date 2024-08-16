@@ -11,11 +11,16 @@ import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
 import { Badge } from "@acme/ui/badge";
-import { CardContent, CardHeader, CardTitle } from "@acme/ui/card";
+import {
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
-import { EditorToReact } from "./editor-to-react";
+import { EditorToText } from "./editor-to-react";
 
 export function ArticleDrizzleCard({
   article,
@@ -43,6 +48,7 @@ export function ArticleDrizzleCard({
         article.draft_preview_image ?? article.preview_image ?? undefined
       }
       content={article.draft_content ?? article.content ?? undefined}
+      created_at={article.created_at}
     />
   );
 }
@@ -52,9 +58,10 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
     <ArticleCard
       title={hit.title}
       url={generate_encoded_url({ id: parseInt(hit.objectID), url: hit.url })}
-      published={!hit.content}
+      published
       preview_image={hit.image ?? undefined}
       content={hit.content ?? undefined}
+      created_at={new Date(hit.created_at)}
     />
   );
 }
@@ -84,6 +91,7 @@ export function FeaturedArticleCard({
     >
       <MagicCard
         className="flex h-full w-full flex-col"
+        innerClassName="h-full w-full"
         gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
       >
         {preview_image ? (
@@ -100,18 +108,7 @@ export function FeaturedArticleCard({
               fill
               className="rounded-md object-cover"
             />
-            {!published && (
-              <Badge
-                className={cn(
-                  "absolute bottom-0 right-0 m-4 shadow-sm",
-                  theme.resolvedTheme === "dark"
-                    ? "shadow-black"
-                    : "shadow-white",
-                )}
-              >
-                Osnutek
-              </Badge>
-            )}
+            {!published && <DraftBadge />}
           </AspectRatio>
         ) : null}
         <div>
@@ -119,10 +116,11 @@ export function FeaturedArticleCard({
             <CardTitle>{title}</CardTitle>
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="relative">
             <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact just_text content={content} />
+              <EditorToText content={content} />
             </div>
+            {!preview_image && !published && <DraftBadge />}
           </CardContent>
         </div>
       </MagicCard>
@@ -136,12 +134,14 @@ export function ArticleCard({
   published,
   preview_image,
   content,
+  created_at,
 }: {
   title: string;
   url: string;
   published: boolean;
   preview_image?: string;
   content?: ArticleContentType;
+  created_at: Date;
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
@@ -155,6 +155,7 @@ export function ArticleCard({
     >
       <MagicCard
         className="flex h-full w-full flex-col"
+        innerClassName="h-full w-full"
         gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
       >
         {preview_image ? (
@@ -171,32 +172,47 @@ export function ArticleCard({
               fill
               className="rounded-md object-cover"
             />
-            {!published && (
-              <Badge
-                className={cn(
-                  "absolute bottom-0 right-0 m-4 shadow-sm",
-                  theme.resolvedTheme === "dark"
-                    ? "shadow-black"
-                    : "shadow-white",
-                )}
-              >
-                Osnutek
-              </Badge>
-            )}
+            {!published && <DraftBadge />}
           </AspectRatio>
         ) : null}
         {/* TODO: če sta dve vrstici, ni poravnano */}
-        <div className="flex flex-col justify-between">
+        <div className="flex h-full w-full flex-col justify-between">
           <CardHeader>
-            <CardTitle>{title}</CardTitle>
+            <CardTitle className="line-clamp-2">{title}</CardTitle>
+            <CardDescription className="line-clamp-1">
+              {created_at.toDateString()}
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToReact just_text content={content} />
+          <CardContent className="relative flex h-full w-full flex-col justify-between">
+            {!preview_image && !published && <DraftBadge />}
+            <div className="flex h-full w-full items-end">
+              <p
+                className={cn(
+                  "relative line-clamp-2 items-end",
+                  !preview_image && "line-clamp-4",
+                )}
+              >
+                <EditorToText content={content} />
+              </p>
             </div>
           </CardContent>
         </div>
       </MagicCard>
     </Link>
+  );
+}
+
+function DraftBadge() {
+  const theme = useTheme();
+
+  return (
+    <Badge
+      className={cn(
+        "absolute bottom-0 right-0 m-4 shadow-md",
+        theme.resolvedTheme === "dark" ? "shadow-black" : "shadow-white",
+      )}
+    >
+      Osnutek
+    </Badge>
   );
 }

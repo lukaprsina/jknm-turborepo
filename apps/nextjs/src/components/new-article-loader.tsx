@@ -74,7 +74,7 @@ export default function NewArticleLoader({
           }}
         />
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="relative z-[150] mx-6 w-80">
         <Card>
           <CardHeader>
             <CardTitle>Ustvarjamo novo novico.</CardTitle>

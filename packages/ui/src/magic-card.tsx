@@ -9,11 +9,13 @@ export interface MagicCardProps extends React.HTMLAttributes<HTMLDivElement> {
   gradientSize?: number;
   gradientColor?: string;
   gradientOpacity?: number;
+  innerClassName?: string;
 }
 
 export function MagicCard({
   children,
   className,
+  innerClassName,
   gradientSize = 200,
   gradientColor = "#262626",
   gradientOpacity = 0.8,
@@ -49,7 +51,7 @@ export function MagicCard({
         className,
       )}
     >
-      <div className="relative z-10">{children}</div>
+      <div className={cn("relative z-10", innerClassName)}>{children}</div>
       <motion.div
         className="pointer-events-none absolute -inset-px rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{

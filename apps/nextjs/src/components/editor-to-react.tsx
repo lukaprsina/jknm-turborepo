@@ -21,57 +21,22 @@ const allowed_blocks = ["paragraph", "list", "quote"];
   );
 }; */
 
-export function EditorToReact({
-  content,
-  just_text,
-}: {
-  content?: ArticleContentType;
-  just_text?: boolean;
-}) {
-  const filtered_content = useMemo(() => {
+export function EditorToReact({ content }: { content?: ArticleContentType }) {
+  const editor_data = useMemo(() => {
     if (!content) return undefined;
 
-    if (!just_text) {
-      return {
-        version: content.version ?? "2.19.0",
-        blocks: content.blocks,
-        time: content.time ?? Date.now(),
-      };
-    }
-
-    const blocks = content.blocks.filter((block) =>
-      allowed_blocks.includes(block.type),
-    );
-
-    const without_links = blocks.map((block) => {
-      if (block.type !== "paragraph") return block;
-      const paragraph_data = block.data as { text: string };
-
-      const clean = DOMPurify.sanitize(paragraph_data.text, {
-        ALLOWED_TAGS: [],
-      });
-
-      return {
-        ...block,
-        data: {
-          ...block.data,
-          text: clean,
-        },
-      };
-    });
-
     return {
-      version: content.version ?? "2.19.0",
-      blocks: without_links,
+      version: content.version ?? "unknown version",
+      blocks: content.blocks,
       time: content.time ?? Date.now(),
     };
-  }, [content, just_text]);
+  }, [content]);
 
-  if (!filtered_content) return null;
+  if (!editor_data) return null;
 
   return (
     <Blocks
-      data={filtered_content}
+      data={editor_data}
       renderers={
         {
           // link: JustTextLink,
@@ -79,4 +44,32 @@ export function EditorToReact({
       }
     />
   );
+}
+
+export function EditorToText({ content }: { content?: ArticleContentType }) {
+  const filtered_text = useMemo(() => {
+    if (!content) return undefined;
+
+    const blocks = content.blocks.filter((block) =>
+      allowed_blocks.includes(block.type),
+    );
+
+    const sanitized_text = blocks
+      .map((block) => {
+        if (block.type !== "paragraph") return undefined;
+        const paragraph_data = block.data as { text: string };
+
+        const clean = DOMPurify.sanitize(paragraph_data.text, {
+          ALLOWED_TAGS: [],
+        });
+
+        return clean;
+      })
+      .filter((text) => typeof text !== "undefined")
+      .join("\n");
+
+    return sanitized_text;
+  }, [content]);
+
+  return <>{filtered_text}</>;
 }

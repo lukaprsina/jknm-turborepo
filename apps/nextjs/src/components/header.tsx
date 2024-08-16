@@ -117,7 +117,7 @@ function FacebookIcon() {
       target="_blank"
       className={cn(
         buttonVariants({ variant: "ghost", size: "icon" }),
-        "h-6 w-8 p-0 text-center",
+        "h-9 w-9 p-0 text-center",
       )}
     >
       <svg
@@ -141,7 +141,7 @@ function YoutubeIcon() {
       target="_blank"
       className={cn(
         buttonVariants({ variant: "ghost", size: "icon" }),
-        "h-6 w-8 p-0 text-center",
+        "h-9 w-9 p-0 text-center",
       )}
     >
       <svg
