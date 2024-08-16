@@ -572,6 +572,9 @@ importers:
       react:
         specifier: catalog:react18
         version: 18.3.1
+      react-detect-click-outside:
+        specifier: ^1.1.7
+        version: 1.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dnd:
         specifier: ^16.0.1
         version: 16.0.1(@types/node@20.14.15)(@types/react@18.3.3)(react@18.3.1)
@@ -9434,6 +9437,12 @@ packages:
     peerDependencies:
       date-fns: ^2.28.0 || ^3.0.0
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
+
+  react-detect-click-outside@1.1.7:
+    resolution: {integrity: sha512-dMrBZD7JW0Eh/uYNmMLTNwFj6afGYxAnc80fDSGJdjXjxJddH8ZazyMg2emyb8CAx9Hilr+r1fY+tm7O7m9eJg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+      react-dom: ^16.8.0 || ^17 || ^18
 
   react-devtools-core@5.3.1:
     resolution: {integrity: sha512-7FSb9meX0btdBQLwdFOwt6bGqvRPabmVMMslv8fgoSPqXyuGpgQe36kx8gR86XPw7aV1yVouTp6fyZ0EH+NfUw==}
@@ -21300,6 +21309,11 @@ snapshots:
     dependencies:
       date-fns: 3.6.0
       react: 18.3.1
+
+  react-detect-click-outside@1.1.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   react-devtools-core@5.3.1(bufferutil@4.0.8)(utf-8-validate@6.0.4):
     dependencies:

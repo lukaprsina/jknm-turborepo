@@ -47,14 +47,16 @@ export const ImageCarousel = React.forwardRef<
             className="cursor-pointer md:basis-1/2 lg:basis-1/3"
           >
             <Card
-              className={cn(imageUrl === image.url ? "bg-slate-600" : null)}
+              className={cn(
+                imageUrl === image.file.url ? "bg-slate-600" : null,
+              )}
               onClick={() => {
-                onImageUrlChange(image.url);
+                onImageUrlChange(image.file.url);
               }}
             >
               <CardContent className="flex aspect-square items-center justify-center py-2 hover:bg-muted">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={image.url} />
+                <img src={image.file.url} />
               </CardContent>
             </Card>
           </CarouselItem>

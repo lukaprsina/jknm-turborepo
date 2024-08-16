@@ -95,13 +95,11 @@ export function TimelineRefinement(props: UseRefinementListProps) {
       {sorted_list.map((item) => (
         <TimelineItem
           onClick={() => {
-            clear_refinements.refine();
-            refinement_list.refine(item.value);
-
-            for (const t of refinement_list.items) {
-              if (t.value === item.value) {
-                // t.isRefined = true;
-              }
+            if (item.isRefined) {
+              clear_refinements.refine();
+            } else {
+              clear_refinements.refine();
+              refinement_list.refine(item.value);
             }
           }}
           key={item.value}
@@ -131,7 +129,7 @@ export function TimelineItem({
       </Button>
       <div className="flex items-center">
         <div className="z-10 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-blue-200 ring-0 ring-background dark:bg-blue-900 dark:ring-background sm:ring-8">
-          <button>
+          <button onClick={props.onClick}>
             <svg
               className="h-2.5 w-2.5"
               aria-hidden="true"

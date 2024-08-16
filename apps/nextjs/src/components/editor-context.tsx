@@ -110,9 +110,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!preview_image) {
         console.log(
           "Setting preview image as the first",
-          image_data.at(0)?.url,
+          image_data.at(0)?.file.url,
         );
-        editor_store.set.preview_image(image_data.at(0)?.url);
+        editor_store.set.preview_image(image_data.at(0)?.file.url);
       }
 
       editor_store.set.id(article.id);
@@ -239,7 +239,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       const editor_content = await editorJS.current.save();
       const image_data = get_image_data_from_editor(editor_content);
-      const urls_to_keep = image_data.map((image) => image.url);
+      const urls_to_keep = image_data.map((image) => image.file.url);
 
       if (returned_data.preview_image)
         urls_to_keep.push(returned_data.preview_image);

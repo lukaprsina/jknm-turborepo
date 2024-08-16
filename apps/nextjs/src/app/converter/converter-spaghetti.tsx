@@ -80,7 +80,7 @@ export async function iterate_over_articles(
     if (!content) throw new Error("No content");
 
     const images = get_image_data_from_editor(content);
-    const preview_image = images[0] ? images[0]?.url : undefined;
+    const preview_image = images[0] ? images[0]?.file.url : undefined;
 
     if (typeof preview_image === "undefined") {
       console.error("No images in article", csv_article.title);

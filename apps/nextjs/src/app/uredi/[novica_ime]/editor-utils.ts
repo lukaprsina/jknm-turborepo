@@ -1,6 +1,8 @@
 import type { OutputData } from "@editorjs/editorjs";
 import sanitize_filename from "sanitize-filename";
 
+import type { EditorJSImageData } from "~/components/plugins";
+
 export function get_clean_url(dangerous_url: string) {
   const sanitized = sanitize_filename(dangerous_url, { replacement: "-" });
   return sanitized.toLowerCase().replace(/\s/g, "-");
@@ -33,23 +35,10 @@ export function get_heading_from_editor(
   }
 }
 
-export interface ImageData {
-  url: string;
-  width: number;
-  height: number;
-}
-
 export function get_image_data_from_editor(
   editor_content: OutputData,
-): ImageData[] {
-  const images: ImageData[] = [];
-
-  for (const block of editor_content.blocks) {
-    if (block.type === "image") {
-      const image_data = block.data as { file: ImageData };
-      images.push(image_data.file);
-    }
-  }
-
-  return images;
+): EditorJSImageData[] {
+  return editor_content.blocks
+    .filter((block) => block.type === "image")
+    .map((block) => block.data as EditorJSImageData);
 }

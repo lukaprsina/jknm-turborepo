@@ -12,8 +12,11 @@ import { cn } from "@acme/ui";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
-import { get_heading_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
-import { image_store } from "./image-store";
+import {
+  get_heading_from_editor,
+  get_image_data_from_editor,
+} from "~/app/uredi/[novica_ime]/editor-utils";
+import { gallery_store } from "./gallery-store";
 
 export function EditorToReact({
   article,
@@ -36,9 +39,12 @@ export function EditorToReact({
 
     setHeading(heading_info.title);
 
+    const image_data = get_image_data_from_editor(content);
+    gallery_store.set.images(image_data);
+
     return {
       version: content.version ?? "unknown version",
-      blocks: content.blocks.splice(1), // remove heading
+      blocks: content.blocks.slice(1), // remove first heading
       time: content.time ?? Date.now(),
     };
   }, [article?.content, article?.draft_content, draft]);
@@ -65,17 +71,16 @@ export function EditorToReact({
 
 const allowed_blocks = ["paragraph", "list", "quote"];
 
-const NextImageRenderer: RenderFn<EditorJSImageData> = ({
+export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
 }) => {
-  // console.log(data);
   return (
     <figure>
       <Image
         onClick={() => {
           console.log("setting gallery image", data);
-          image_store.set.gallery_image(data);
+          gallery_store.set.default_image(data);
         }}
         className={cn("cursor-pointer", className)}
         src={data.file.url}
