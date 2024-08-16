@@ -37,8 +37,20 @@ import {
   upload_image_by_url,
 } from "../app/uredi/[novica_ime]/upload-file";
 
+export interface EditorJSImageData {
+  caption: string;
+  file: {
+    url: string;
+    width: number;
+    height: number;
+  };
+  stretched: boolean;
+  withBackground: boolean;
+  withBorder: boolean;
+}
+
 export function EDITOR_JS_PLUGINS(): Record<
-// toast: ReturnType<typeof useToast>,
+  // toast: ReturnType<typeof useToast>,
   string,
   ToolConstructable | ToolSettings
 > {

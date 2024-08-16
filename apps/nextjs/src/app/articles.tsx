@@ -16,7 +16,7 @@ export function Articles({
     <>
       {articles && articles.length !== 0 && articles[0] ? (
         /* prose-h3:my-0 prose-p:mt-0 lg:prose-xl prose-p:text-lg mx-auto   */
-        <div className="prose dark:prose-invert prose-img:m-0 prose-h3:mt-0 prose-p:m-0 container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="prose dark:prose-invert prose-img:m-0 prose-h3:my-0 prose-h3:py-0 prose-p:m-0 container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8">
           {featured && <ArticleDrizzleCard featured article={articles[0]} />}
           {rest?.map((article, index) => (
             <ArticleDrizzleCard key={index} article={article} />

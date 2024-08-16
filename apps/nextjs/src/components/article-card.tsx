@@ -136,9 +136,11 @@ export function ArticleCard({
         {/* TODO: če sta dve vrstici, ni poravnano */}
         <div className="h-full">
           <CardHeader>
-            <CardTitle className="line-clamp-2 h-16">{title}</CardTitle>
-            <CardDescription>{created_at.toDateString()}</CardDescription>
-            <div>{!preview_image && !published && <DraftBadge />}</div>
+            <h3 className="line-clamp-2 h-16">{title}</h3>
+            <div className="flex w-full justify-between">
+              <CardDescription>{created_at.toDateString()}</CardDescription>
+              {!preview_image && !published && <DraftBadge />}
+            </div>
           </CardHeader>
           <CardContent className="">
             <div className="h-full">

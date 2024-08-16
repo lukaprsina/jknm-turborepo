@@ -88,12 +88,12 @@ function PublishedContent({
   }
 
   return (
-    <div className="container h-full min-h-screen pt-8">
-      {/* lg:prose-xl  */}
-      <div className="prose dark:prose-invert container w-full">
-        <EditorToReact content={article.content} />
-      </div>
+    // <div className="container h-full min-h-screen pt-8">
+    // {/* lg:prose-xl  */}
+    <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+      <EditorToReact article={article} />
     </div>
+    // </div>
   );
 }
 
@@ -114,7 +114,7 @@ async function TabbedContent({
     <Tabs
       defaultValue={article.draft_content ? "draft" : "published"}
       /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
-      className="prose dark:prose-invert container w-full overflow-x-auto pt-8"
+      className="prose dark:prose-invert container w-full pt-8"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content} value="draft">
@@ -125,10 +125,10 @@ async function TabbedContent({
         </TabsTrigger>
       </TabsList>
       <TabsContent value="draft" className="py-6">
-        <EditorToReact content={article.draft_content ?? undefined} />
+        <EditorToReact draft article={article} />
       </TabsContent>
       <TabsContent value="published" className="py-6">
-        <EditorToReact content={article.content ?? undefined} />
+        <EditorToReact article={article} />
       </TabsContent>
     </Tabs>
   );

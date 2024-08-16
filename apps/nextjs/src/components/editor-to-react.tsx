@@ -1,48 +1,79 @@
 "use client";
 
-import { useMemo } from "react";
+import type { RenderFn } from "editorjs-blocks-react-renderer";
+import { useMemo, useState } from "react";
+import Image from "next/image";
 import Blocks from "editorjs-blocks-react-renderer";
+// import HTMLReactParser from "html-react-parser";
 import DOMPurify from "isomorphic-dompurify";
 
-import type { ArticleContentType } from "@acme/db/schema";
+import type { Article, ArticleContentType } from "@acme/db/schema";
+import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
+
+import type { EditorJSImageData } from "./plugins";
+import { get_heading_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
 
 const allowed_blocks = ["paragraph", "list", "quote"];
 
-/* const JustTextLink: RenderFn<{
-  items: string[];
-}> = ({ data, className = "" }) => {
+const NextImageRenderer: RenderFn<EditorJSImageData> = ({
+  data,
+  className,
+}) => {
   return (
-    <>
-      {data.items.map((item, i) => (
-        <a key={i} className={className} {HTMLReactParser(item)}>
-        </a>
-      ))}
-    </>
+    <Image
+      className={className}
+      src={data.file.url}
+      alt={data.caption}
+      width={data.file.width}
+      height={data.file.height}
+    />
   );
-}; */
+};
 
-export function EditorToReact({ content }: { content?: ArticleContentType }) {
+export function EditorToReact({
+  article,
+  draft,
+}: {
+  article?: typeof Article.$inferSelect;
+  draft?: boolean;
+}) {
+  const [heading, setHeading] = useState<string | undefined>(undefined);
   const editor_data = useMemo(() => {
+    const content = draft ? article?.draft_content : article?.content;
     if (!content) return undefined;
+
+    const heading_info = get_heading_from_editor(content);
+    if (heading_info.error || !heading_info.title) {
+      console.error("Invalid heading", heading_info);
+      return;
+    }
+
+    setHeading(heading_info.title);
 
     return {
       version: content.version ?? "unknown version",
-      blocks: content.blocks,
+      blocks: content.blocks.splice(1),
       time: content.time ?? Date.now(),
     };
-  }, [content]);
+  }, [article?.content, article?.draft_content, draft]);
 
-  if (!editor_data) return null;
+  if (!editor_data) return;
 
   return (
-    <Blocks
-      data={editor_data}
-      /* renderers={
-        {
-          // link: JustTextLink,
-        }
-      } */
-    />
+    <Card className="pt-8">
+      <CardHeader>
+        <h1>{heading}</h1>
+        <CardDescription>{article?.created_at.toDateString()}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Blocks
+          data={editor_data}
+          renderers={{
+            image: NextImageRenderer,
+          }}
+        />
+      </CardContent>
+    </Card>
   );
 }
 
