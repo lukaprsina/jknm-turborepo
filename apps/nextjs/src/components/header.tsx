@@ -61,7 +61,7 @@ export function TestHeader({
       <div
         ref={header_ref}
         className={cn(
-          "container relative flex h-[182px] w-full items-end justify-between px-6 py-4 backdrop-blur-sm md:px-12",
+          "container relative flex h-[182px] w-full items-end justify-between px-6 py-4 backdrop-blur-sm",
           className,
         )}
         {...props}

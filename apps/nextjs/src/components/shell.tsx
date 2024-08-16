@@ -43,11 +43,7 @@ async function Header({
 
   return (
     <>
-      <TestHeader
-        article={article}
-        session={session ?? undefined}
-        className=""
-      />
+      <TestHeader article={article} session={session ?? undefined} />
       {/* <DesktopHeader className="hidden xl:flex" article={article} /> */}
       {/* <TabletHeader className="hidden md:flex xl:hidden" article={article} />
       <MobileHeader className="md:hidden" /> */}

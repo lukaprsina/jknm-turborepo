@@ -37,11 +37,11 @@ export function EditorToReact({ content }: { content?: ArticleContentType }) {
   return (
     <Blocks
       data={editor_data}
-      renderers={
+      /* renderers={
         {
           // link: JustTextLink,
         }
-      }
+      } */
     />
   );
 }

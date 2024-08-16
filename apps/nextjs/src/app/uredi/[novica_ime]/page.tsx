@@ -1,14 +1,6 @@
 import dynamic from "next/dynamic";
 
-import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@acme/ui/breadcrumb";
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -21,7 +13,6 @@ import {
 
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
-import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { api } from "~/trpc/server";
 import { get_clean_url } from "./editor-utils";
 
@@ -45,6 +36,7 @@ export default async function EditorPage({
   const novica_ime = novica_parts.slice(0, -1).join("-");
 
   if (!novica_id_string) {
+    console.error("No article ID found in URL", novica_ime_raw);
     return (
       <Shell>
         <Card>
@@ -66,14 +58,16 @@ export default async function EditorPage({
         id: novica_id,
       });
 
+  /*<>
+      <ArticleBreadcrumb article={article_by_url} />
+      <Editor article={article_by_url} />
+    </> */
+
   return (
     <Shell>
       <div className="container mb-4 mt-8 h-full min-h-screen">
         {article_by_url ? (
-          <>
-            <ArticleBreadcrumb article={article_by_url} />
-            <Editor article={article_by_url} />
-          </>
+          <Editor article={article_by_url} />
         ) : (
           <CreateNewArticle novica_ime={novica_ime} />
         )}
@@ -115,7 +109,7 @@ function CreateNewArticle({ novica_ime }: { novica_ime: string }) {
   );
 }
 
-function ArticleBreadcrumb({
+/* function ArticleBreadcrumb({
   article,
 }: {
   article: typeof Article.$inferSelect;
@@ -137,4 +131,4 @@ function ArticleBreadcrumb({
       </BreadcrumbList>
     </Breadcrumb>
   );
-}
+} */

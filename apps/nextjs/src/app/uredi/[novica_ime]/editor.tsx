@@ -38,7 +38,7 @@ export default function MyEditor({
         <div
           id="editorjs"
           /* lg:prose-xl  */
-          className="prose dark:prose-invert mx-auto"
+          className="prose dark:prose-invert container"
         />
       </div>
       <SettingsSummary />

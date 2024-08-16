@@ -29,7 +29,20 @@ export function ArticleDrizzleCard({
   article: typeof Article.$inferSelect;
   featured?: boolean;
 }) {
-  return featured ? (
+  return (
+    <ArticleCard
+      featured={featured}
+      title={article.title}
+      url={generate_encoded_url({ id: article.id, url: article.url })}
+      published={!article.draft_content}
+      preview_image={
+        article.draft_preview_image ?? article.preview_image ?? undefined
+      }
+      content={article.draft_content ?? article.content ?? undefined}
+      created_at={article.created_at}
+    />
+  );
+  /* return featured ? (
     <FeaturedArticleCard
       title={article.title}
       url={generate_encoded_url({ id: article.id, url: article.url })}
@@ -50,7 +63,7 @@ export function ArticleDrizzleCard({
       content={article.draft_content ?? article.content ?? undefined}
       created_at={article.created_at}
     />
-  );
+  ); */
 }
 
 export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
@@ -66,69 +79,8 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
   );
 }
 
-export function FeaturedArticleCard({
-  title,
-  url,
-  published,
-  preview_image,
-  content,
-}: {
-  title: string;
-  url: string;
-  published: boolean;
-  preview_image?: string;
-  content?: ArticleContentType;
-}) {
-  const theme = useTheme();
-  const [hover, setHover] = useState(false);
-
-  return (
-    <Link
-      href={`/novica/${url}`}
-      className="col-span-1 overflow-hidden rounded-md no-underline shadow-lg md:col-span-2 lg:col-span-3"
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <MagicCard
-        className="flex h-full w-full flex-col"
-        innerClassName="h-full w-full"
-        gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
-      >
-        {preview_image ? (
-          <AspectRatio
-            ratio={16 / 9}
-            className={cn(
-              "relative h-full w-full rounded-md transition-transform",
-              hover ? "scale-[1.01]" : null,
-            )}
-          >
-            <Image
-              src={preview_image}
-              alt={title}
-              fill
-              className="rounded-md object-cover"
-            />
-            {!published && <DraftBadge />}
-          </AspectRatio>
-        ) : null}
-        <div>
-          <CardHeader>
-            <CardTitle>{title}</CardTitle>
-          </CardHeader>
-
-          <CardContent className="relative">
-            <div className="line-clamp-2 h-full overflow-y-hidden">
-              <EditorToText content={content} />
-            </div>
-            {!preview_image && !published && <DraftBadge />}
-          </CardContent>
-        </div>
-      </MagicCard>
-    </Link>
-  );
-}
-
 export function ArticleCard({
+  featured,
   title,
   url,
   published,
@@ -136,6 +88,7 @@ export function ArticleCard({
   content,
   created_at,
 }: {
+  featured?: boolean;
   title: string;
   url: string;
   published: boolean;
@@ -149,20 +102,23 @@ export function ArticleCard({
   return (
     <Link
       href={`/novica/${url}`}
-      className="overflow-hidden rounded-md bg-card no-underline shadow-lg"
+      className={cn(
+        "overflow-hidden rounded-md bg-card no-underline shadow-lg",
+        featured && "col-span-1 md:col-span-2 lg:col-span-3",
+      )}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       <MagicCard
-        className="flex h-full w-full flex-col"
-        innerClassName="h-full w-full"
+        className="flex h-full flex-col"
+        innerClassName="h-full"
         gradientColor={theme.resolvedTheme === "dark" ? "#262626" : "#D9D9D955"}
       >
         {preview_image ? (
           <AspectRatio
             ratio={16 / 9}
             className={cn(
-              "relative h-full w-full rounded-md transition-transform",
+              "relative rounded-md transition-transform",
               hover ? "scale-[1.01]" : null,
             )}
           >
@@ -172,20 +128,20 @@ export function ArticleCard({
               fill
               className="rounded-md object-cover"
             />
-            {!published && <DraftBadge />}
+            {!published && (
+              <DraftBadge className="absolute bottom-0 right-0 mx-4 my-6" />
+            )}
           </AspectRatio>
         ) : null}
         {/* TODO: če sta dve vrstici, ni poravnano */}
-        <div className="flex h-full w-full flex-col justify-between">
+        <div className="h-full">
           <CardHeader>
-            <CardTitle className="line-clamp-2">{title}</CardTitle>
-            <CardDescription className="line-clamp-1">
-              {created_at.toDateString()}
-            </CardDescription>
+            <CardTitle className="line-clamp-2 h-16">{title}</CardTitle>
+            <CardDescription>{created_at.toDateString()}</CardDescription>
+            <div>{!preview_image && !published && <DraftBadge />}</div>
           </CardHeader>
-          <CardContent className="relative flex h-full w-full flex-col justify-between">
-            {!preview_image && !published && <DraftBadge />}
-            <div className="flex h-full w-full items-end">
+          <CardContent className="">
+            <div className="h-full">
               <p
                 className={cn(
                   "relative line-clamp-2 items-end",
@@ -202,15 +158,20 @@ export function ArticleCard({
   );
 }
 
-function DraftBadge() {
+function DraftBadge({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   const theme = useTheme();
 
   return (
     <Badge
       className={cn(
-        "absolute bottom-0 right-0 m-4 shadow-md",
+        "shadow-sm",
         theme.resolvedTheme === "dark" ? "shadow-black" : "shadow-white",
+        className,
       )}
+      {...props}
     >
       Osnutek
     </Badge>

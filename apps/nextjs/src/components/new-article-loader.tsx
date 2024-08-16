@@ -22,6 +22,8 @@ export default function NewArticleLoader({
   ...props
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
+  const trpc_utils = api.useUtils();
+
   const article_create = api.article.create_article.useMutation({
     onSuccess: async (data) => {
       const returned_data = data.at(0);
@@ -37,6 +39,8 @@ export default function NewArticleLoader({
         published: !!returned_data.published,
         year: returned_data.created_at.getFullYear().toString(),
       });
+
+      await trpc_utils.article.invalidate();
 
       router.push(`/uredi/${generate_encoded_url(returned_data)}`);
     },

@@ -28,7 +28,7 @@ export default async function NovicaPage({
       <Shell>
         <Card>
           <CardHeader>
-            <CardTitle>Novica ne obstaja</CardTitle>
+            <CardTitle>s obstaja</CardTitle>
           </CardHeader>
         </Card>
       </Shell>
@@ -82,18 +82,15 @@ function PublishedContent({
   article?: typeof Article.$inferSelect;
 }) {
   console.log("published", article);
+
   if (!article?.content) {
-    return (
-      <Card>
-        <CardHeader>Novica ne obstaja</CardHeader>
-      </Card>
-    );
+    return <ArticleNotFound />;
   }
 
   return (
-    <div className="container h-full min-h-screen pt-16">
+    <div className="container h-full min-h-screen pt-8">
       {/* lg:prose-xl  */}
-      <div className="prose dark:prose-invert mx-auto w-full">
+      <div className="prose dark:prose-invert container w-full">
         <EditorToReact content={article.content} />
       </div>
     </div>
@@ -108,19 +105,16 @@ async function TabbedContent({
   const session = await auth();
 
   console.log("tabbed", article);
+
   if (!article || (session && !article.content && !article.draft_content)) {
-    return (
-      <Card>
-        <CardHeader>Novica ne obstaja</CardHeader>
-      </Card>
-    );
+    return <ArticleNotFound />;
   }
 
   return (
     <Tabs
       defaultValue={article.draft_content ? "draft" : "published"}
       /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
-      className="prose dark:prose-invert container mx-auto w-full pt-8"
+      className="prose dark:prose-invert container w-full overflow-x-auto pt-8"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content} value="draft">
@@ -137,5 +131,15 @@ async function TabbedContent({
         <EditorToReact content={article.content ?? undefined} />
       </TabsContent>
     </Tabs>
+  );
+}
+
+function ArticleNotFound() {
+  return (
+    <div className="container h-full min-h-screen pt-8">
+      <Card>
+        <CardHeader>Novica ne obstaja</CardHeader>
+      </Card>
+    </div>
   );
 }

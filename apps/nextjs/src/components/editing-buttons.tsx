@@ -23,6 +23,7 @@ export default function EditingButtons({
 }) {
   const editable = useContext(EditableContext);
   const router = useRouter();
+  const trpc_utils = api.useUtils();
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: async (data) => {
@@ -40,6 +41,8 @@ export default function EditingButtons({
         year: returned_data.created_at.getFullYear().toString(),
       });
 
+      await trpc_utils.article.invalidate();
+
       router.push(`/uredi/${generate_encoded_url(returned_data)}`);
     },
   });
@@ -54,9 +57,18 @@ export default function EditingButtons({
           variant="ghost"
           size="icon"
           onClick={() => {
-            article_create_draft.mutate({
-              id: article.id,
-            });
+            if (!article.draft_content) {
+              article_create_draft.mutate({
+                id: article.id,
+              });
+            } else {
+              router.push(
+                `/uredi/${generate_encoded_url({
+                  id: article.id,
+                  url: article.url,
+                })}`,
+              );
+            }
           }}
         >
           <PencilIcon size={20} />

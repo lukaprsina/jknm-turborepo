@@ -330,10 +330,11 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
     await rename_images_in_editor(editorJS.current, new_article_url);
 
-    const new_preview_image = rename_image(
-      settings_store.get.preview_image() ?? "",
-      new_article_url,
-    );
+    const preview_image = settings_store.get.preview_image();
+
+    const new_preview_image = preview_image
+      ? rename_image(preview_image, new_article_url)
+      : undefined;
 
     editor_content = await editorJS.current.save();
     update_settings_from_editor(editor_content, new_title, new_url);

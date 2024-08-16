@@ -98,33 +98,21 @@ export const articleRouter = {
     .input(
       z.object({
         id: z.number(),
+        content: content_validator,
+        preview_image: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       if (!input.id) return;
 
-      const article = await ctx.db.query.Article.findFirst({
-        where: eq(Article.id, input.id),
-      });
-
-      if (!article?.id) return;
-
-      if (article.draft_content && article.draft_preview_image) {
-        // draft already exists, edit it
-        console.log("Draft already exists, edit it");
-        return [article];
-      } else {
-        // draft was deleted when the article was published
-        console.log("Draft was deleted when the article was published");
-        return ctx.db
-          .update(Article)
-          .set({
-            draft_content: article.content,
-            draft_preview_image: article.preview_image,
-          })
-          .where(eq(Article.id, input.id))
-          .returning();
-      }
+      return ctx.db
+        .update(Article)
+        .set({
+          draft_content: input.content,
+          draft_preview_image: input.preview_image,
+        })
+        .where(eq(Article.id, input.id))
+        .returning();
     }),
 
   save_draft: protectedProcedure
@@ -213,19 +201,5 @@ export const articleRouter = {
       .delete(Article)
       .where(eq(Article.id, input))
       .returning({ id: Article.id, url: Article.url });
-  }),
-
-  get_possible_years: publicProcedure.query(async ({ ctx }) => {
-    const years = await ctx.db.query.Article.findMany({
-      where: eq(Article.published, true),
-      columns: { created_at: true },
-    });
-
-    const uniqueYears = new Set<number>();
-    years.forEach((year) => {
-      uniqueYears.add(year.created_at.getFullYear());
-    });
-
-    return Array.from(uniqueYears);
   }),
 } satisfies TRPCRouterRecord;
