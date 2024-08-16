@@ -1,8 +1,9 @@
 "use client";
 
 import type { RenderFn } from "editorjs-blocks-react-renderer";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import DOMPurify from "isomorphic-dompurify";
@@ -71,22 +72,41 @@ export function EditorToReact({
 
 const allowed_blocks = ["paragraph", "list", "quote"];
 
-export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
+const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
 }) => {
+  // const image_data = gallery_store.use.images();
+  // const router = useRouter();
+
+  /* const priority = useMemo(
+    () => image_data.at(0)?.file.url == data.file.url,
+    [data.file.url, image_data],
+  ); */
+
+  const dimensions = useMemo(
+    () => data.file.width && data.file.height,
+    [data.file.height, data.file.width],
+  );
+
   return (
     <figure>
       <Image
         onClick={() => {
-          console.log("setting gallery image", data);
+          // router.push(`?image=${data.file.url}`);
           gallery_store.set.default_image(data);
         }}
-        className={cn("cursor-pointer", className)}
+        className={cn(
+          "cursor-pointer",
+          className,
+          !dimensions && "object-contain",
+        )}
         src={data.file.url}
         alt={data.caption}
-        width={data.file.width ?? 100}
-        height={data.file.height ?? 100}
+        width={dimensions ? data.file.width : 1500}
+        height={dimensions ? data.file.height : 1000}
+        priority={true}
+        // fill={!dimensions}
       />
       <figcaption>{HTMLReactParser(data.caption)}</figcaption>
     </figure>

@@ -8,6 +8,7 @@ import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
 import { ImageGallery } from "./image-gallery";
+import { SwiperGallery } from "./swiper-gallery";
 
 interface NovicaProps {
   params: {
@@ -29,7 +30,7 @@ export default async function NovicaPage({
       <Shell>
         <Card>
           <CardHeader>
-            <CardTitle>s obstaja</CardTitle>
+            <CardTitle>Novica ne obstaja</CardTitle>
           </CardHeader>
         </Card>
       </Shell>
@@ -113,28 +114,31 @@ async function TabbedContent({
   }
 
   return (
-    <Tabs
-      defaultValue={article.draft_content ? "draft" : "published"}
-      /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
-      className="prose dark:prose-invert container w-full pt-8"
-    >
-      <TabsList>
-        <TabsTrigger disabled={!article.draft_content} value="draft">
-          Osnutek
-        </TabsTrigger>
-        <TabsTrigger disabled={!article.content} value="published">
-          Objavljeno
-        </TabsTrigger>
-      </TabsList>
-      <TabsContent value="draft" className="py-6">
-        <EditorToReact draft article={article} />
-        <ImageGallery />
-      </TabsContent>
-      <TabsContent value="published" className="py-6">
-        <EditorToReact article={article} />
-        <ImageGallery />
-      </TabsContent>
-    </Tabs>
+    <>
+      {/* <SwiperGallery /> */}
+
+      <Tabs
+        defaultValue={article.draft_content ? "draft" : "published"}
+        /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
+        className="prose dark:prose-invert container w-full pt-8"
+      >
+        <TabsList>
+          <TabsTrigger disabled={!article.draft_content} value="draft">
+            Osnutek
+          </TabsTrigger>
+          <TabsTrigger disabled={!article.content} value="published">
+            Objavljeno
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="draft" className="py-6">
+          <EditorToReact draft article={article} />
+        </TabsContent>
+        <TabsContent value="published" className="py-6">
+          <EditorToReact article={article} />
+        </TabsContent>
+      </Tabs>
+      <ImageGallery />
+    </>
   );
 }
 
