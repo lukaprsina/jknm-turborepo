@@ -14,6 +14,7 @@ import {
 } from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 
+import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import { read_articles, sync_with_algolia } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
@@ -21,6 +22,7 @@ import { iterate_over_articles } from "./converter-spaghetti";
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
+  const article_update = api.article.create_article_with_date.useMutation();
   const [firstArticle, setFirstArticle] = useState(20); // 20 - 60
   const [lastArticle, setLastArticle] = useState(60);
 
@@ -56,6 +58,7 @@ export function ArticleConverter() {
             await iterate_over_articles(
               csv_articles,
               editorJS.current,
+              article_update,
               firstArticle,
               lastArticle,
             );

@@ -12,6 +12,9 @@ import { Article } from "@acme/db/schema";
 import type { ProblematicArticleType } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const JKNM_SERVED_DIR = "D:/JKNM/served";
+
 export interface CSVType {
   id: string;
   title: string;
