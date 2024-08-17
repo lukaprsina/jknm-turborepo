@@ -78,10 +78,12 @@ export function MyStats() {
   );
 }
 
-export function TimelineRefinement(props: UseRefinementListProps) {
-  const refinement_list = useRefinementList(props);
+export function TimelineRefinement(
+  props: Omit<UseRefinementListProps, "attribute">,
+) {
+  const refinement_list = useRefinementList({ attribute: "year", ...props });
   const clear_refinements = useClearRefinements({
-    includedAttributes: [props.attribute],
+    includedAttributes: ["year"],
   });
 
   const sorted_list = useMemo(() => {
@@ -91,7 +93,7 @@ export function TimelineRefinement(props: UseRefinementListProps) {
   }, [refinement_list]);
 
   return (
-    <ol className="items-center pb-8 pl-2 sm:flex">
+    <ol className="flex items-center justify-center pb-2 pl-1 sm:flex">
       {sorted_list.map((item) => (
         <TimelineItem
           onClick={() => {

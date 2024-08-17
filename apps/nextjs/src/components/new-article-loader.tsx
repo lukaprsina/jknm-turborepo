@@ -37,6 +37,7 @@ export default function NewArticleLoader({
         content: returned_data.content ?? undefined,
         created_at: returned_data.created_at,
         published: !!returned_data.published,
+        has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
       });
 

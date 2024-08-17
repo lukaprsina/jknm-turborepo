@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation";
 import { PencilIcon, PlusIcon } from "lucide-react";
 
 import type { Session } from "@acme/auth";
-import type { Article } from "@acme/db/schema";
+import type { Article, ArticleContentType } from "@acme/db/schema";
+import type { ButtonProps } from "@acme/ui/button";
 import { Button } from "@acme/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditableContext } from "~/components/editable-context";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
@@ -22,6 +24,45 @@ export default function EditingButtons({
   article?: typeof Article.$inferSelect;
 }) {
   const editable = useContext(EditableContext);
+
+  if (!session?.user) return null;
+
+  return (
+    <>
+      {article && editable == "readonly" ? (
+        <EditButton
+          id={article.id}
+          url={article.url}
+          preview_image={article.preview_image ?? undefined}
+          content={article.content ?? undefined}
+          has_draft={!!article.draft_content}
+        />
+      ) : null}
+      <NewArticleLoader
+        className="dark:bg-primary/80 dark:text-primary-foreground"
+        variant="ghost"
+        size="icon"
+        children={<PlusIcon size={24} />}
+      />
+    </>
+  );
+}
+
+export function EditButton({
+  id,
+  url,
+  preview_image,
+  content,
+  has_draft,
+  variant = "ghost",
+}: {
+  id: number;
+  url: string;
+  preview_image?: string;
+  content?: ArticleContentType;
+  has_draft?: boolean;
+  variant?: ButtonProps["variant"];
+}) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
 
@@ -38,6 +79,7 @@ export default function EditingButtons({
         content: returned_data.content ?? undefined,
         created_at: returned_data.created_at,
         published: !!returned_data.published,
+        has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
       });
 
@@ -47,25 +89,25 @@ export default function EditingButtons({
     },
   });
 
-  if (!session?.user) return null;
-
   return (
-    <>
-      {article && editable == "readonly" ? (
+    <Tooltip>
+      <TooltipTrigger asChild>
         <Button
           className="dark:bg-primary/80 dark:text-primary-foreground"
-          variant="ghost"
+          variant={variant}
           size="icon"
           onClick={() => {
-            if (!article.draft_content) {
+            if (has_draft) {
               article_create_draft.mutate({
-                id: article.id,
+                id,
+                preview_image: preview_image ?? "",
+                content: content ?? undefined,
               });
             } else {
               router.push(
                 `/uredi/${generate_encoded_url({
-                  id: article.id,
-                  url: article.url,
+                  id,
+                  url,
                 })}`,
               );
             }
@@ -73,13 +115,8 @@ export default function EditingButtons({
         >
           <PencilIcon size={20} />
         </Button>
-      ) : null}
-      <NewArticleLoader
-        className="dark:bg-primary/80 dark:text-primary-foreground"
-        variant="ghost"
-        size="icon"
-        children={<PlusIcon size={24} />}
-      />
-    </>
+      </TooltipTrigger>
+      <TooltipContent>Uredi</TooltipContent>
+    </Tooltip>
   );
 }

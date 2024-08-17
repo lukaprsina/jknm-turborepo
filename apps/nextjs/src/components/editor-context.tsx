@@ -54,6 +54,9 @@ export interface EditorContextType {
   setDirty: (value: boolean) => void;
   mutations: {
     save_draft: ReturnType<typeof api.article.save_draft.useMutation>["mutate"];
+    delete_draft: ReturnType<
+      typeof api.article.delete_draft.useMutation
+    >["mutate"];
     publish: ReturnType<typeof api.article.publish.useMutation>["mutate"];
     unpublish: ReturnType<typeof api.article.unpublish.useMutation>["mutate"];
     delete_by_id: ReturnType<typeof api.article.delete.useMutation>["mutate"];
@@ -87,11 +90,6 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     [article],
   );
 
-  // api: API, event: BlockMutationEvent | BlockMutationEvent[]
-  const onChange = useCallback(() => {
-    setDirty(true);
-  }, []);
-
   const update_settings_from_editor = useCallback(
     (editor_content: OutputData, title?: string, url?: string) => {
       if (!editorJS.current || !article) return;
@@ -124,6 +122,11 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   );
 
   const editor_factory = useCallback(() => {
+    // api: API, event: BlockMutationEvent | BlockMutationEvent[]
+    const onChange = () => {
+      setDirty(true);
+    };
+
     const temp_editor = new EditorJS({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS(),
@@ -174,7 +177,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     });
 
     return temp_editor;
-  }, [content, article, update_settings_from_editor, onChange]);
+  }, [content, article, update_settings_from_editor]);
 
   const save_draft = api.article.save_draft.useMutation({
     onMutate: () => {
@@ -195,6 +198,30 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     },
   });
 
+  const delete_draft = api.article.delete_draft.useMutation({
+    onMutate: () => {
+      if (!article?.id) {
+        console.error("Article ID is missing.");
+        return;
+      }
+
+      setSavingText("Brišem osnutek ...");
+    },
+    onSuccess: (data) => {
+      const returned_data = data?.at(0);
+      if (!editorJS.current || !returned_data || !article) return;
+
+      setSavingText(undefined);
+
+      router.push(
+        `/novica/${generate_encoded_url({
+          id: returned_data.id,
+          url: returned_data.url,
+        })}`,
+      );
+    },
+  });
+
   const publish = api.article.publish.useMutation({
     onMutate: () => {
       if (!article?.id) {
@@ -211,19 +238,18 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       await update_algolia_article({
         objectID: returned_data.id.toString(),
-        published: true,
         title: returned_data.title,
         url: returned_data.url,
         created_at: returned_data.created_at,
         year: returned_data.created_at.getFullYear().toString(),
         content: returned_data.content ?? undefined,
+        published: true,
+        has_draft: !!returned_data.draft_content,
         image: returned_data.preview_image ?? undefined,
       });
 
       setSavingText(undefined);
 
-      // const old_article_url = generate_encoded_url(article);
-      // const new_article_url = generate_encoded_url(returned_data);
       const old_article_url = `${get_clean_url(article.url)}-${article.id}`;
       const new_article_url = `${get_clean_url(returned_data.url)}-${returned_data.id}`;
 
@@ -273,6 +299,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       await update_algolia_article({
         objectID: returned_data.id.toString(),
         published: false,
+        has_draft: true,
       });
     },
   });
@@ -355,6 +382,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         update_settings_from_editor,
         mutations: {
           save_draft: save_draft.mutate,
+          delete_draft: delete_draft.mutate,
           publish: publish.mutate,
           unpublish: unpublish.mutate,
           delete_by_id: delete_by_id.mutate,

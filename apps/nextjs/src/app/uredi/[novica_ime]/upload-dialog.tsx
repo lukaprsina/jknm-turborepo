@@ -45,9 +45,7 @@ export function UploadDialog() {
           </Button>
           {/* </AlertDialogTrigger> */}
         </TooltipTrigger>
-        <TooltipContent>
-          <p>Shrani in objavi</p>
-        </TooltipContent>
+        <TooltipContent>Shrani in objavi</TooltipContent>
       </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>

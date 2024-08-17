@@ -136,9 +136,7 @@ function SaveButton() {
             <SaveIcon />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>Shrani</p>
-        </TooltipContent>
+        <TooltipContent>Shrani</TooltipContent>
       </Tooltip>
     </div>
   );
@@ -159,9 +157,7 @@ function ClearButton() {
             </Button>
           </AlertDialogTrigger>
         </TooltipTrigger>
-        <TooltipContent>
-          <p>Ponastavi osnutek</p>
-        </TooltipContent>
+        <TooltipContent>Ponastavi osnutek</TooltipContent>
       </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -173,17 +169,13 @@ function ClearButton() {
         </AlertDialogDescription>
         <AlertDialogFooter>
           <AlertDialogAction
-            onClick={async () => {
-              const content = editor.article?.content;
-              if (!content) {
-                throw new Error("Article content is missing.");
+            onClick={() => {
+              if (!editor.article?.id) {
+                console.error("Article ID is missing.");
+                return;
               }
 
-              await editor.editor?.render(content);
-              editor_store.set.preview_image(
-                // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-                editor.article?.preview_image || "",
-              );
+              editor.mutations.delete_draft({ id: editor.article.id });
             }}
           >
             Ponastavi osnutek

@@ -22,6 +22,7 @@ export const article_hit_validator = z.object({
   content: content_validator,
   image: z.string().optional(),
   published: z.boolean(),
+  has_draft: z.boolean(),
   year: z.string(),
 });
 

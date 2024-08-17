@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 
 import type { Article } from "@acme/db/schema";
@@ -12,8 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@acme/ui/card";
+import { Input } from "@acme/ui/input";
 
-import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import { read_articles, sync_with_algolia } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
@@ -21,44 +21,50 @@ import { iterate_over_articles } from "./converter-spaghetti";
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
 
-  const article_update = api.article.create_article_with_date.useMutation();
-  const first_article = 20;
-  const last_article = 60;
+  const [firstArticle, setFirstArticle] = useState(20); // 20 - 60
+  const [lastArticle, setLastArticle] = useState(60);
 
   return (
     <div className="prose container mx-auto py-8">
       <h1>Article Converter</h1>
-      <p>This is a tool to convert articles from one format to another.</p>
-      <Button
-        onClick={async () => {
-          await read_articles();
-          console.clear();
-          const csv_articles = await read_articles();
+      <div className="flex w-full gap-4">
+        <Button
+          onClick={async () => {
+            await sync_with_algolia();
+          }}
+        >
+          Sync with Algolia
+        </Button>
+        <div className="flex flex-shrink gap-2">
+          <Input
+            type="number"
+            value={firstArticle}
+            onChange={(event) => setFirstArticle(parseInt(event.target.value))}
+          />
+          <Input
+            type="number"
+            value={lastArticle}
+            onChange={(event) => setLastArticle(parseInt(event.target.value))}
+          />
+        </div>
+        <Button
+          onClick={async () => {
+            await read_articles();
+            console.clear();
+            const csv_articles = await read_articles();
 
-          await iterate_over_articles(
-            csv_articles,
-            editorJS.current,
-            article_update,
-            first_article,
-            last_article,
-          );
-        }}
-      >
-        Convert
-      </Button>
-      <Button
-        onClick={async () => {
-          await sync_with_algolia();
-        }}
-      >
-        Sync with Algolia
-      </Button>
+            await iterate_over_articles(
+              csv_articles,
+              editorJS.current,
+              firstArticle,
+              lastArticle,
+            );
+          }}
+        >
+          Convert
+        </Button>
+      </div>
       <TempEditor editorJS={editorJS} />
-      {/* <>
-        {article_all.data?.map((article) => (
-          <SampleArticle key={article.id} article={article} />
-        ))}
-      </> */}
     </div>
   );
 }

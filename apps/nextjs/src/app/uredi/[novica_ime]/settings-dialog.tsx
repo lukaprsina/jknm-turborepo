@@ -46,7 +46,7 @@ export function SettingsDialog() {
           </DialogTrigger>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Nastvitve novičke</p>
+        Nastvitve novičke
         </TooltipContent>
       </Tooltip>
       <DialogContent className="sm:max-w-[425px]">

@@ -188,9 +188,8 @@ export const articleRouter = {
       return ctx.db
         .update(Article)
         .set({
-          content: null,
-          preview_image: null,
-          published: false,
+          draft_content: null,
+          draft_preview_image: null,
         })
         .where(eq(Article.id, input.id))
         .returning({ id: Article.id, url: Article.url });
