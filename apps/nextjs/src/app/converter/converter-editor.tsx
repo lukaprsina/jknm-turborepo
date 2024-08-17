@@ -16,11 +16,25 @@ import { Input } from "@acme/ui/input";
 
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
-import { read_articles, sync_with_algolia } from "./converter-server";
+import {
+  get_article_count,
+  read_articles,
+  sync_with_algolia,
+} from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
+  const [article_count, setArticleCount] = useState<number | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    void (async () => {
+      const article_count = await get_article_count();
+      setArticleCount(article_count);
+    })();
+  }, []);
 
   const article_update = api.article.create_article_with_date.useMutation();
   const [firstArticle, setFirstArticle] = useState(20); // 20 - 60
@@ -28,7 +42,7 @@ export function ArticleConverter() {
 
   return (
     <div className="prose container mx-auto py-8">
-      <h1>Article Converter</h1>
+      <h1>Article Converter: {article_count} novičk</h1>
       <div className="flex w-full gap-4">
         <Button
           onClick={async () => {

@@ -1,9 +1,8 @@
 "use client";
 
 import type { RenderFn } from "editorjs-blocks-react-renderer";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import DOMPurify from "isomorphic-dompurify";
@@ -114,29 +113,31 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
 };
 
 export function EditorToText({ content }: { content?: ArticleContentType }) {
-  const filtered_text = useMemo(() => {
-    if (!content) return undefined;
-
-    const blocks = content.blocks.filter((block) =>
-      allowed_blocks.includes(block.type),
-    );
-
-    const sanitized_text = blocks
-      .map((block) => {
-        if (block.type !== "paragraph") return undefined;
-        const paragraph_data = block.data as { text: string };
-
-        const clean = DOMPurify.sanitize(paragraph_data.text, {
-          ALLOWED_TAGS: [],
-        });
-
-        return clean;
-      })
-      .filter((text) => typeof text !== "undefined")
-      .join("\n");
-
-    return sanitized_text;
-  }, [content]);
+  const filtered_text = useMemo(() => content_to_text(content), [content]);
 
   return <>{filtered_text}</>;
+}
+
+export function content_to_text(content?: ArticleContentType) {
+  if (!content) return undefined;
+
+  const blocks = content.blocks.filter((block) =>
+    allowed_blocks.includes(block.type),
+  );
+
+  const sanitized_text = blocks
+    .map((block) => {
+      if (block.type !== "paragraph") return undefined;
+      const paragraph_data = block.data as { text: string };
+
+      const clean = DOMPurify.sanitize(paragraph_data.text, {
+        ALLOWED_TAGS: [],
+      });
+
+      return clean;
+    })
+    .filter((text) => typeof text !== "undefined")
+    .join("\n");
+
+  return sanitized_text;
 }

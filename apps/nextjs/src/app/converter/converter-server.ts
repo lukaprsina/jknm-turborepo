@@ -4,12 +4,14 @@ import fs from "node:fs";
 import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import { parse as csv_parse } from "csv-parse";
+import { count } from "drizzle-orm";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
 import type { ProblematicArticleType } from "./converter-spaghetti";
+import { content_to_text } from "~/components/editor-to-react";
 import { algolia_protected } from "~/lib/algolia-protected";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -70,7 +72,7 @@ export async function sync_with_algolia() {
     url: article.url,
     created_at: article.created_at,
     image: article.preview_image ?? undefined,
-    content: article.content ?? undefined,
+    content_preview: content_to_text(article.content ?? undefined),
     published: true,
     has_draft: false,
     year: article.created_at.getFullYear().toString(),
@@ -101,4 +103,9 @@ export async function get_problematic_html(
 ) {
   const dir = `./pt-novicke/${problematic_dir}`;
   return fs_promises.readFile(`${dir}/${id}.html`, "utf-8");
+}
+
+export async function get_article_count() {
+  const article_count = await db.select({ count: count() }).from(Article);
+  return article_count.at(0)?.count;
 }
