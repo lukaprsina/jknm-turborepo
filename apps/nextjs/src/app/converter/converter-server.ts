@@ -151,7 +151,7 @@ export async function upload_images() {
   let serial_id = 1;
 
   // 625
-  for (let objave_id = 1; objave_id <= 13; objave_id++) {
+  for (let objave_id = 1; objave_id <= 630; objave_id++) {
     const filePath = `${images_dir}/${objave_id}.json`;
     if (!fs.existsSync(filePath)) {
       console.error("Folder with id doesn't exist", filePath);
@@ -175,10 +175,12 @@ export async function upload_images() {
 
         // TODO: server to server fetch
         // return upload_from_path(old_path, s3_dir);
-        await fs_promises.stat(old_path).catch((error) => {
-          console.error("File doesn't exist", old_path);
-          throw error;
-        });
+        try {
+          await fs_promises.stat(old_path);
+        } catch (error) {
+          console.error("DANGER: MISSING FILE", old_path, error);
+          return;
+        }
 
         const new_dir = `${all_dir}/${s3_dir}`;
         await fs_promises.mkdir(new_dir, { recursive: true });
