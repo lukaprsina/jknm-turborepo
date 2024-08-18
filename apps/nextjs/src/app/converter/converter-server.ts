@@ -4,14 +4,18 @@ import fs from "node:fs";
 import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import { parse as csv_parse } from "csv-parse";
-import { count } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
+import { serial } from "drizzle-orm/pg-core";
 import mime from "mime/lite";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
-import type { ProblematicArticleType } from "./converter-spaghetti";
+import type {
+  ImageToSave,
+  ProblematicArticleType,
+} from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
 import { upload_image_by_file } from "../uredi/[novica_ime]/upload-file";
@@ -25,7 +29,9 @@ export interface CSVType {
 }
 
 export async function read_articles() {
-  await db.delete(Article);
+  /* await db.delete(Article);
+  db.insert(Article).values({}); */
+  await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
 
   const csv_articles: CSVType[] = [];
 
@@ -116,9 +122,81 @@ export async function get_article_count() {
   return article_count.at(0)?.count;
 }
 
-const JKNM_SERVED_DIR = "D:/JKNM/served/media/img/novice";
+export async function save_images(images: ImageToSave[]) {
+  const dir = `./pt-images`;
+  await fs_promises.mkdir(dir, { recursive: true });
 
-export async function upload_images_to_s3() {
+  const promises = images.map(async (image) => {
+    return fs_promises.writeFile(
+      `${dir}/${image.id}.json`,
+      JSON.stringify(image),
+    );
+  });
+  // fs_promises.writeFile(`${dir}/${id}.json`, JSON.stringify(images));
+  await Promise.all(promises);
+}
+
+export async function upload_images() {
+  const dir = `./pt-images`;
+  /* {
+    serial_id: number;
+    objave_id: number;
+    json: ImageToSave;
+  } */
+  const promises: Promise<void>[] = [];
+
+  let serial_id = 1;
+
+  // 625
+  for (let objave_id = 1; objave_id <= 13; objave_id++) {
+    const filePath = `${dir}/${objave_id}.json`;
+    if (!fs.existsSync(filePath)) {
+      console.error("File doesn't exist", filePath);
+      continue;
+    }
+
+    const callback = async () => {
+      const file = await fs_promises.readFile(filePath, "utf-8");
+      const json = JSON.parse(file) as ImageToSave;
+      const test = serial_id;
+      serial_id++;
+
+      const s3_dir = `${json.url}-${test}`;
+      const nested_promises = json.images.map(async (image) => {
+        const old_path = `${JKNM_SERVED_DIR}/${decodeURIComponent(image)}`;
+        // TODO: server to server fetch
+        return upload_from_path(old_path, s3_dir);
+      });
+
+      await Promise.all(nested_promises);
+    };
+
+    promises.push(callback());
+  }
+
+  await Promise.all(promises);
+}
+
+/* for (const image of json.images) {
+        const old_path = `${JKNM_SERVED_DIR}/${decodeURIComponent(image)}`
+        upload_from_path(old_path, s3_dir);
+
+        const old_path_parts = old_path.split("/");
+        const old_file_name = old_path_parts.pop();
+        if (!old_file_name) {
+          throw new Error("Old file name doesn't exist: " + old_path);
+        }
+
+
+        const file = new File([old_file_name], image.name, {
+          type: image.mime,
+        });
+
+        await upload_image_by_file(file, s3_dir);
+      } */
+
+const JKNM_SERVED_DIR = "D:/JKNM/served";
+/* export async function upload_images_to_s3() {
   const articles = await db.query.Article.findMany({
     limit: 10,
     orderBy: (a, { asc }) => [asc(a.id)],
@@ -126,7 +204,6 @@ export async function upload_images_to_s3() {
 
   const promises = articles.map(async (article) => {
     if (!article.preview_image) {
-      console.log(article);
       console.error("No preview image for article", article.id);
       return;
     }
@@ -144,7 +221,7 @@ export async function upload_images_to_s3() {
   });
 
   await Promise.all(promises);
-}
+} */
 
 async function upload_from_path(path: string, article_url: string) {
   const buffer = await fs_promises.readFile(path);
@@ -158,5 +235,11 @@ async function upload_from_path(path: string, article_url: string) {
   }
 
   const file = new File([buffer], file_name, { type: file_mime });
+  console.log("Uploading image", {
+    article_url,
+    file_name,
+    file_mime,
+  });
+
   await upload_image_by_file(file, article_url);
 }

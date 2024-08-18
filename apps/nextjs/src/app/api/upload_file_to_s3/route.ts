@@ -22,6 +22,7 @@ export interface FileUploadJSON {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("upload_file_to_s3", request.url);
   const form_data = await request.formData();
 
   const directory = form_data.get("directory");

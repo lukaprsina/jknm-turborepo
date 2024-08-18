@@ -12,6 +12,7 @@ import {
   get_article_count,
   read_articles,
   sync_with_algolia,
+  upload_images,
   upload_images_to_s3,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
@@ -46,7 +47,7 @@ export function ArticleConverter() {
         </Button>
         <Button
           onClick={async () => {
-            await upload_images_to_s3();
+            await upload_images();
           }}
         >
           Upload images to s3
@@ -65,7 +66,6 @@ export function ArticleConverter() {
         </div>
         <Button
           onClick={async () => {
-            await read_articles();
             console.clear();
             const csv_articles = await read_articles();
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type EditorJS from "@editorjs/editorjs";
@@ -19,10 +18,7 @@ import {
   get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
-import {
-  get_problematic_html,
-  write_article_html_to_file,
-} from "./converter-server";
+import { get_problematic_html, save_images } from "./converter-server";
 
 export interface ProblematicArticleType {
   csv: CSVType;
@@ -36,6 +32,14 @@ let wrong_divs = 0;
 let videos = 0;
 const problematic_articles: ProblematicArticleType[] = [];
 
+export interface ImageToSave {
+  id: string;
+  url: string;
+  images: string[];
+}
+
+const images_to_save: ImageToSave[] = [];
+
 export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
@@ -46,16 +50,20 @@ export async function iterate_over_articles(
   wrong_divs = 0;
   videos = 0;
   problematic_articles.length = 0;
+  // images_to_save.length = 0;
 
   const do_splice = false as boolean;
 
   const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
     : csv_articles;
+
   for (const csv_article of spliced_csv_articles) {
     await parse_csv_article(csv_article, editorJS, article_create);
   }
 
+  await save_images(images_to_save);
+  // await write_article_html_to_file(problematic_articles);
   console.log("Total articles:", csv_articles.length);
   console.log({ wrong_divs, videos });
   console.log(
@@ -63,8 +71,6 @@ export async function iterate_over_articles(
     problematic_articles.map((a) => `${a.csv.id}-${a.csv.title}`),
     problematic_articles.map((a) => a.csv.id),
   );
-
-  // await write_article_html_to_file(problematic_articles);
 }
 
 const AWS_PREFIX =
@@ -97,6 +103,23 @@ async function parse_csv_article(
       data: { text: csv_article.title, level: 1 },
     },
   ];
+
+  const image_urls: string[] = [];
+
+  for (const image of root.querySelectorAll("img")) {
+    const src = image.getAttribute("src");
+    if (!src) throw new Error("No src attribute in image");
+
+    image_urls.push(src);
+  }
+
+  images_to_save.push({
+    id: csv_article.id,
+    url: csv_url,
+    images: image_urls,
+  });
+
+  return;
 
   for (const node of root.childNodes) {
     if (node.nodeType == NodeType.ELEMENT_NODE) {
@@ -143,16 +166,18 @@ async function parse_csv_article(
       updated_at,
     ); */
 
-  article_create.mutate({
-    title: csv_article.title,
-    preview_image,
-    content,
-    draft_content: null,
-    url: csv_url,
-    created_at,
-    updated_at,
-    published: true,
-  });
+  if (false as boolean) {
+    article_create.mutate({
+      title: csv_article.title,
+      preview_image,
+      content,
+      draft_content: null,
+      url: csv_url,
+      created_at,
+      updated_at,
+      published: true,
+    });
+  }
 }
 
 function parse_node(
