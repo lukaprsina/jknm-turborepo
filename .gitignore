@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 apps/nextjs/pt-novicke
 apps/nextjs/pt-images
+apps/nextjs/pt-all
 
 # dependencies
 node_modules

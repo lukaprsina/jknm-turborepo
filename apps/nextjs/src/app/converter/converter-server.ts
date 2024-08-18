@@ -137,21 +137,24 @@ export async function save_images(images: ImageToSave[]) {
 }
 
 export async function upload_images() {
-  const dir = `./pt-images`;
+  const images_dir = `./pt-images`;
+  const all_dir = `./pt-all`;
   /* {
     serial_id: number;
     objave_id: number;
     json: ImageToSave;
   } */
   const promises: Promise<void>[] = [];
+  await fs_promises.mkdir(images_dir, { recursive: true });
+  await fs_promises.mkdir(all_dir, { recursive: true });
 
   let serial_id = 1;
 
   // 625
   for (let objave_id = 1; objave_id <= 13; objave_id++) {
-    const filePath = `${dir}/${objave_id}.json`;
+    const filePath = `${images_dir}/${objave_id}.json`;
     if (!fs.existsSync(filePath)) {
-      console.error("File doesn't exist", filePath);
+      console.error("Folder with id doesn't exist", filePath);
       continue;
     }
 
@@ -164,17 +167,42 @@ export async function upload_images() {
       const s3_dir = `${json.url}-${test}`;
       const nested_promises = json.images.map(async (image) => {
         const old_path = `${JKNM_SERVED_DIR}/${decodeURIComponent(image)}`;
+        const old_path_parts = old_path.split("/");
+        const old_file_name = old_path_parts.pop();
+        if (!old_file_name) {
+          throw new Error("Old file name doesn't exist: " + old_path);
+        }
+
         // TODO: server to server fetch
-        return upload_from_path(old_path, s3_dir);
+        // return upload_from_path(old_path, s3_dir);
+        await fs_promises.stat(old_path).catch((error) => {
+          console.error("File doesn't exist", old_path);
+          throw error;
+        });
+
+        const new_dir = `${all_dir}/${s3_dir}`;
+        await fs_promises.mkdir(new_dir, { recursive: true });
+
+        const new_path = `${new_dir}/${old_file_name}`;
+        // console.log("Copying file", old_path, new_path);
+        return fs_promises.copyFile(old_path, new_path);
+
+        /* return {
+          old_path,
+          new_path: `${s3_dir}/${old_file_name}`,
+        }; */
       });
 
       await Promise.all(nested_promises);
+      /* const file_info =  */
+      // console.log(file_info);
     };
 
     promises.push(callback());
   }
 
   await Promise.all(promises);
+  console.log("Done");
 }
 
 /* for (const image of json.images) {
