@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
-import type { Article, ArticleContentType } from "@acme/db/schema";
+import type { Article } from "@acme/db/schema";
 import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
@@ -14,8 +14,8 @@ import { Badge } from "@acme/ui/badge";
 import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
+import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
-import { EditorToText } from "./editor-to-react";
 
 export function ArticleDrizzleCard({
   article,
@@ -33,7 +33,9 @@ export function ArticleDrizzleCard({
       preview_image={
         article.draft_preview_image ?? article.preview_image ?? undefined
       }
-      content={article.draft_content ?? article.content ?? undefined}
+      content_preview={content_to_text(
+        article.draft_content ?? article.content ?? undefined,
+      )}
       created_at={article.created_at}
     />
   );
@@ -68,7 +70,7 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
       url={generate_encoded_url({ id: parseInt(hit.objectID), url: hit.url })}
       published
       preview_image={hit.image ?? undefined}
-      content={hit.content ?? undefined}
+      content_preview={hit.content_preview}
       created_at={new Date(hit.created_at)}
     />
   );
@@ -80,7 +82,7 @@ export function ArticleCard({
   url,
   published,
   preview_image,
-  content,
+  content_preview,
   created_at,
 }: {
   featured?: boolean;
@@ -88,7 +90,7 @@ export function ArticleCard({
   url: string;
   published: boolean;
   preview_image?: string;
-  content?: ArticleContentType;
+  content_preview?: string;
   created_at: Date;
 }) {
   const theme = useTheme();
@@ -145,7 +147,7 @@ export function ArticleCard({
                   !preview_image && "line-clamp-4",
                 )}
               >
-                <EditorToText content={content} />
+                {content_preview}
               </p>
             </div>
           </CardContent>

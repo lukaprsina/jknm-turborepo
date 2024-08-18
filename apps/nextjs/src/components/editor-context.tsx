@@ -2,16 +2,7 @@
 
 import type { OutputData } from "@editorjs/editorjs";
 import type { ReactNode } from "react";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 // @ts-expect-error no types
@@ -19,25 +10,24 @@ import DragDrop from "editorjs-drag-drop";
 // @ts-expect-error no types
 import Undo from "editorjs-undo";
 
+
+
 import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
+
+
 import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
 import { editor_store } from "~/app/uredi/[novica_ime]/editor-store";
-import {
-  get_clean_url,
-  get_heading_from_editor,
-  get_image_data_from_editor,
-} from "~/app/uredi/[novica_ime]/editor-utils";
+import { get_clean_url, get_heading_from_editor, get_image_data_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
+import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
-import {
-  delete_algolia_article,
-  update_algolia_article,
-} from "~/server/algolia";
+import { delete_algolia_article, update_algolia_article } from "~/server/algolia";
 import { clean_directory } from "~/server/image-s3";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
+
 
 export interface EditorContextType {
   editor?: EditorJS;
@@ -236,13 +226,18 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!editorJS.current || !returned_data || !article) return;
       console.warn("published", returned_data);
 
+      const content_preview = content_to_text(
+        returned_data.content ?? undefined,
+      );
+      if (!content_preview) return;
+
       await update_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
         url: returned_data.url,
         created_at: returned_data.created_at,
         year: returned_data.created_at.getFullYear().toString(),
-        content: returned_data.content ?? undefined,
+        content_preview,
         published: true,
         has_draft: !!returned_data.draft_content,
         image: returned_data.preview_image ?? undefined,

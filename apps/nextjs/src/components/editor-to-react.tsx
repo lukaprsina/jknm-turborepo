@@ -5,9 +5,8 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
-import DOMPurify from "isomorphic-dompurify";
 
-import type { Article, ArticleContentType } from "@acme/db/schema";
+import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
@@ -69,8 +68,6 @@ export function EditorToReact({
   );
 }
 
-const allowed_blocks = ["paragraph", "list", "quote"];
-
 const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
@@ -111,33 +108,3 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
     </figure>
   );
 };
-
-export function EditorToText({ content }: { content?: ArticleContentType }) {
-  const filtered_text = useMemo(() => content_to_text(content), [content]);
-
-  return <>{filtered_text}</>;
-}
-
-export function content_to_text(content?: ArticleContentType) {
-  if (!content) return undefined;
-
-  const blocks = content.blocks.filter((block) =>
-    allowed_blocks.includes(block.type),
-  );
-
-  const sanitized_text = blocks
-    .map((block) => {
-      if (block.type !== "paragraph") return undefined;
-      const paragraph_data = block.data as { text: string };
-
-      const clean = DOMPurify.sanitize(paragraph_data.text, {
-        ALLOWED_TAGS: [],
-      });
-
-      return clean;
-    })
-    .filter((text) => typeof text !== "undefined")
-    .join("\n");
-
-  return sanitized_text;
-}

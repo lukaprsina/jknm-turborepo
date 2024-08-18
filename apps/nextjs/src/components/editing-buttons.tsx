@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { PencilIcon, PlusIcon } from "lucide-react";
 
 import type { Session } from "@acme/auth";
-import type { Article, ArticleContentType } from "@acme/db/schema";
+import type { Article } from "@acme/db/schema";
 import type { ButtonProps } from "@acme/ui/button";
 import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditableContext } from "~/components/editable-context";
+import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
@@ -34,7 +35,7 @@ export default function EditingButtons({
           id={article.id}
           url={article.url}
           preview_image={article.preview_image ?? undefined}
-          content={article.content ?? undefined}
+          content_preview={content_to_text(article.content ?? undefined)}
           has_draft={!!article.draft_content}
         />
       ) : null}
@@ -52,19 +53,23 @@ export function EditButton({
   id,
   url,
   preview_image,
-  content,
+  content_preview,
   has_draft,
   variant = "ghost",
 }: {
   id: number;
   url: string;
   preview_image?: string;
-  content?: ArticleContentType;
+  content_preview?: string;
   has_draft?: boolean;
   variant?: ButtonProps["variant"];
 }) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
+
+  const article_by_id = api.article.by_id.useQuery({
+    id,
+  });
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: async (data) => {
@@ -72,11 +77,13 @@ export function EditButton({
       if (!returned_data) return;
 
       console.log("editing buttons", returned_data);
+      if (!content_preview) return;
+
       await create_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
         url: returned_data.url,
-        content: returned_data.content ?? undefined,
+        content_preview,
         created_at: returned_data.created_at,
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
@@ -97,19 +104,22 @@ export function EditButton({
           variant={variant}
           size="icon"
           onClick={() => {
+            console.log({ has_draft });
             if (has_draft) {
-              article_create_draft.mutate({
-                id,
-                preview_image: preview_image ?? "",
-                content: content ?? undefined,
-              });
-            } else {
               router.push(
                 `/uredi/${generate_encoded_url({
                   id,
                   url,
                 })}`,
               );
+            } else {
+              if (!article_by_id.data?.content) return;
+
+              article_create_draft.mutate({
+                id,
+                preview_image: preview_image ?? "",
+                content: article_by_id.data.content,
+              });
             }
           }}
         >

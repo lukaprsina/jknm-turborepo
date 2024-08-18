@@ -32,6 +32,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditButton } from "~/components/editing-buttons";
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { delete_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
 import { MyStats } from "./search-components";
@@ -82,7 +83,14 @@ function ArticleTableRow({
       <TableCell>{hit.objectID}</TableCell>
       <TableCell className="font-medium">
         <Button variant="link" asChild>
-          <Link href={`/novica/${hit.url}`}>{hit.title}</Link>
+          <Link
+            href={`/novica/${generate_encoded_url({
+              id: parseInt(hit.objectID),
+              url: hit.url,
+            })}`}
+          >
+            {hit.title}
+          </Link>
         </Button>
       </TableCell>
       <TableCell>{hit.url}</TableCell>
@@ -92,7 +100,7 @@ function ArticleTableRow({
             id={parseInt(hit.objectID)}
             url={hit.url}
             preview_image={hit.image}
-            content={hit.content}
+            content_preview={hit.content_preview}
             has_draft={hit.has_draft}
             variant="outline"
           />

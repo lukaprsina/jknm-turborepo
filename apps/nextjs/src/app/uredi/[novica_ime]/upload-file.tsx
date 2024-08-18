@@ -7,9 +7,12 @@ import { editor_store } from "./editor-store";
 
 export async function upload_image_by_file(
   file: File,
+  novica_url?: string,
   // toast: ReturnType<typeof useToast>,
 ): Promise<FileUploadResponse> {
-  const novica_url = `${editor_store.get.url()}-${editor_store.get.id()}`;
+  novica_url = novica_url
+    ? novica_url
+    : `${editor_store.get.url()}-${editor_store.get.id()}`;
   /* const novica_url = generate_encoded_url({
     url: settings_store.get.url(),
     id: settings_store.get.id(),

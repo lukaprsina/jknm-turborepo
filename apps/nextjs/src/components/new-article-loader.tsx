@@ -1,20 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+
+
 
 import type { ButtonProps } from "@acme/ui/button";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@acme/ui/card";
 
+
+
+import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
+
 
 export default function NewArticleLoader({
   title,
@@ -30,11 +32,16 @@ export default function NewArticleLoader({
       if (!returned_data) return;
 
       console.log("new article loader", returned_data);
+      const content_preview = content_to_text(
+        returned_data.content ?? undefined,
+      );
+      if (!content_preview) return;
+
       await create_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
         url: returned_data.url,
-        content: returned_data.content ?? undefined,
+        content_preview,
         created_at: returned_data.created_at,
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,

@@ -3,15 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 
-import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
 import { Input } from "@acme/ui/input";
 
 import { api } from "~/trpc/react";
@@ -20,6 +12,7 @@ import {
   get_article_count,
   read_articles,
   sync_with_algolia,
+  upload_images_to_s3,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
 
@@ -50,6 +43,13 @@ export function ArticleConverter() {
           }}
         >
           Sync with Algolia
+        </Button>
+        <Button
+          onClick={async () => {
+            await upload_images_to_s3();
+          }}
+        >
+          Upload images to s3
         </Button>
         <div className="flex flex-shrink gap-2">
           <Input
@@ -110,34 +110,4 @@ export function TempEditor({
   }, [editor_factory, editorJS]);
 
   return <div id="editorjs" />;
-}
-
-export function SampleArticle({
-  article,
-}: {
-  article: typeof Article.$inferSelect;
-}) {
-  return (
-    <Card className="py-6" key={article.title}>
-      <CardHeader>
-        <CardTitle>{article.title}</CardTitle>
-        <CardDescription>
-          <p>Created at {article.created_at.toISOString()}</p>
-          <p>Updated at {article.updated_at?.toISOString()}</p>
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent>
-        {/* {dompurify.sanitize(
-          article.content_html ??
-            "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        )}
-        <divs
-              dangerouslySetInnerHTML={{
-                __html: article.content_html ?? "<h1>Ne obstaja</h1>",
-              }}
-            /> */}
-      </CardContent>
-    </Card>
-  );
 }
