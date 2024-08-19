@@ -13,7 +13,6 @@ import {
   read_articles,
   sync_with_algolia,
   upload_images,
-  upload_images_to_s3,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
 
@@ -31,8 +30,8 @@ export function ArticleConverter() {
   }, []);
 
   const article_update = api.article.create_article_with_date.useMutation();
-  const [firstArticle, setFirstArticle] = useState(20); // 20 - 60
-  const [lastArticle, setLastArticle] = useState(60);
+  const [firstArticle, setFirstArticle] = useState(0); // 20 - 60
+  const [lastArticle, setLastArticle] = useState(15);
 
   return (
     <div className="prose container mx-auto py-8">
@@ -50,7 +49,7 @@ export function ArticleConverter() {
             await upload_images();
           }}
         >
-          Upload images to s3
+          Copy images to S3
         </Button>
         <div className="flex flex-shrink gap-2">
           <Input

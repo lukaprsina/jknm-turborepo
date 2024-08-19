@@ -5,7 +5,6 @@ import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import { parse as csv_parse } from "csv-parse";
 import { count, sql } from "drizzle-orm";
-import { serial } from "drizzle-orm/pg-core";
 import mime from "mime/lite";
 
 import type { ArticleHit } from "@acme/validators";
@@ -60,7 +59,9 @@ export async function read_articles() {
 
 // sync just the published articles
 export async function sync_with_algolia() {
-  const articles = await db.query.Article.findMany({});
+  const articles = await db.query.Article.findMany({
+    // limit: 10,
+  });
   const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");
 
@@ -128,7 +129,7 @@ export async function save_images(images: ImageToSave[]) {
 
   const promises = images.map(async (image) => {
     return fs_promises.writeFile(
-      `${dir}/${image.id}.json`,
+      `${dir}/${image.objave_id}.json`,
       JSON.stringify(image),
     );
   });
@@ -148,8 +149,6 @@ export async function upload_images() {
   await fs_promises.mkdir(images_dir, { recursive: true });
   await fs_promises.mkdir(all_dir, { recursive: true });
 
-  let serial_id = 1;
-
   // 625
   for (let objave_id = 1; objave_id <= 630; objave_id++) {
     const filePath = `${images_dir}/${objave_id}.json`;
@@ -161,10 +160,8 @@ export async function upload_images() {
     const callback = async () => {
       const file = await fs_promises.readFile(filePath, "utf-8");
       const json = JSON.parse(file) as ImageToSave;
-      const test = serial_id;
-      serial_id++;
 
-      const s3_dir = `${json.url}-${test}`;
+      const s3_dir = `${json.url}-${json.serial_id}`;
       const nested_promises = json.images.map(async (image) => {
         const old_path = `${JKNM_SERVED_DIR}/${decodeURIComponent(image)}`;
         const old_path_parts = old_path.split("/");
@@ -186,6 +183,7 @@ export async function upload_images() {
         await fs_promises.mkdir(new_dir, { recursive: true });
 
         const new_path = `${new_dir}/${old_file_name}`;
+        // console.log("Copying file", old_path, new_path);
         // console.log("Copying file", old_path, new_path);
         return fs_promises.copyFile(old_path, new_path);
 

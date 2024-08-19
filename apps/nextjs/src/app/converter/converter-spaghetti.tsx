@@ -14,6 +14,7 @@ import {
 
 import type { CSVType } from "./converter-server";
 import type { api } from "~/trpc/react";
+import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import {
   get_clean_url,
   get_image_data_from_editor,
@@ -30,10 +31,12 @@ type ArticleUpdateType = ReturnType<
 
 let wrong_divs = 0;
 let videos = 0;
+let article_id = 1;
 const problematic_articles: ProblematicArticleType[] = [];
 
 export interface ImageToSave {
-  id: string;
+  objave_id: string;
+  serial_id: string;
   url: string;
   images: string[];
 }
@@ -50,9 +53,10 @@ export async function iterate_over_articles(
   wrong_divs = 0;
   videos = 0;
   problematic_articles.length = 0;
-  // images_to_save.length = 0;
+  images_to_save.length = 0;
+  article_id = 1;
 
-  const do_splice = false as boolean;
+  const do_splice = true as boolean;
 
   const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
@@ -62,7 +66,7 @@ export async function iterate_over_articles(
     await parse_csv_article(csv_article, editorJS, article_create);
   }
 
-  await save_images(images_to_save);
+  // await save_images(images_to_save);
   // await write_article_html_to_file(problematic_articles);
   console.log("Total articles:", csv_articles.length);
   console.log({ wrong_divs, videos });
@@ -114,12 +118,14 @@ async function parse_csv_article(
   }
 
   images_to_save.push({
-    id: csv_article.id,
+    objave_id: csv_article.id,
+    serial_id: article_id.toString(),
     url: csv_url,
     images: image_urls,
   });
 
-  return;
+  /* article_id++;
+  return; */
 
   for (const node of root.childNodes) {
     if (node.nodeType == NodeType.ELEMENT_NODE) {
@@ -165,9 +171,13 @@ async function parse_csv_article(
       created_at,
       updated_at,
     ); */
-
+  /* generate_encoded_url({
+        id: article_id,
+        url: csv_url,
+      }), */
   if (false as boolean) {
     article_create.mutate({
+      id: article_id,
       title: csv_article.title,
       preview_image,
       content,
@@ -177,6 +187,8 @@ async function parse_csv_article(
       updated_at,
       published: true,
     });
+
+    article_id++;
   }
 }
 
@@ -272,7 +284,7 @@ function parse_node(
 
           const src_parts = src_attr.split("/");
           const image_name = src_parts[src_parts.length - 1];
-          src = `${AWS_PREFIX}/${csv_url}/${image_name}`;
+          src = `${AWS_PREFIX}/${csv_url}-${article_id}/${image_name}`;
         } else if (div_child.nodeType == NodeType.TEXT_NODE) {
           if (div_child.text.trim() !== "")
             console.error("Some text in div: " + csv_article.id);

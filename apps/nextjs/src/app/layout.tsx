@@ -62,7 +62,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <TooltipProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
             <TRPCReactProvider>{props.children}</TRPCReactProvider>
             <Toaster />
           </ThemeProvider>

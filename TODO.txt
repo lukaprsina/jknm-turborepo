@@ -11,3 +11,5 @@ preveri če preview image obstaja, ko shraniš
 ko odpreš settings, shrani stvari "settings-button"
 
 https://trpc.io/docs/client/react/useUtils#query-invalidation
+
+D:\dev\js\jknm-turborepo\apps\nextjs\pt-all\potop-v-termalni-izvir-1
