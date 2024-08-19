@@ -5,7 +5,6 @@ import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import { parse as csv_parse } from "csv-parse";
 import { count, sql } from "drizzle-orm";
-import mime from "mime/lite";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
@@ -17,7 +16,6 @@ import type {
 } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
-import { upload_image_by_file } from "../uredi/[novica_ime]/upload-file";
 
 export interface CSVType {
   id: string;
@@ -81,7 +79,7 @@ export async function sync_with_algolia() {
         objectID: article.id.toString(),
         title: article.title,
         url: article.url,
-        created_at: article.created_at,
+        created_at: article.created_at.getTime(),
         image: article.preview_image ?? undefined,
         content_preview,
         published: true,
@@ -251,7 +249,7 @@ const JKNM_SERVED_DIR = "D:/JKNM/served";
   await Promise.all(promises);
 } */
 
-async function upload_from_path(path: string, article_url: string) {
+/* async function upload_from_path(path: string, article_url: string) {
   const buffer = await fs_promises.readFile(path);
   const file_mime = mime.getType(path);
   if (!file_mime?.includes("image")) {
@@ -270,4 +268,4 @@ async function upload_from_path(path: string, article_url: string) {
   });
 
   await upload_image_by_file(file, article_url);
-}
+} */

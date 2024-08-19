@@ -79,6 +79,8 @@ export async function iterate_over_articles(
 
 const AWS_PREFIX =
   "https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com";
+/* const AWS_PREFIX =
+  "https://jknm.s3.eu-central-1.amazonaws.com"; */
 
 async function parse_csv_article(
   csv_article: CSVType,
@@ -144,6 +146,8 @@ async function parse_csv_article(
       throw new Error("Unexpected comment: " + node.text);
     }
   }
+
+  await get_authors(csv_article, blocks);
 
   await editorJS?.render({
     blocks,
@@ -456,3 +460,14 @@ const PROBLEMATIC_CONSTANTS = [
   114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
   538, 566, 571, 615,
 ];
+function get_authors(
+  csv_article: CSVType,
+  blocks: OutputBlockData[],
+) {
+  const last_block = blocks[blocks.length - 1]
+  if(!last_block) {
+throw new Error("No blocks in article: " + csv_article.id);
+  }
+
+  if(last_block?.type == "paragraph") 
+}

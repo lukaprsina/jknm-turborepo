@@ -5,6 +5,32 @@ import mime from "mime/lite";
 import type { FileUploadResponse } from "~/app/api/upload_file_to_s3/route";
 import { editor_store } from "./editor-store";
 
+export async function upload_file(
+  file: File,
+  novica_url?: string,
+): Promise<FileUploadResponse> {
+  novica_url = novica_url
+    ? novica_url
+    : `${editor_store.get.url()}-${editor_store.get.id()}`;
+
+  if (!novica_url) {
+    return {
+      success: 0,
+    };
+  }
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("directory", novica_url);
+
+  const file_data = await fetch("/api/upload_file_to_s3", {
+    method: "POST",
+    body: formData,
+  });
+
+  return await parse_s3_response(file_data /* novica_url, file.name, toast */);
+}
+
 export async function upload_image_by_file(
   file: File,
   novica_url?: string,
@@ -18,18 +44,18 @@ export async function upload_image_by_file(
     id: settings_store.get.id(),
   }); */
 
-  const error_response = {
-    success: 0,
-  } as const;
-
   if (!novica_url) {
-    return error_response;
+    return {
+      success: 0,
+    };
   }
 
   const file_mime = mime.getType(file.name);
   if (!file_mime?.includes("image")) {
     console.warn("Wrong MIME type", file_mime);
-    return error_response;
+    return {
+      success: 0,
+    };
   }
 
   const formData = new FormData();

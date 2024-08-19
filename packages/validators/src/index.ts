@@ -18,7 +18,7 @@ export const article_hit_validator = z.object({
   objectID: z.string(),
   title: z.string(),
   url: z.string(),
-  created_at: z.date(),
+  created_at: z.number(), // unix timestamp
   content_preview: z.string().max(1000), // maybe 600
   image: z.string().optional(),
   published: z.boolean(),

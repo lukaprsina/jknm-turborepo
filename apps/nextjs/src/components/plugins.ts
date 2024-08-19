@@ -33,6 +33,7 @@ import {
 // import type { useToast } from "@acme/ui/use-toast";
 
 import {
+  upload_file,
   upload_image_by_file,
   upload_image_by_url,
 } from "../app/uredi/[novica_ime]/upload-file";
@@ -55,6 +56,22 @@ export function EDITOR_JS_PLUGINS(): Record<
   ToolConstructable | ToolSettings
 > {
   return {
+    image: {
+      // @ts-expect-error no types
+      class: Image,
+      // inlineToolbar: ["link"],
+      inlineToolbar: true,
+      config: {
+        /* endpoints: {
+          byFile: "/api/upload_image_by_file",
+          byUrl: "/api/upload_image_by_url",
+        }, */
+        uploader: {
+          uploadByFile: (file: File) => upload_image_by_file(file),
+          uploadByUrl: (url: string) => upload_image_by_url(url),
+        },
+      },
+    },
     paragraph: {
       class: Paragraph,
       inlineToolbar: true,
@@ -74,7 +91,7 @@ export function EDITOR_JS_PLUGINS(): Record<
     list: {
       // @ts-expect-error no types
       class: List,
-      // inlineToolbar: true,
+      inlineToolbar: true,
       config: {
         defaultStyle: "unordered",
       },
@@ -85,28 +102,16 @@ export function EDITOR_JS_PLUGINS(): Record<
     attaches: {
       class: AttachesTool,
       config: {
-        endpoint: "/api/upload_file",
-      },
-    },
-    image: {
-      // @ts-expect-error no types
-      class: Image,
-      // inlineToolbar: ["link"],
-      // inlineToolbar: true,
-      config: {
-        /* endpoints: {
-          byFile: "/api/upload_image_by_file",
-          byUrl: "/api/upload_image_by_url",
-        }, */
         uploader: {
-          uploadByFile: (file: File) => upload_image_by_file(file),
-          uploadByUrl: (url: string) => upload_image_by_url(url),
+          uploadByFile: (file: File) => upload_file(file),
         },
+        // endpoint: "/api/upload_file",
       },
     },
     header: {
       // @ts-expect-error no types
       class: Header,
+      inlineToolbar: true,
       config: {
         defaultLevel: 2,
       },

@@ -84,7 +84,7 @@ export function EditButton({
         title: returned_data.title,
         url: returned_data.url,
         content_preview,
-        created_at: returned_data.created_at,
+        created_at: returned_data.created_at.getTime(),
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
