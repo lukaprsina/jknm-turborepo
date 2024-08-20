@@ -9,6 +9,8 @@ import { Input } from "@acme/ui/input";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
+  add_authors,
+  delete_articles,
   get_article_count,
   read_articles,
   sync_with_algolia,
@@ -31,7 +33,7 @@ export function ArticleConverter() {
 
   const article_update = api.article.create_article_with_date.useMutation();
   const [firstArticle, setFirstArticle] = useState(0); // 20 - 60
-  const [lastArticle, setLastArticle] = useState(15);
+  const [lastArticle, setLastArticle] = useState(30);
 
   return (
     <div className="prose container mx-auto py-8">
@@ -43,6 +45,20 @@ export function ArticleConverter() {
           }}
         >
           Sync with Algolia
+        </Button>
+        <Button
+          onClick={async () => {
+            await delete_articles();
+          }}
+        >
+          Delete articles
+        </Button>
+        <Button
+          onClick={async () => {
+            await add_authors();
+          }}
+        >
+          Add authors
         </Button>
         <Button
           onClick={async () => {
@@ -71,7 +87,6 @@ export function ArticleConverter() {
             await iterate_over_articles(
               csv_articles,
               editorJS.current,
-              article_update,
               firstArticle,
               lastArticle,
             );

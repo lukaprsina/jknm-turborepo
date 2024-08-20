@@ -1,8 +1,10 @@
-export const AUTHORS: {
+export interface AuthorType {
   name: string;
   ids: string[];
-  change_to?: string;
-}[] = [
+  change_to?: false | string;
+}
+
+export const AUTHORS: AuthorType[] = [
   {
     name: "Aja Zamolo",
     ids: ["619"],
@@ -239,7 +241,7 @@ export const AUTHORS: {
   {
     name: "Dan D",
     ids: ["144"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Davor Kacin",
@@ -268,12 +270,12 @@ export const AUTHORS: {
   {
     name: "Jamarji Jamarskega kluba Novo mesto",
     ids: ["42"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Jamarji JKNM",
     ids: ["142", "202", "264", "491"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Janja Bučar",
@@ -282,6 +284,7 @@ export const AUTHORS: {
   {
     name: "Janja in Zdravko Bučar",
     ids: ["333"],
+    change_to: false,
   },
   {
     name: "Jernej Tramte",
@@ -363,7 +366,7 @@ export const AUTHORS: {
   {
     name: "Kolektiv izleta JKNM",
     ids: ["174"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Lovro Remih",
@@ -463,7 +466,7 @@ export const AUTHORS: {
   {
     name: "PS 2",
     ids: ["120"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Sandi Vidrih",
@@ -507,7 +510,7 @@ export const AUTHORS: {
   {
     name: "T-mediji",
     ids: ["319"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Tanja Rukše",
@@ -575,7 +578,7 @@ export const AUTHORS: {
   {
     name: "Vabljeni vsi bodoči raziskovalci in ... povabite prijateljice in prijatelje!",
     ids: ["56"],
-    change_to: undefined,
+    change_to: false,
   },
   {
     name: "Zdravko Bučar",

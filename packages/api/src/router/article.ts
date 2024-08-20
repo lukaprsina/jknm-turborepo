@@ -1,7 +1,7 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, desc, eq } from "@acme/db";
+import { asc, eq, gt, lt } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -12,7 +12,33 @@ import { content_validator } from "@acme/validators";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
-  all: publicProcedure.query(({ ctx }) => {
+  infinite: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(1000).default(50),
+        cursor: z.date().optional(), // <-- "cursor" needs to exist, but can be any type
+        direction: z
+          .enum(["forward", "backward"])
+          .optional()
+          .default("forward"), // optional, useful for bi-directional query
+        show_drafts: z.boolean().optional().default(false),
+      }),
+    )
+    .query(({ ctx, input }) => {
+      return ctx.db
+        .select()
+        .from(Article)
+        .where(
+          input.cursor
+            ? input.direction == "forward"
+              ? gt(Article.created_at, input.cursor)
+              : lt(Article.created_at, input.cursor)
+            : undefined,
+        ) // if cursor is provided, get rows after it
+        .limit(input.limit) // the number of rows to return
+        .orderBy(asc(Article.id));
+    }),
+  /* all: publicProcedure.query(({ ctx }) => {
     // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
     return ctx.db.query.Article.findMany({
       where: eq(Article.published, true),
@@ -74,7 +100,7 @@ export const articleRouter = {
       return ctx.db.query.Article.findFirst({
         where: eq(Article.id, input.id),
       });
-    }),
+    }), */
 
   create_article: protectedProcedure
     .input(CreateArticleSchema)

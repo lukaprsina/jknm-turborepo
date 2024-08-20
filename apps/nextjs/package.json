@@ -136,6 +136,7 @@
     "react-editor-js": "^2.1.0",
     "react-instantsearch": "^7.12.4",
     "react-instantsearch-nextjs": "^0.3.9",
+    "react-intersection-observer-hook": "^3.0.1",
     "react-lite-youtube-embed": "^2.4.0",
     "react-tweet": "^3.2.1",
     "sanitize-filename": "^1.6.3",

@@ -3,19 +3,26 @@
 import fs from "node:fs";
 import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
+import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
 import { count, sql } from "drizzle-orm";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
-import { Article } from "@acme/db/schema";
+import {
+  Article,
+  ArticlesToCreditedPeople,
+  CreditedPeople,
+} from "@acme/db/schema";
 
+import type { AuthorType } from "./authors";
 import type {
   ImageToSave,
   ProblematicArticleType,
 } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
+import { AUTHORS } from "./authors";
 
 export interface CSVType {
   id: string;
@@ -25,10 +32,42 @@ export interface CSVType {
   updated_at: string;
 }
 
+export async function delete_articles() {
+  await db.execute(sql`TRUNCATE TABLE ${CreditedPeople} CASCADE;`);
+  await db.execute(sql`TRUNCATE TABLE ${ArticlesToCreditedPeople} CASCADE;`);
+  await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
+}
+
+export interface TempArticleType {
+  serial_id: number;
+  objave_id: string;
+  title: string;
+  preview_image: string | undefined;
+  content: OutputData;
+  csv_url: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export async function upload_articles(articles: TempArticleType[]) {
+  await db.insert(Article).values(
+    articles.map((article) => ({
+      id: article.serial_id,
+      old_id: parseInt(article.objave_id),
+      title: article.title,
+      content: article.content,
+      created_at: article.created_at,
+      updated_at: article.updated_at,
+      preview_image: article.preview_image,
+      url: article.csv_url,
+    })),
+  );
+}
+
 export async function read_articles() {
   /* await db.delete(Article);
   db.insert(Article).values({}); */
-  await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
+  // await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
 
   const csv_articles: CSVType[] = [];
 
@@ -201,6 +240,21 @@ export async function upload_images() {
 
   await Promise.all(promises);
   console.log("Done");
+}
+export async function add_authors() {
+  const all_authors = AUTHORS.reduce((acc: Set<string>, author: AuthorType) => {
+    if (typeof author.change_to === "undefined") {
+      acc.add(author.name);
+    } else if (typeof author.change_to === "string") {
+      acc.add(author.change_to);
+    }
+
+    return acc;
+  }, new Set<string>());
+
+  await db
+    .insert(CreditedPeople)
+    .values(Array.from(all_authors).map((name) => ({ name, email: "" })));
 }
 
 /* for (const image of json.images) {

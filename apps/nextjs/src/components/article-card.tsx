@@ -1,7 +1,7 @@
 "use client";
 
 import type { Hit as SearchHit } from "instantsearch.js";
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -17,13 +17,13 @@ import { MagicCard } from "@acme/ui/magic-card";
 import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 
-export function ArticleDrizzleCard({
-  article,
-  featured,
-}: {
-  article: typeof Article.$inferSelect;
-  featured?: boolean;
-}) {
+export const ArticleDrizzleCard = React.forwardRef<
+  HTMLDivElement,
+  {
+    article: typeof Article.$inferSelect;
+    featured?: boolean;
+  }
+>(({ article, featured }) => {
   return (
     <ArticleCard
       featured={featured}
@@ -39,29 +39,7 @@ export function ArticleDrizzleCard({
       created_at={article.created_at}
     />
   );
-  /* return featured ? (
-    <FeaturedArticleCard
-      title={article.title}
-      url={generate_encoded_url({ id: article.id, url: article.url })}
-      published={!article.draft_content}
-      preview_image={
-        article.draft_preview_image ?? article.preview_image ?? undefined
-      }
-      content={article.draft_content ?? article.content ?? undefined}
-    />
-  ) : (
-    <ArticleCard
-      title={article.title}
-      url={generate_encoded_url({ id: article.id, url: article.url })}
-      published={!article.draft_content}
-      preview_image={
-        article.draft_preview_image ?? article.preview_image ?? undefined
-      }
-      content={article.draft_content ?? article.content ?? undefined}
-      created_at={article.created_at}
-    />
-  ); */
-}
+});
 
 export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
   return (

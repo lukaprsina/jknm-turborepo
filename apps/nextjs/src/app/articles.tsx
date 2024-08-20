@@ -1,3 +1,4 @@
+import React, { useMemo } from "react";
 import { cva } from "class-variance-authority";
 
 import type { Article } from "@acme/db/schema";
@@ -10,14 +11,24 @@ export const articles_variants = cva(
   "prose dark:prose-invert prose-img:m-0 prose-h3:my-0 prose-h3:py-0 prose-p:m-0",
 );
 
-export function Articles({
-  articles,
-  featured,
-}: {
-  articles?: (typeof Article.$inferSelect)[];
-  featured?: boolean;
-}) {
-  const rest = featured ? articles?.slice(1) : articles;
+export const Articles = React.forwardRef<
+  HTMLDivElement,
+  {
+    articles?: (typeof Article.$inferSelect)[];
+    featured?: boolean;
+  }
+>(({ articles, featured }, ref) => {
+  const all_articles = useMemo(() => {
+    articles?.map((article, index) => {
+      if (index === 0 && featured)
+        return <ArticleDrizzleCard featured article={article} />;
+      else if (index === articles.length - 1)
+        return (
+          <ArticleDrizzleCard key={article.id} article={article} ref={ref} />
+        );
+      else return <ArticleDrizzleCard key={article.id} article={article} />;
+    });
+  }, []);
 
   return (
     <>
@@ -29,10 +40,7 @@ export function Articles({
             "container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8",
           )}
         >
-          {featured && <ArticleDrizzleCard featured article={articles[0]} />}
-          {rest?.map((article, index) => (
-            <ArticleDrizzleCard key={index} article={article} />
-          ))}
+          {all_articles}
         </div>
       ) : (
         <div className="container mb-4 mt-8 flex h-full min-h-screen w-full items-center justify-center">
@@ -46,4 +54,4 @@ export function Articles({
       )}
     </>
   );
-}
+});

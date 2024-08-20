@@ -12,26 +12,21 @@ import {
   HTMLElement as ParserHTMLElement,
 } from "node-html-parser";
 
-import type { CSVType } from "./converter-server";
-import type { api } from "~/trpc/react";
+import type { CSVType, TempArticleType } from "./converter-server";
 import {
   get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
 import { AUTHORS } from "./authors";
-import { get_problematic_html } from "./converter-server";
+import { get_problematic_html, upload_articles } from "./converter-server";
 
 export interface ProblematicArticleType {
   csv: CSVType;
   html: string;
 }
-type ArticleUpdateType = ReturnType<
-  typeof api.article.create_article_with_date.useMutation
->;
 
 let wrong_divs = 0;
 let videos = 0;
-let article_id = 1;
 const problematic_articles: ProblematicArticleType[] = [];
 
 export interface ImageToSave {
@@ -47,7 +42,6 @@ const articles_without_authors = new Set<number>();
 export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
-  article_create: ArticleUpdateType,
   first_article: number,
   last_article: number,
 ) {
@@ -55,17 +49,41 @@ export async function iterate_over_articles(
   videos = 0;
   problematic_articles.length = 0;
   images_to_save.length = 0;
-  article_id = 1;
 
-  const do_splice = false as boolean;
+  const do_splice = true as boolean;
 
   const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
     : csv_articles;
 
+  console.log("spliced_csv_articles", spliced_csv_articles);
+
+  const articles: TempArticleType[] = [];
+  let article_id = 1;
   for (const csv_article of spliced_csv_articles) {
-    await parse_csv_article(csv_article, editorJS, article_create);
+    const article = await parse_csv_article(csv_article, editorJS, article_id);
+    articles.push(article);
+    article_id++;
   }
+
+  console.log("done", articles);
+  await upload_articles(articles);
+
+  /* if (true as boolean) {
+    article_create.mutate({
+      id: article_id,
+      title: csv_article.title,
+      preview_image,
+      content,
+      draft_content: null,
+      url: csv_url,
+      created_at,
+      updated_at,
+      published: true,
+    });
+
+    article_id++;
+  } */
 
   // await save_images(images_to_save);
   // await write_article_html_to_file(problematic_articles);
@@ -90,7 +108,7 @@ const AWS_PREFIX =
 async function parse_csv_article(
   csv_article: CSVType,
   editorJS: EditorJS | null,
-  article_create: ArticleUpdateType,
+  article_id: number,
 ) {
   const problematic_dir = "1723901265154";
 
@@ -102,11 +120,6 @@ async function parse_csv_article(
   const root = html_parse(sanitized);
 
   const csv_url = get_clean_url(csv_article.title);
-
-  /* console.log("New article:", csv_article.title, root.structure);
-    if (csv_article.title == "Ponovno na Straškem hribu") {
-      console.log(sanitized);
-    } */
 
   const blocks: OutputBlockData[] = [
     {
@@ -131,12 +144,15 @@ async function parse_csv_article(
     images: image_urls,
   });
 
-  /* article_id++;
-  return; */
-
   for (const node of root.childNodes) {
     if (node.nodeType == NodeType.ELEMENT_NODE) {
-      const is_problem = parse_node(node, blocks, csv_article, csv_url);
+      const is_problem = parse_node(
+        node,
+        blocks,
+        csv_article,
+        csv_url,
+        article_id,
+      );
 
       if (is_problem) {
         problematic_articles.push({
@@ -184,33 +200,16 @@ async function parse_csv_article(
     console.error("No images in article", csv_article.title);
   }
 
-  /* console.log(
-      csv_article.title,
-      content,
-      csv_article.created_at,
-      csv_article.updated_at,
-      created_at,
-      updated_at,
-    ); */
-  /* generate_encoded_url({
-        id: article_id,
-        url: csv_url,
-      }), */
-  if (false as boolean) {
-    article_create.mutate({
-      id: article_id,
-      title: csv_article.title,
-      preview_image,
-      content,
-      draft_content: null,
-      url: csv_url,
-      created_at,
-      updated_at,
-      published: true,
-    });
-
-    article_id++;
-  }
+  return {
+    serial_id: article_id,
+    objave_id: csv_article.id,
+    title: csv_article.title,
+    preview_image,
+    content,
+    csv_url,
+    created_at,
+    updated_at,
+  };
 }
 
 function parse_node(
@@ -218,6 +217,7 @@ function parse_node(
   blocks: OutputBlockData[],
   csv_article: CSVType,
   csv_url: string,
+  article_id: number,
 ): boolean {
   if (!(node instanceof ParserHTMLElement))
     throw new Error("Not an HTMLElement");
@@ -334,55 +334,6 @@ function parse_node(
           throw new Error("Unexpected comment: " + node.text);
         }
       }
-
-      /* for (const div_child of node.childNodes) {
-        if (div_child.nodeType == NodeType.ELEMENT_NODE) {
-          if (!(div_child instanceof ParserHTMLElement))
-            throw new Error("Not an HTMLElement");
-
-          if (div_child.tagName === "DIV") {
-            wrong_divs++;
-            // throw new Error("Unexpected div element in div element");
-            return true;
-          }
-
-          const allowed_tags = ["IMG", "P", "STRONG", "A", "BR"];
-          if (!allowed_tags.includes(div_child.tagName))
-            throw new Error(
-              "Unexpected element in div element: " +
-                div_child.tagName +
-                " " +
-                csv_article.id,
-            );
-
-          if (div_child.tagName === "IMG") {
-            if (already_set_src)
-              throw new Error("Already set source once " + csv_article.id);
-
-            already_set_src = true;
-            const src_attr = div_child.attributes.src;
-            if (!src_attr)
-              throw new Error("No src attribute " + csv_article.id);
-
-            const src_parts = src_attr.split("/");
-            const image_name = src_parts[src_parts.length - 1];
-            src = `${AWS_PREFIX}/${csv_url}/${image_name}`;
-            // src = `https://www.jknm.si${div_child.attributes.src}`;
-            // } else if (div_child.tagName === "a") {
-          } else if (div_child.tagName === "P") {
-            if (already_set_caption)
-              throw new Error("Already set caption once " + csv_article.id);
-            already_set_caption = true;
-
-            caption = div_child.text;
-          }
-        } else if (div_child.nodeType == NodeType.TEXT_NODE) {
-          if (div_child.text.trim() !== "")
-            console.error("Some text in div: " + csv_article.id);
-        } else {
-          throw new Error("Unexpected comment: " + node.text);
-        }
-      } */
 
       blocks.push({
         type: "image",

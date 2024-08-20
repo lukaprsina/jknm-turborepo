@@ -90,6 +90,7 @@ export interface ArticleContentType {
 // My schema below
 export const Article = pgTable("article", {
   id: serial("id").primaryKey(),
+  old_id: integer("old_id"),
   title: varchar("title", { length: 255 }).notNull(),
   url: varchar("url", { length: 255 }).notNull(),
   published: boolean("published").default(false),
@@ -124,9 +125,9 @@ export const ArticleRelations = relations(Article, ({ many }) => ({
 }));
 
 export const CreditedPeople = pgTable("credited_people", {
-  id: uuid("id").notNull().primaryKey(),
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull(),
 });
 
 export const CreditedPeopleRelations = relations(
