@@ -1,4 +1,8 @@
-export const AUTHORS = [
+export const AUTHORS: {
+  name: string;
+  ids: string[];
+  change_to?: string;
+}[] = [
   {
     name: "Aja Zamolo",
     ids: ["619"],

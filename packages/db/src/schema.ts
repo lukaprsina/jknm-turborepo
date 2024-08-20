@@ -119,8 +119,42 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   created_at: true,
 });
 
+export const ArticleRelations = relations(Article, ({ many }) => ({
+  credited_people: many(ArticlesToCreditedPeople),
+}));
+
 export const CreditedPeople = pgTable("credited_people", {
   id: uuid("id").notNull().primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
 });
+
+export const CreditedPeopleRelations = relations(
+  CreditedPeople,
+  ({ many }) => ({
+    articles: many(ArticlesToCreditedPeople),
+  }),
+);
+
+export const ArticlesToCreditedPeople = pgTable("articles_to_credited_people", {
+  article_id: integer("article_id")
+    .notNull()
+    .references(() => Article.id),
+  credited_people_id: uuid("credited_people_id")
+    .notNull()
+    .references(() => CreditedPeople.id),
+});
+
+export const ArticlesToCreditedPeopleRelations = relations(
+  ArticlesToCreditedPeople,
+  ({ one }) => ({
+    article: one(Article, {
+      fields: [ArticlesToCreditedPeople.article_id],
+      references: [Article.id],
+    }),
+    credited_people: one(CreditedPeople, {
+      fields: [ArticlesToCreditedPeople.credited_people_id],
+      references: [CreditedPeople.id],
+    }),
+  }),
+);

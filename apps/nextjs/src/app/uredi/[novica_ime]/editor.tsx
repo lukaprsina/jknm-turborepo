@@ -25,6 +25,7 @@ import { EditorProvider, useEditor } from "~/components/editor-context";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
+import AuthorTags from "./author-tags";
 
 export default function MyEditor({
   article,
@@ -72,14 +73,17 @@ function MyToolbar() {
 
   if (!editor) return null;
   return (
-    <div className="flex w-full items-baseline justify-between p-4">
-      <div>{editor.savingText}</div>
-      <div className="flex">
-        <SaveButton />
-        <UploadDialog />
-        <SettingsDialog />
-        <ClearButton />
+    <div className="flex flex-col justify-between gap-4">
+      <div className="flex w-full items-baseline justify-between p-4">
+        <div>{editor.savingText}</div>
+        <div className="flex">
+          <SaveButton />
+          <UploadDialog />
+          <SettingsDialog />
+          <ClearButton />
+        </div>
       </div>
+      <AuthorTags />
     </div>
   );
 }

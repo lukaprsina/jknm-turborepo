@@ -18,6 +18,7 @@ import {
   get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
+import { AUTHORS } from "./authors";
 import { get_problematic_html } from "./converter-server";
 
 export interface ProblematicArticleType {
@@ -151,8 +152,19 @@ async function parse_csv_article(
     }
   }
 
-  get_authors(csv_article, blocks);
-  return;
+  const current_authors = get_authors(csv_article, blocks);
+  const new_authors = new Set<string>();
+  for (const current_author of current_authors) {
+    const author = AUTHORS.find((a) => a.name === current_author);
+    if (!author) throw new Error("No author found: " + current_author);
+
+    if (author.change_to) {
+      console.log("Change author", current_author, author.change_to);
+      new_authors.add(author.change_to);
+    } else {
+      new_authors.add(author.name);
+    }
+  }
 
   await editorJS?.render({
     blocks,
@@ -475,6 +487,8 @@ function get_authors(csv_article: CSVType, blocks: OutputBlockData[]) {
   }
 
   console.log(last_block.type);
+  const current_authors: string[] = [];
+
   if (last_block.type == "paragraph") {
     const paragraph_block = last_block.data as { text: string };
     const root = html_parse(paragraph_block.text);
@@ -486,6 +500,7 @@ function get_authors(csv_article: CSVType, blocks: OutputBlockData[]) {
       if (trimmed === "") continue;
 
       const author = authors.find((a) => a.name === trimmed);
+      current_authors.push(trimmed);
 
       if (author) {
         author.ids.push(csv_article.id);
@@ -496,4 +511,6 @@ function get_authors(csv_article: CSVType, blocks: OutputBlockData[]) {
   } else {
     articles_without_authors.add(parseInt(csv_article.id));
   }
+
+  return current_authors;
 }
