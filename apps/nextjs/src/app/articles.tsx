@@ -28,7 +28,7 @@ export const Articles = React.forwardRef<
         );
       else return <ArticleDrizzleCard key={article.id} article={article} />;
     });
-  }, []);
+  }, [articles, featured, ref]);
 
   return (
     <>
