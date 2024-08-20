@@ -65,6 +65,7 @@
     "eslint": "catalog:",
     "prettier": "catalog:",
     "react": "catalog:react-rc",
+    "babel-plugin-react-compiler": "catalog:react-rc",
     "tailwindcss": "^3.4.4",
     "typescript": "catalog:",
     "zod": "catalog:"

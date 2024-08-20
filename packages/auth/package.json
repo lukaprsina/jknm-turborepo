@@ -26,6 +26,7 @@
     "next-auth": "5.0.0-beta.19",
     "react": "catalog:react-rc",
     "react-dom": "catalog:react-rc",
+    "babel-plugin-react-compiler": "catalog:react-rc",
     "zod": "catalog:"
   },
   "devDependencies": {

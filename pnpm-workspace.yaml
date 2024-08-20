@@ -24,5 +24,6 @@ catalogs:
     next: 15.0.0-rc.0
     react: 19.0.0-rc-6ebfd5b0-20240818
     react-dom: 19.0.0-rc-6ebfd5b0-20240818
+    babel-plugin-react-compiler: "0.0.0-experimental-1f3db3d-20240818"
     "@types/react": npm:types-react@rc
     "@types/react-dom": npm:types-react-dom@rc

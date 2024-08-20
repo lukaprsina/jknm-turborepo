@@ -40,6 +40,9 @@ catalogs:
     '@types/react-dom':
       specifier: npm:types-react-dom@rc
       version: 19.0.0-rc.1
+    babel-plugin-react-compiler:
+      specifier: 0.0.0-experimental-1f3db3d-20240818
+      version: 0.0.0-experimental-1f3db3d-20240818
     next:
       specifier: 15.0.0-rc.0
       version: 15.0.0-rc.0
@@ -130,6 +133,9 @@ importers:
       '@trpc/server':
         specifier: 'catalog:'
         version: 11.0.0-rc.477
+      babel-plugin-react-compiler:
+        specifier: catalog:react-rc
+        version: 0.0.0-experimental-1f3db3d-20240818
       expo:
         specifier: ~51.0.18
         version: 51.0.26(@babel/core@7.25.2)(@babel/preset-env@7.25.3(@babel/core@7.25.2))(bufferutil@4.0.8)
@@ -778,6 +784,9 @@ importers:
       '@t3-oss/env-nextjs':
         specifier: ^0.10.1
         version: 0.10.1(typescript@5.5.4)(zod@3.23.8)
+      babel-plugin-react-compiler:
+        specifier: catalog:react-rc
+        version: 0.0.0-experimental-1f3db3d-20240818
       next:
         specifier: ^14.2.4
         version: 14.2.5(react-dom@19.0.0-rc-6ebfd5b0-20240818(react@19.0.0-rc-6ebfd5b0-20240818))(react@19.0.0-rc-6ebfd5b0-20240818)
@@ -970,6 +979,9 @@ importers:
       '@types/react':
         specifier: catalog:react-rc
         version: types-react@19.0.0-rc.1
+      babel-plugin-react-compiler:
+        specifier: catalog:react-rc
+        version: 0.0.0-experimental-1f3db3d-20240818
       eslint:
         specifier: 'catalog:'
         version: 9.9.0(jiti@1.21.6)
