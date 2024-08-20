@@ -14,12 +14,11 @@ import {
 
 import type { CSVType } from "./converter-server";
 import type { api } from "~/trpc/react";
-import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import {
   get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
-import { get_problematic_html, save_images } from "./converter-server";
+import { get_problematic_html } from "./converter-server";
 
 export interface ProblematicArticleType {
   csv: CSVType;
@@ -42,6 +41,7 @@ export interface ImageToSave {
 }
 
 const images_to_save: ImageToSave[] = [];
+const articles_without_authors = new Set<number>();
 
 export async function iterate_over_articles(
   csv_articles: CSVType[],
@@ -56,7 +56,7 @@ export async function iterate_over_articles(
   images_to_save.length = 0;
   article_id = 1;
 
-  const do_splice = true as boolean;
+  const do_splice = false as boolean;
 
   const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
@@ -75,6 +75,10 @@ export async function iterate_over_articles(
     problematic_articles.map((a) => `${a.csv.id}-${a.csv.title}`),
     problematic_articles.map((a) => a.csv.id),
   );
+
+  console.log(authors.sort((a, b) => a.name.localeCompare(b.name)));
+
+  console.log(Array.from(articles_without_authors));
 }
 
 const AWS_PREFIX =
@@ -147,7 +151,8 @@ async function parse_csv_article(
     }
   }
 
-  await get_authors(csv_article, blocks);
+  get_authors(csv_article, blocks);
+  return;
 
   await editorJS?.render({
     blocks,
@@ -460,14 +465,35 @@ const PROBLEMATIC_CONSTANTS = [
   114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
   538, 566, 571, 615,
 ];
-function get_authors(
-  csv_article: CSVType,
-  blocks: OutputBlockData[],
-) {
-  const last_block = blocks[blocks.length - 1]
-  if(!last_block) {
-throw new Error("No blocks in article: " + csv_article.id);
+
+const authors: { name: string; ids: string[] }[] = [];
+
+function get_authors(csv_article: CSVType, blocks: OutputBlockData[]) {
+  const last_block = blocks[blocks.length - 1];
+  if (!last_block) {
+    throw new Error("No blocks in article: " + csv_article.id);
   }
 
-  if(last_block?.type == "paragraph") 
+  console.log(last_block.type);
+  if (last_block.type == "paragraph") {
+    const paragraph_block = last_block.data as { text: string };
+    const root = html_parse(paragraph_block.text);
+    const strongs = root.querySelectorAll("strong");
+
+    for (const strong of strongs) {
+      const trimmed = strong.text.trim().replace(/\s+/g, " ");
+
+      if (trimmed === "") continue;
+
+      const author = authors.find((a) => a.name === trimmed);
+
+      if (author) {
+        author.ids.push(csv_article.id);
+      } else {
+        authors.push({ name: trimmed, ids: [csv_article.id] });
+      }
+    }
+  } else {
+    articles_without_authors.add(parseInt(csv_article.id));
+  }
 }
