@@ -1,12 +1,12 @@
 "use client";
 
 import type { Hit as SearchHit } from "instantsearch.js";
-import React, { useState } from "react";
+import type { IntersectionObserverHookRefCallback } from "react-intersection-observer-hook";
+import React, { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
-import type { Article } from "@acme/db/schema";
 import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
@@ -14,19 +14,30 @@ import { Badge } from "@acme/ui/badge";
 import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
+import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 
-export const ArticleDrizzleCard = React.forwardRef<
-  HTMLDivElement,
-  {
-    article: typeof Article.$inferSelect;
-    featured?: boolean;
-  }
->(({ article, featured }) => {
+// React.RefObject<HTMLAnchorElement>;
+export const ArticleDrizzleCard = ({
+  article,
+  featured,
+  ref,
+}: {
+  article: ArticleWithCreditedPeople;
+  featured?: boolean;
+  ref?: IntersectionObserverHookRefCallback;
+}) => {
+  const authors = useMemo(() => {
+    return article.credited_people.map(
+      (credited_person) => credited_person.credited_people.name,
+    );
+  }, [article.credited_people]);
+
   return (
     <ArticleCard
       featured={featured}
+      ref={ref}
       title={article.title}
       url={generate_encoded_url({ id: article.id, url: article.url })}
       published={!article.draft_content}
@@ -37,9 +48,10 @@ export const ArticleDrizzleCard = React.forwardRef<
         article.draft_content ?? article.content ?? undefined,
       )}
       created_at={article.created_at}
+      authors={authors}
     />
   );
-});
+};
 
 export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
   return (
@@ -50,6 +62,7 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
       preview_image={hit.image ?? undefined}
       content_preview={hit.content_preview}
       created_at={new Date(hit.created_at)}
+      authors={hit.authors}
     />
   );
 }
@@ -62,6 +75,8 @@ export function ArticleCard({
   preview_image,
   content_preview,
   created_at,
+  authors,
+  ref,
 }: {
   featured?: boolean;
   title: string;
@@ -70,6 +85,8 @@ export function ArticleCard({
   preview_image?: string;
   content_preview?: string;
   created_at: Date;
+  authors: string[];
+  ref?: IntersectionObserverHookRefCallback;
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
@@ -77,10 +94,12 @@ export function ArticleCard({
   return (
     <Link
       href={`/novica/${url}`}
+      // rounded-md bg-card
       className={cn(
-        "overflow-hidden rounded-md bg-card no-underline shadow-lg",
+        "overflow-hidden rounded-xl bg-transparent no-underline shadow-lg",
         featured && "col-span-1 md:col-span-2 lg:col-span-3",
       )}
+      ref={ref}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
@@ -113,7 +132,26 @@ export function ArticleCard({
           <CardHeader>
             <h3 className="line-clamp-2 h-16">{title}</h3>
             <div className="flex w-full justify-between">
-              <CardDescription>{created_at.toDateString()}</CardDescription>
+              <CardDescription className="flex w-full items-center justify-between">
+                <div className="flex flex-nowrap text-nowrap">
+                  {created_at.toDateString()}
+                </div>
+                {authors.length !== 0 ? (
+                  <>
+                    {/* <DotIcon /> */}
+                    <div className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden text-ellipsis text-nowrap">
+                      {authors.slice(0, 2).map((author, index) => (
+                        <div className="flex items-center" key={index}>
+                          <span>
+                            {author}
+                            {index !== authors.length - 1 && ",\u00A0"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : undefined}
+              </CardDescription>
               {!preview_image && !published && <DraftBadge />}
             </div>
           </CardHeader>

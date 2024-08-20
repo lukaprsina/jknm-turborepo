@@ -37,6 +37,10 @@ const config = {
 
   experimental: {
     reactCompiler: true,
+    serverActions: {
+      // TODO
+      bodySizeLimit: "100mb",
+    },
   },
 
   reactStrictMode: true,

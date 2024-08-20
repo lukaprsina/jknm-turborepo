@@ -23,6 +23,7 @@
     "@acme/db": "workspace:*",
     "@acme/validators": "workspace:*",
     "@trpc/server": "catalog:",
+    "drizzle-pagination": "^1.0.10",
     "superjson": "2.2.1",
     "zod": "catalog:"
   },

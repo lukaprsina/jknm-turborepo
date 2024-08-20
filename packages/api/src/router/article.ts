@@ -1,7 +1,8 @@
 import type { TRPCRouterRecord } from "@trpc/server";
+import { withCursorPagination } from "drizzle-pagination";
 import { z } from "zod";
 
-import { asc, eq, gt, lt } from "@acme/db";
+import { and, desc, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -12,95 +13,62 @@ import { content_validator } from "@acme/validators";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
+  last_n: publicProcedure.input(z.number()).query(({ ctx, input }) => {
+    return ctx.db.query.Article.findMany({
+      limit: input,
+      orderBy: desc(Article.created_at),
+    });
+  }),
+
   infinite: publicProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(1000).default(50),
-        cursor: z.date().optional(), // <-- "cursor" needs to exist, but can be any type
-        direction: z
-          .enum(["forward", "backward"])
-          .optional()
-          .default("forward"), // optional, useful for bi-directional query
+        cursor: z.date().optional(),
+        direction: z.enum(["forward", "backward"]).optional(),
         show_drafts: z.boolean().optional().default(false),
       }),
     )
-    .query(({ ctx, input }) => {
-      return ctx.db
-        .select()
-        .from(Article)
-        .where(
-          input.cursor
-            ? input.direction == "forward"
-              ? gt(Article.created_at, input.cursor)
-              : lt(Article.created_at, input.cursor)
-            : undefined,
-        ) // if cursor is provided, get rows after it
-        .limit(input.limit) // the number of rows to return
-        .orderBy(asc(Article.id));
-    }),
-  /* all: publicProcedure.query(({ ctx }) => {
-    // return ctx.db.select().from(schema.post).orderBy(desc(schema.post.id));
-    return ctx.db.query.Article.findMany({
-      where: eq(Article.published, true),
-      orderBy: desc(Article.created_at),
-      limit: 10,
-    });
-  }),
+    .query(async ({ ctx, input }) => {
+      console.warn("input", input);
+      const direction = input.direction == "forward" ? "desc" : "asc";
 
-  all_with_offset: publicProcedure
-    .input(z.object({ offset: z.number() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.query.Article.findMany({
-        where: eq(Article.published, true),
-        orderBy: desc(Article.created_at),
-        offset: input.offset,
-        limit: 10,
+      const data = await ctx.db.query.Article.findMany({
+        ...withCursorPagination({
+          limit: input.limit,
+          cursors: [[Article.created_at, direction, input.cursor]],
+          where:
+            !ctx.session || !input.show_drafts
+              ? eq(Article.published, true)
+              : undefined,
+        }),
+        with: {
+          credited_people: {
+            with: {
+              credited_people: true,
+            },
+          },
+        },
       });
-    }),
 
-  all_protected: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.Article.findMany({
-      orderBy: desc(Article.created_at),
-      limit: 10,
-    });
-  }),
+      const last = data[data.length - 1];
 
-  all_protected_with_offset: protectedProcedure
-    .input(z.object({ offset: z.number() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.query.Article.findMany({
-        where: eq(Article.published, true),
-        orderBy: desc(Article.created_at),
-        offset: input.offset,
-        limit: 10,
-      });
+      return {
+        data,
+        nextCursor: last?.created_at,
+      };
     }),
 
   by_id: publicProcedure
     .input(z.object({ id: z.number() }))
     .query(({ ctx, input }) => {
-      // return ctx.db
-      //   .select()
-      //   .from(schema.post)
-      //   .where(eq(schema.post.id, input.id));
-
+      // TODO: when url doesn't match, send me an email
       return ctx.db.query.Article.findFirst({
-        where: and(eq(Article.id, input.id), eq(Article.published, true)),
+        where: ctx.session
+          ? and(eq(Article.id, input.id), eq(Article.published, true))
+          : eq(Article.id, input.id),
       });
     }),
-
-  by_id_protected: protectedProcedure
-    .input(z.object({ id: z.number() }))
-    .query(({ ctx, input }) => {
-      // return ctx.db
-      //   .select()
-      //   .from(schema.post)
-      //   .where(eq(schema.post.id, input.id));
-
-      return ctx.db.query.Article.findFirst({
-        where: eq(Article.id, input.id),
-      });
-    }), */
 
   create_article: protectedProcedure
     .input(CreateArticleSchema)

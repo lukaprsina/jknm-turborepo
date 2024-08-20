@@ -5,7 +5,7 @@ import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
-import { count, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
@@ -33,6 +33,7 @@ export interface CSVType {
 }
 
 export async function delete_articles() {
+  console.log("deleting articles");
   await db.execute(sql`TRUNCATE TABLE ${CreditedPeople} CASCADE;`);
   await db.execute(sql`TRUNCATE TABLE ${ArticlesToCreditedPeople} CASCADE;`);
   await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
@@ -47,21 +48,76 @@ export interface TempArticleType {
   csv_url: string;
   created_at: Date;
   updated_at: Date;
+  author_names: string[];
 }
 
 export async function upload_articles(articles: TempArticleType[]) {
-  await db.insert(Article).values(
-    articles.map((article) => ({
-      id: article.serial_id,
-      old_id: parseInt(article.objave_id),
-      title: article.title,
-      content: article.content,
-      created_at: article.created_at,
-      updated_at: article.updated_at,
-      preview_image: article.preview_image,
-      url: article.csv_url,
-    })),
-  );
+  console.log("uploading articles", articles.length);
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(Article)
+      .values(
+        articles.map((article) => ({
+          id: article.serial_id,
+          old_id: parseInt(article.objave_id),
+          title: article.title,
+          content: article.content,
+          created_at: article.created_at,
+          updated_at: article.updated_at,
+          preview_image: article.preview_image,
+          url: article.csv_url,
+        })),
+      )
+      .returning();
+
+    const authors: (typeof ArticlesToCreditedPeople.$inferInsert)[] = [];
+
+    for (const article of articles) {
+      for (const author_name of article.author_names) {
+        const author = await db.query.CreditedPeople.findFirst({
+          where: eq(CreditedPeople.name, author_name),
+        });
+
+        if (!author) {
+          console.error("Author not found", author_name, article.serial_id);
+          continue;
+        }
+
+        authors.push({
+          article_id: article.serial_id,
+          credited_people_id: author.id,
+        });
+      }
+    }
+
+    await tx.insert(ArticlesToCreditedPeople).values(authors);
+
+    /* await tx.insert(ArticlesToCreditedPeople).values(
+      await Promise.all(
+        articles.flatMap(async (article) => {
+          const authors = article.author_names.map((author_name) => {
+            const author = await db.query.CreditedPeople.findFirst({
+              where: eq(CreditedPeople.name, author_name),
+            });
+
+            if(!author) return;
+
+            return {
+              article_id: article.serial_id,
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              credited_people_id: author.id,
+            };
+          });
+
+          if(!authors) return;
+
+          return authors;
+        }),
+      ),
+    ); */
+  });
+
+  console.log("done uploading articles");
 }
 
 export async function read_articles() {
@@ -98,7 +154,15 @@ export async function read_articles() {
 export async function sync_with_algolia() {
   const articles = await db.query.Article.findMany({
     // limit: 10,
+    with: {
+      credited_people: {
+        with: {
+          credited_people: true,
+        },
+      },
+    },
   });
+
   const algolia = algolia_protected.getClient();
   const index = algolia.initIndex("novice");
 
@@ -124,7 +188,10 @@ export async function sync_with_algolia() {
         published: true,
         has_draft: false,
         year: article.created_at.getFullYear().toString(),
-      };
+        authors: article.credited_people.map(
+          (person) => person.credited_people.name,
+        ),
+      } satisfies ArticleHit;
     })
     .filter((article) => typeof article !== "undefined");
 
@@ -252,6 +319,7 @@ export async function add_authors() {
     return acc;
   }, new Set<string>());
 
+  console.log("adding authors", all_authors.size);
   await db
     .insert(CreditedPeople)
     .values(Array.from(all_authors).map((name) => ({ name, email: "" })));

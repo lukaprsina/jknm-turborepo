@@ -14,9 +14,10 @@ import { TestHeader } from "./header";
 interface ShellProps {
   children: React.ReactNode;
   article?: typeof Article.$inferSelect;
+  without_footer?: boolean;
 }
 
-export function Shell({ children, article }: ShellProps) {
+export function Shell({ children, article, without_footer }: ShellProps) {
   return (
     <HydrateClient>
       <Background />
@@ -26,9 +27,11 @@ export function Shell({ children, article }: ShellProps) {
           <Header article={article} />
         </header>
         <main className="relative w-full">{children}</main>
-        <footer className="bottom-0">
-          <Footer />
-        </footer>
+        {!without_footer ? (
+          <footer className="bottom-0">
+            <Footer />
+          </footer>
+        ) : undefined}
       </div>
     </HydrateClient>
   );

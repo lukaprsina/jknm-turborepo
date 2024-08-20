@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   json,
   pgTable,
@@ -88,22 +89,28 @@ export interface ArticleContentType {
 }
 
 // My schema below
-export const Article = pgTable("article", {
-  id: serial("id").primaryKey(),
-  old_id: integer("old_id"),
-  title: varchar("title", { length: 255 }).notNull(),
-  url: varchar("url", { length: 255 }).notNull(),
-  published: boolean("published").default(false),
-  created_at: timestamp("created_at").defaultNow().notNull(),
-  updated_at: timestamp("updated_at", {
-    mode: "date",
-    withTimezone: true,
+export const Article = pgTable(
+  "article",
+  {
+    id: serial("id").primaryKey(),
+    old_id: integer("old_id"),
+    title: varchar("title", { length: 255 }).notNull(),
+    url: varchar("url", { length: 255 }).notNull(),
+    published: boolean("published").default(false),
+    created_at: timestamp("created_at").defaultNow().notNull(),
+    updated_at: timestamp("updated_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    content: json("content").$type<ArticleContentType>(),
+    draft_content: json("draft_content").$type<ArticleContentType>(),
+    preview_image: varchar("preview_image", { length: 255 }),
+    draft_preview_image: varchar("draft_preview_image", { length: 255 }),
+  },
+  (article) => ({
+    created_at_index: index("created_at_index").on(article.created_at),
   }),
-  content: json("content").$type<ArticleContentType>(),
-  draft_content: json("draft_content").$type<ArticleContentType>(),
-  preview_image: varchar("preview_image", { length: 255 }),
-  draft_preview_image: varchar("draft_preview_image", { length: 255 }),
-});
+);
 
 export const CreateArticleWithDateSchema = createInsertSchema(Article, {
   content: content_validator,

@@ -1,24 +1,20 @@
-// import { auth } from "@acme/auth";
-
 import { auth } from "@acme/auth";
 
 import { ShowDraftsProvider } from "~/components/drafts-provider";
+import { api } from "~/trpc/server";
 import { Shell } from "../components/shell";
 import { ArticlesClient } from "./articles-client";
-import { ArticlesServer } from "./articles-server";
 
 export default async function HomePageServer() {
   const session = await auth();
 
-  const articles = session ? (
-    <ArticlesClient session={session} />
-  ) : (
-    <ArticlesServer />
-  );
+  const infinite_articles = await api.article.last_n(50);
 
   return (
-    <ShowDraftsProvider show_button={!!session}>
-      <Shell>{articles}</Shell>
+    <ShowDraftsProvider show_button={Boolean(session)}>
+      <Shell without_footer>
+        <ArticlesClient initial_articles={infinite_articles} />
+      </Shell>
     </ShowDraftsProvider>
   );
 }

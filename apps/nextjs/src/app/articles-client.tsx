@@ -1,45 +1,23 @@
 "use client";
 
-import { useContext, useEffect, useRef } from "react";
-import { useIntersectionObserver } from "react-intersection-observer-hook";
+import { useEffect } from "react";
 
-import type { Session } from "@acme/auth";
+import type { Article } from "@acme/db/schema";
 
-import { ShowDraftsContext } from "~/components/drafts-provider";
-import { api } from "~/trpc/react";
+import { useInfiniteArticles } from "~/hooks/use-infinite-articles";
 import { Articles } from "./articles";
 
-export function ArticlesClient({ session }: { session: Session | null }) {
-  const drafts = useContext(ShowDraftsContext);
-  const show_drafts = drafts?.[0] ?? false;
-
-  /* const articles =
-    session && showDrafts
-      ? api.article.all_protected.useQuery()
-      : api.article.all.useQuery(); */
-
-  const articles = api.article.infinite.useInfiniteQuery(
-    {
-      show_drafts,
-    },
-    {
-      getNextPageParam: (lastPage) => {
-        // console.log("getNextPageParam", lastPage);
-        const real_last_page = lastPage[0];
-        if (!real_last_page) return null;
-
-        return real_last_page.created_at;
-      },
-    },
-  );
-
-  const [ref, { entry }] = useIntersectionObserver({
-    threshold: 1,
-  });
+export function ArticlesClient({
+  initial_articles,
+}: {
+  initial_articles: (typeof Article.$inferSelect)[];
+}) {
+  const { articles, ref } = useInfiniteArticles(initial_articles);
 
   useEffect(() => {
-    console.log("ArticlesClient", articles, entry);
-  }, [articles, entry]);
+    if (!articles) return;
+    console.log("last article", articles[articles.length - 1]?.id);
+  });
 
-  return <Articles featured articles={articles.data?.pages.at(0)} ref={ref} />;
+  return <Articles featured articles={articles} ref={ref} />;
 }

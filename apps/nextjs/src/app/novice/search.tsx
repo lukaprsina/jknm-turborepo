@@ -63,8 +63,9 @@ export function Search({ session }: { session?: Session }) {
           <Hits
             hitComponent={ArticleAlgoliaCard}
             classNames={{
+              list: "container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8",
               item: articles_variants(),
-              list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
+              // list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
             }}
           />
         </TabsContent>

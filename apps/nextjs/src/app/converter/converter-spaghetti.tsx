@@ -25,6 +25,7 @@ export interface ProblematicArticleType {
   html: string;
 }
 
+const do_splice = false as boolean;
 let wrong_divs = 0;
 let videos = 0;
 const problematic_articles: ProblematicArticleType[] = [];
@@ -49,8 +50,6 @@ export async function iterate_over_articles(
   videos = 0;
   problematic_articles.length = 0;
   images_to_save.length = 0;
-
-  const do_splice = true as boolean;
 
   const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
@@ -209,7 +208,8 @@ async function parse_csv_article(
     csv_url,
     created_at,
     updated_at,
-  };
+    author_names: Array.from(new_authors),
+  } satisfies TempArticleType;
 }
 
 function parse_node(

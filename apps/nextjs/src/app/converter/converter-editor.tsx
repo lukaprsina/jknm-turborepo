@@ -6,7 +6,6 @@ import EditorJS from "@editorjs/editorjs";
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 
-import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
   add_authors,
@@ -31,7 +30,6 @@ export function ArticleConverter() {
     })();
   }, []);
 
-  const article_update = api.article.create_article_with_date.useMutation();
   const [firstArticle, setFirstArticle] = useState(0); // 20 - 60
   const [lastArticle, setLastArticle] = useState(30);
 

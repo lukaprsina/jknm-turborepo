@@ -50,7 +50,8 @@ export function ArticleTable({
         <TableRow>
           <TableHead>ID</TableHead>
           <TableHead>Naslov</TableHead>
-          <TableHead>URL</TableHead>
+          <TableHead>Datum nastanka</TableHead>
+          <TableHead>Avtorji</TableHead>
           {session && <TableHead className="text-right"></TableHead>}
         </TableRow>
       </TableHeader>
