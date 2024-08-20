@@ -132,26 +132,29 @@ export function ArticleCard({
           <CardHeader>
             <h3 className="line-clamp-2 h-16">{title}</h3>
             <div className="flex w-full justify-between">
-              <CardDescription className="flex w-full items-center justify-between">
-                <div className="flex flex-nowrap text-nowrap">
+              <div className="flex w-full items-center justify-between">
+                <CardDescription className="flex flex-nowrap text-nowrap">
                   {created_at.toDateString()}
-                </div>
+                </CardDescription>
                 {authors.length !== 0 ? (
                   <>
                     {/* <DotIcon /> */}
                     <div className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden text-ellipsis text-nowrap">
                       {authors.slice(0, 2).map((author, index) => (
-                        <div className="flex items-center" key={index}>
+                        <CardDescription
+                          className="flex items-center"
+                          key={index}
+                        >
                           <span>
                             {author}
                             {index !== authors.length - 1 && ",\u00A0"}
                           </span>
-                        </div>
+                        </CardDescription>
                       ))}
                     </div>
                   </>
                 ) : undefined}
-              </CardDescription>
+              </div>
               {!preview_image && !published && <DraftBadge />}
             </div>
           </CardHeader>

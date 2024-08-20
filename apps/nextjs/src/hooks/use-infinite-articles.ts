@@ -20,6 +20,7 @@ export function useInfiniteArticles(
       limit: 6 * 5,
     },
     {
+      // maxPages: 100,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.nextCursor,
       /* initialData: {
@@ -34,10 +35,15 @@ export function useInfiniteArticles(
     },
   );
 
-  const articles = useMemo(
-    () => article_api.data?.pages.flatMap((page) => page.data),
-    [article_api.data?.pages],
-  );
+  const articles = useMemo(() => {
+    const pages = article_api.data?.pages;
+    if (!pages) return;
+    const last_page = pages[pages.length - 1]?.data;
+    if (!last_page) return;
+    console.log("use memo", pages, last_page);
+
+    return article_api.data?.pages.flatMap((page) => page.data);
+  }, [article_api.data?.pages]);
 
   const [ref, { entry }] = useIntersectionObserver({
     threshold: 1,
