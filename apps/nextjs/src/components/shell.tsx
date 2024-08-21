@@ -6,7 +6,6 @@ import { auth } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import { Separator } from "@acme/ui/separator";
 
-import { Background } from "~/components/backgrounds";
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
 import { TestHeader } from "./header";
@@ -20,7 +19,7 @@ interface ShellProps {
 export function Shell({ children, article, without_footer }: ShellProps) {
   return (
     <HydrateClient>
-      <Background />
+      {/* <Background /> */}
       <div className="w-full">
         {/* py-4 md:py-6 backdrop-blur-sm*/}
         <header /* className="z-50" */>

@@ -100,7 +100,7 @@ export function TestHeader({
         ref={sticky_navbar}
         className={cn(
           "relative z-40 flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
-          sticky ? "fixed top-0 bg-white/60 transition-colors" : null,
+          sticky ? "fixed top-0 bg-white/80 transition-colors" : null,
         )}
       >
         <LinksMenu />
@@ -213,7 +213,7 @@ function DesktopHeaderLink({
 }
 
 const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
+  React.ComponentRef<"a">,
   React.ComponentPropsWithoutRef<"a">
 >(({ className, title, children, ...props }, ref) => {
   return (

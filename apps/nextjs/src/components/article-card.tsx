@@ -132,17 +132,14 @@ export function ArticleCard({
           <CardHeader>
             <h3 className="line-clamp-2 h-16">{title}</h3>
             <div className="flex w-full justify-between">
-              <div className="flex w-full items-center justify-between">
-                <CardDescription className="flex flex-nowrap text-nowrap">
-                  {created_at.toDateString()}
-                </CardDescription>
+              <div className="flex w-full items-center justify-between gap-3">
                 {authors.length !== 0 ? (
                   <>
                     {/* <DotIcon /> */}
                     <div className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden text-ellipsis text-nowrap">
                       {authors.slice(0, 2).map((author, index) => (
                         <CardDescription
-                          className="flex items-center"
+                          className="flex items-center text-foreground"
                           key={index}
                         >
                           <span>
@@ -154,6 +151,9 @@ export function ArticleCard({
                     </div>
                   </>
                 ) : undefined}
+                <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
+                  {created_at.toDateString()}
+                </CardDescription>
               </div>
               {!preview_image && !published && <DraftBadge />}
             </div>
@@ -162,7 +162,7 @@ export function ArticleCard({
             <div className="h-full">
               <p
                 className={cn(
-                  "relative line-clamp-2 items-end",
+                  "relative line-clamp-3 items-end",
                   !preview_image && "line-clamp-4",
                 )}
               >

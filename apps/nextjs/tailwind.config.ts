@@ -58,18 +58,23 @@ export default {
           css: {
             maxWidth: "1280px",
             p: {
+              fontWeight: "400",
               fontSize: "18px",
             },
             h1: {
-              fontWeight: "500",
+              fontWeight: "400", // 500
               color: theme("colors.blue.800"),
               fontSize: "36px",
             },
             h2: {
+              fontWeight: "400",
               color: theme("colors.blue.800"),
+              fontSize: "24px",
             },
             h3: {
+              fontWeight: "400",
               color: theme("colors.blue.800"),
+              fontSize: "18px",
             },
           },
         },
