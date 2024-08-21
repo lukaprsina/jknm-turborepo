@@ -105,8 +105,8 @@ interface AutocompleteProps {
 // https://www.algolia.com/doc/ui-libraries/autocomplete/integrations/using-react/
 export function Autocomplete({ detached, ...props }: AutocompleteProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const rootRef = useRef<HTMLElement>();
-  const panelRootRef = useRef<Root>();
+  const rootRef = useRef<HTMLElement | null>(null);
+  const panelRootRef = useRef<Root | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) {

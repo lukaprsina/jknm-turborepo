@@ -6,7 +6,6 @@ import type {
   UseSearchBoxProps,
   UseSortByProps,
 } from "react-instantsearch";
-import { useMemo } from "react";
 // import { InstantSearchNext } from "react-instantsearch-nextjs";
 import {
   useClearRefinements,
@@ -81,20 +80,28 @@ export function MyStats() {
 export function TimelineRefinement(
   props: Omit<UseRefinementListProps, "attribute">,
 ) {
-  const refinement_list = useRefinementList({ attribute: "year", ...props });
+  const refinement_list = useRefinementList({
+    attribute: "year",
+    sortBy: ["name:asc"],
+    limit: 100,
+    ...props,
+  });
   const clear_refinements = useClearRefinements({
     includedAttributes: ["year"],
   });
 
-  const sorted_list = useMemo(() => {
-    return refinement_list.items.sort((a, b) => {
+  /* const sorted_list = useMemo(() => {
+    const sorted_items = refinement_list.items.sort((a, b) => {
       return parseInt(a.value) - parseInt(b.value);
     });
-  }, [refinement_list]);
+
+    console.log({ sorted_items });
+    return sorted_items;
+  }, [refinement_list]); */
 
   return (
     <ol className="flex items-center justify-center pb-2 pl-1 sm:flex">
-      {sorted_list.map((item) => (
+      {refinement_list.items.map((item) => (
         <TimelineItem
           onClick={() => {
             if (item.isRefined) {

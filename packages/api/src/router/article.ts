@@ -17,6 +17,14 @@ export const articleRouter = {
     return ctx.db.query.Article.findMany({
       limit: input,
       orderBy: desc(Article.created_at),
+      where: !ctx.session ? eq(Article.published, true) : undefined,
+      with: {
+        credited_people: {
+          with: {
+            credited_people: true,
+          },
+        },
+      },
     });
   }),
 

@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@acme/ui/button";
+import { FancyBox } from "@acme/ui/fancy-box";
 import {
   Form,
   FormControl,
@@ -26,7 +27,11 @@ const FormSchema = z.object({
   ),
 });
 
-export default function AuthorTags() {
+export function AuthorTags() {
+  return <FancyBox />;
+}
+
+export function AuthorTags2() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });

@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-
-import type { Article } from "@acme/db/schema";
-
+import type { ArticleWithCreditedPeople } from "./articles";
 import { useInfiniteArticles } from "~/hooks/use-infinite-articles";
 import { Articles } from "./articles";
 
 export function ArticlesClient({
   initial_articles,
 }: {
-  initial_articles: (typeof Article.$inferSelect)[];
+  initial_articles: ArticleWithCreditedPeople[];
 }) {
   const { articles, ref } = useInfiniteArticles(initial_articles);
-
-  useEffect(() => {
-    if (!articles) return;
-    console.log("last article", articles[articles.length - 1]?.id);
-  });
 
   return <Articles featured articles={articles} ref={ref} />;
 }

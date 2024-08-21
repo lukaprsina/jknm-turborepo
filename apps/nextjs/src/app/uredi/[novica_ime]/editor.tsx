@@ -22,10 +22,10 @@ import { Button } from "@acme/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
+import { AuthorTags } from "./author-tags";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
-import AuthorTags from "./author-tags";
 
 export default function MyEditor({
   article,

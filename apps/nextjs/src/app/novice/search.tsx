@@ -38,19 +38,18 @@ export function Search({ session }: { session?: Session }) {
                   { value: "novice_date_asc", label: "Najstarejše" },
                 ]}
               />
+              <TabsList>
+                <TabsTrigger value="card">
+                  <LayoutDashboard />
+                </TabsTrigger>
+                <TabsTrigger value="table">
+                  <TableIcon />
+                </TabsTrigger>
+              </TabsList>
             </div>
           </div>
           <div className="flex w-full items-center justify-between">
             <TimelineRefinement />
-
-            <TabsList>
-              <TabsTrigger value="card">
-                <LayoutDashboard />
-              </TabsTrigger>
-              <TabsTrigger value="table">
-                <TableIcon />
-              </TabsTrigger>
-            </TabsList>
           </div>
         </div>
         <TabsContent
@@ -63,7 +62,7 @@ export function Search({ session }: { session?: Session }) {
           <Hits
             hitComponent={ArticleAlgoliaCard}
             classNames={{
-              list: "container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8",
+              list: "container grid w-full grid-cols-1 gap-6 px-0 py-8 md:grid-cols-2 lg:grid-cols-3",
               item: articles_variants(),
               // list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
             }}

@@ -3,13 +3,12 @@
 import { useContext, useEffect, useMemo } from "react";
 import { useIntersectionObserver } from "react-intersection-observer-hook";
 
-import type { Article } from "@acme/db/schema";
-
+import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { ShowDraftsContext } from "~/components/drafts-provider";
 import { api } from "~/trpc/react";
 
 export function useInfiniteArticles(
-  _initial_articles: (typeof Article.$inferSelect)[],
+  initial_articles: ArticleWithCreditedPeople[],
 ) {
   const drafts = useContext(ShowDraftsContext);
   const show_drafts = drafts?.[0] ?? false;
@@ -23,6 +22,7 @@ export function useInfiniteArticles(
       // maxPages: 100,
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       getPreviousPageParam: (firstPage) => firstPage.nextCursor,
+      // TODO
       /* initialData: {
         pages: [
           {
@@ -36,6 +36,7 @@ export function useInfiniteArticles(
   );
 
   const articles = useMemo(() => {
+    console.error(article_api.data?.pages);
     const pages = article_api.data?.pages;
     if (!pages) return;
     const last_page = pages[pages.length - 1]?.data;

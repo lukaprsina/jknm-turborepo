@@ -1,17 +1,19 @@
 "use client";
 
-import * as React from "react";
-import {
+import type {
   ColumnDef,
   ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+} from "@tanstack/react-table";
+import * as React from "react";
+import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  SortingState,
   useReactTable,
-  VisibilityState,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
@@ -69,12 +71,12 @@ const data: Payment[] = [
   },
 ];
 
-export type Payment = {
+export interface Payment {
   id: string;
   amount: number;
   status: "pending" | "processing" | "success" | "failed";
   email: string;
-};
+}
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -200,7 +202,11 @@ export function DataTableDemo() {
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+          value={
+            (table.getColumn("email")?.getFilterValue() as
+              | string
+              | undefined) ?? ""
+          }
           onChange={(event) =>
             table.getColumn("email")?.setFilterValue(event.target.value)
           }
