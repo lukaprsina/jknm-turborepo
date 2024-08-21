@@ -76,22 +76,21 @@ export function EditButton({
       const returned_data = data?.at(0);
       if (!returned_data) return;
 
-      console.log("editing buttons", returned_data);
-      if (!content_preview) return;
-
       await create_algolia_article({
         objectID: returned_data.id.toString(),
         title: returned_data.title,
         url: returned_data.url,
-        content_preview,
+        content_preview: content_preview ?? "",
         created_at: returned_data.created_at.getTime(),
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
+        authors: [],
       });
 
       await trpc_utils.article.invalidate();
 
+      // console.log("/uredi", generate_encoded_url(returned_data));
       router.push(`/uredi/${generate_encoded_url(returned_data)}`);
     },
   });

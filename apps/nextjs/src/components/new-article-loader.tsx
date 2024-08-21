@@ -31,10 +31,9 @@ export default function NewArticleLoader({
       if (!returned_data) return;
 
       console.log("new article loader", returned_data);
-      const content_preview = content_to_text(
-        returned_data.content ?? undefined,
-      );
-      if (!content_preview) return;
+      const content_preview =
+        content_to_text(returned_data.content ?? undefined) ?? "";
+      // if (!content_preview) return;
 
       await create_algolia_article({
         objectID: returned_data.id.toString(),
@@ -45,10 +44,12 @@ export default function NewArticleLoader({
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
+        authors: [],
       });
 
       await trpc_utils.article.invalidate();
 
+      // console.log("/uredi", generate_encoded_url(returned_data));
       router.push(`/uredi/${generate_encoded_url(returned_data)}`);
     },
   });

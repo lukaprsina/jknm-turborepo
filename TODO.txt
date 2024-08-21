@@ -9,7 +9,6 @@ https://trpc.io/docs/client/react/useUtils#query-invalidation
 
 D:\dev\js\jknm-turborepo\apps\nextjs\pt-all\potop-v-termalni-izvir-1
 
-
 aws cors policy delete origins: *
 
 

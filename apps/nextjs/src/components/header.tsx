@@ -167,16 +167,12 @@ export function LinksMenu() {
         <DesktopHeaderLink href="/publiciranje">Publiciranje</DesktopHeaderLink>
         <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent">
+          <NavigationMenuTrigger className="bg-transparent text-lg">
             Klub
           </NavigationMenuTrigger>
           <NavigationMenuContent className="relative z-50">
             <ul className="z-50 grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-              <ListItem
-                className="z-50"
-                title="Kataster jam"
-                href=""
-              ></ListItem>
+              <ListItem title="Kataster jam" href=""></ListItem>
               <ListItem title="Izobraževanje" href=""></ListItem>
               <ListItem title="Etični kodeks" href=""></ListItem>
               <ListItem title="Društvo v javnem interesu" href=""></ListItem>
@@ -202,7 +198,7 @@ function DesktopHeaderLink({
         <NavigationMenuLink
           className={cn(
             navigationMenuTriggerStyle(),
-            "bg-transparent dark:bg-primary/80 dark:text-primary-foreground",
+            "bg-transparent text-lg dark:bg-primary/80 dark:text-primary-foreground",
           )}
         >
           {children}
@@ -227,7 +223,8 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
+          {/* text-sm font-medium */}
+          <div className="leading-none">{title}</div>
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>

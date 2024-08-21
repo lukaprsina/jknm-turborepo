@@ -132,8 +132,13 @@ export function ArticleCard({
         <div className="h-full">
           <CardHeader>
             <h3 className="line-clamp-2 h-16">{title}</h3>
-            <div className="flex w-full justify-between">
-              <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex w-full justify-between gap-2">
+              <div
+                className={cn(
+                  "flex w-full items-center gap-3",
+                  authors.length === 0 ? "justify-end" : "justify-between",
+                )}
+              >
                 {authors.length !== 0 ? (
                   <>
                     {/* <DotIcon /> */}
