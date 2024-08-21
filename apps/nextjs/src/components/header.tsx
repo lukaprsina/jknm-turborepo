@@ -167,7 +167,7 @@ export function LinksMenu() {
         <DesktopHeaderLink href="/publiciranje">Publiciranje</DesktopHeaderLink>
         <DesktopHeaderLink href="/varstvo">Varstvo</DesktopHeaderLink>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="bg-transparent text-lg">
+          <NavigationMenuTrigger className="bg-transparent text-base">
             Klub
           </NavigationMenuTrigger>
           <NavigationMenuContent className="relative z-50">
@@ -198,7 +198,7 @@ function DesktopHeaderLink({
         <NavigationMenuLink
           className={cn(
             navigationMenuTriggerStyle(),
-            "bg-transparent text-lg dark:bg-primary/80 dark:text-primary-foreground",
+            "bg-transparent text-base dark:bg-primary/80 dark:text-primary-foreground",
           )}
         >
           {children}
@@ -224,7 +224,7 @@ const ListItem = React.forwardRef<
           {...props}
         >
           {/* text-sm font-medium */}
-          <div className="leading-none">{title}</div>
+          <div className="text-sm font-medium leading-none">{title}</div>
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>

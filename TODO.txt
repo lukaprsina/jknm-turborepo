@@ -19,7 +19,11 @@ Davorin Kacin
 predzadnji odstavek poglej za avtorje
 
 
+slike dvakratnik
 
 RIP OFF:
 https://www.openstatus.dev/
 https://craft.mxkaske.dev/post/fancy-box
+
+http://localhost:3000/novica/jamarski-te%C4%8Daj-2023-596
+nbsp

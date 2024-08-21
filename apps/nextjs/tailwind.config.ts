@@ -62,7 +62,7 @@ export default {
               fontSize: "18px",
             },
             h1: {
-              fontWeight: "400", // 500
+              fontWeight: "500", // 500
               color: theme("colors.blue.800"),
               fontSize: "36px",
             },

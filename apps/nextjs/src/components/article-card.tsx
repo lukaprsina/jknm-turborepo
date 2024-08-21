@@ -128,10 +128,10 @@ export function ArticleCard({
             )}
           </AspectRatio>
         ) : null}
-        {/* TODO: če sta dve vrstici, ni poravnano */}
-        <div className="h-full">
+        <div className="prose-h3:font-semibold prose-h3:text-xl h-full">
           <CardHeader>
-            <h3 className="line-clamp-2 h-16">{title}</h3>
+            {/* TODO, hardcodani dve vrstici */}
+            <h3 className="line-clamp-2 h-[56px]">{title}</h3>
             <div className="flex w-full justify-between gap-2">
               <div
                 className={cn(
