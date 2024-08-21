@@ -15,6 +15,7 @@ import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
+import { format_date } from "~/lib/format-date";
 import { gallery_store } from "./gallery-store";
 
 export function EditorToReact({
@@ -48,13 +49,13 @@ export function EditorToReact({
     };
   }, [article?.content, article?.draft_content, draft]);
 
-  if (!editor_data) return;
+  if (!editor_data || !article) return;
 
   return (
     <Card className="pt-8">
       <CardHeader>
         <h1>{heading}</h1>
-        <CardDescription>{article?.created_at.toDateString()}</CardDescription>
+        <CardDescription>{format_date(article.created_at)}</CardDescription>
       </CardHeader>
       <CardContent>
         <Blocks

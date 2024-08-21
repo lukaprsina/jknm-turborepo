@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 
-import { auth } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -29,8 +28,6 @@ interface EditorPageProps {
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
-  const session = await auth();
-
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
   const novica_ime = novica_parts.slice(0, -1).join("-");
@@ -50,13 +47,9 @@ export default async function EditorPage({
 
   const novica_id = parseInt(novica_id_string);
 
-  const article_by_url = session
-    ? await api.article.by_id_protected({
-        id: novica_id,
-      })
-    : await api.article.by_id({
-        id: novica_id,
-      });
+  const article_by_url = await api.article.by_id({
+    id: novica_id,
+  });
 
   /*<>
       <ArticleBreadcrumb article={article_by_url} />

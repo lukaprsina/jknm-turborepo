@@ -16,6 +16,7 @@ import { MagicCard } from "@acme/ui/magic-card";
 
 import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { content_to_text } from "~/lib/content-to-text";
+import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 
 // React.RefObject<HTMLAnchorElement>;
@@ -152,7 +153,7 @@ export function ArticleCard({
                   </>
                 ) : undefined}
                 <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
-                  {created_at.toDateString()}
+                  {format_date(created_at)}
                 </CardDescription>
               </div>
               {!preview_image && !published && <DraftBadge />}

@@ -8,7 +8,6 @@ import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
 import { ImageGallery } from "./image-gallery";
-import { SwiperGallery } from "./swiper-gallery";
 
 interface NovicaProps {
   params: {
@@ -57,13 +56,9 @@ export default async function NovicaPage({
     );
   }
 
-  const article_by_url = session
-    ? await api.article.by_id_protected({
-        id: novica_id,
-      })
-    : await api.article.by_id({
-        id: novica_id,
-      });
+  const article_by_url = await api.article.by_id({
+    id: novica_id,
+  });
 
   return (
     <EditableProvider editable="readonly">

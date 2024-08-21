@@ -38,9 +38,9 @@ export const articleRouter = {
           limit: input.limit,
           cursors: [[Article.created_at, direction, input.cursor]],
           where:
-            !ctx.session || !input.show_drafts
-              ? eq(Article.published, true)
-              : undefined,
+            ctx.session && input.show_drafts
+              ? undefined
+              : eq(Article.published, true),
         }),
         with: {
           credited_people: {
@@ -65,8 +65,8 @@ export const articleRouter = {
       // TODO: when url doesn't match, send me an email
       return ctx.db.query.Article.findFirst({
         where: ctx.session
-          ? and(eq(Article.id, input.id), eq(Article.published, true))
-          : eq(Article.id, input.id),
+          ? eq(Article.id, input.id)
+          : and(eq(Article.id, input.id), eq(Article.published, true)),
       });
     }),
 
