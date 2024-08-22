@@ -2,12 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDetectClickOutside } from "react-detect-click-outside";
 import { createPortal } from "react-dom";
 
 import type { CarouselApi } from "@acme/ui/carousel";
-import { Card, CardContent } from "@acme/ui/card";
 import {
   Carousel,
   CarouselContent,
@@ -15,17 +12,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@acme/ui/carousel";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@acme/ui/dialog";
 
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
-import { RedditGallery } from "./reddit-gallery";
 
 /* return (
     <>

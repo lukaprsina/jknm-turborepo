@@ -18,6 +18,8 @@ Davorin Kacin
 
 predzadnji odstavek poglej za avtorje
 
+gallery images, upload file, delete images, files
+
 
 slike dvakratnik
 

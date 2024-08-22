@@ -82,7 +82,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const router = useRouter();
   const [savingText, setSavingText] = useState<string | undefined>();
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-  const editorJS = useRef<EditorJS | undefined>();
+  const editorJS = useRef<EditorJS | null>(null);
   const [dirty, setDirty] = useState(false);
   const trpc_utils = api.useUtils();
 
@@ -379,7 +379,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     <EditorContext.Provider
       value={{
         article,
-        editor: editorJS.current,
+        editor: editorJS.current ?? undefined,
         dirty,
         savingText,
         setSavingText,

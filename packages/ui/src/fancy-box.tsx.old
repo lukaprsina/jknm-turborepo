@@ -95,7 +95,7 @@ export function FancyBox() {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [inputValue, setInputValue] = React.useState<string>("");
   const [selectedValues, setSelectedValues] = React.useState<Framework[]>([
-    FRAMEWORKS[0] ?? ({ value: "", label: "", color: "" } satisfies Framework),
+    FRAMEWORKS[0],
   ]);
 
   const createFramework = (name: string) => {
@@ -150,7 +150,7 @@ export function FancyBox() {
           >
             <span className="truncate">
               {selectedValues.length === 0 && "Select labels"}
-              {selectedValues.length === 1 && selectedValues[0]?.label}
+              {selectedValues.length === 1 && selectedValues[0].label}
               {selectedValues.length === 2 &&
                 selectedValues.map(({ label }) => label).join(", ")}
               {selectedValues.length > 2 &&

@@ -28,6 +28,7 @@ function rewriteRequestUrlInDevelopment(req: NextRequest) {
 export const POST = async (_req: NextRequest) => {
   // First step must be to correct the request URL.
   const req = rewriteRequestUrlInDevelopment(_req);
+  // @ts-expect-error missing [INTERNALS]
   return handlers.POST(req);
 };
 
@@ -59,6 +60,7 @@ export const GET = async (
     // Run original handler, then extract the session token from the response
     // Send it back via a query param in the Expo deep link. The Expo app
     // will then get that and set it in the session storage.
+    // @ts-expect-error missing [INTERNALS]
     const authResponse = await handlers.GET(req);
     const setCookie = authResponse.headers
       .getSetCookie()
@@ -77,5 +79,6 @@ export const GET = async (
   }
 
   // Every other request just calls the default handler
+  // @ts-expect-error missing [INTERNALS]
   return handlers.GET(req);
 };
