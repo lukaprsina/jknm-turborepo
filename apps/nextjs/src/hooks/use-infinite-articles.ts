@@ -8,7 +8,7 @@ import { ShowDraftsContext } from "~/components/drafts-provider";
 import { api } from "~/trpc/react";
 
 export function useInfiniteArticles(
-  initial_articles: ArticleWithCreditedPeople[],
+  _initial_articles: ArticleWithCreditedPeople[],
 ) {
   const drafts = useContext(ShowDraftsContext);
   const show_drafts = drafts?.[0] ?? false;
@@ -26,7 +26,7 @@ export function useInfiniteArticles(
       /* initialData: {
         pages: [
           {
-            data: initial_articles,
+            data: _initial_articles,
             nextCursor: undefined,
           },
         ],
@@ -36,7 +36,7 @@ export function useInfiniteArticles(
   );
 
   const articles = useMemo(() => {
-    console.error(article_api.data?.pages);
+    console.log(article_api.data?.pages);
     const pages = article_api.data?.pages;
     if (!pages) return;
     const last_page = pages[pages.length - 1]?.data;

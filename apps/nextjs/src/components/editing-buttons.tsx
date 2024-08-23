@@ -52,7 +52,6 @@ export default function EditingButtons({
 export function EditButton({
   id,
   url,
-  preview_image,
   content_preview,
   has_draft,
   variant = "ghost",
@@ -66,10 +65,6 @@ export function EditButton({
 }) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
-
-  const article_by_id = api.article.by_id.useQuery({
-    id,
-  });
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: async (data) => {
@@ -112,12 +107,8 @@ export function EditButton({
                 })}`,
               );
             } else {
-              if (!article_by_id.data?.content) return;
-
               article_create_draft.mutate({
                 id,
-                preview_image: preview_image ?? "",
-                content: article_by_id.data.content,
               });
             }
           }}

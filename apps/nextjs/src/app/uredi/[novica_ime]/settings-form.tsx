@@ -59,6 +59,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
               <FormControl>
                 <ImageCarousel
                   onImageUrlChange={(value) => {
+                    console.log("onImageUrlChange", value);
                     field.onChange(value);
                     editor_store.set.preview_image(value);
                   }}

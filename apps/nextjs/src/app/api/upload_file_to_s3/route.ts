@@ -11,34 +11,44 @@ import { env } from "~/env";
 
 export interface FileUploadResponse {
   success: 0 | 1;
-  file?: FileUploadJSON;
+  file?: FileUploadJSON | ImageUploadJSON;
   error?: "File exists";
+}
+
+export interface ImageUploadJSON {
+  url: string;
+  width?: number;
+  height?: number;
 }
 
 export interface FileUploadJSON {
   url: string;
-  width: number;
-  height: number;
+  title: string;
+  size: number;
 }
 
 export async function POST(request: NextRequest) {
-  console.log("upload_file_to_s3", request.url);
   const form_data = await request.formData();
 
   const directory = form_data.get("directory");
   if (typeof directory !== "string") return NextResponse.error();
 
   let file = form_data.get("file");
+  const file_type = form_data.get("type");
   const external_url = form_data.get("url");
   let title = form_data.get("title");
   let mime_type = "";
   let key = "";
 
-  if (file instanceof File) {
+  if ((file_type === "image" || file_type === "file") && file instanceof File) {
     // Upload from a file.
     key = `${directory}/${file.name}`;
     mime_type = file.type;
-  } else if (typeof external_url === "string" && typeof title === "string") {
+  } else if (
+    file_type === "image" &&
+    typeof external_url === "string" &&
+    typeof title === "string"
+  ) {
     // Upload from an URL.
     key = `${directory}/${title}`;
 
@@ -101,20 +111,33 @@ export async function POST(request: NextRequest) {
     body: formData,
   });
 
-  const image_buffer = await file.arrayBuffer();
-  const image_metadata = await sharp(image_buffer).metadata();
-  const image_width = image_metadata.width;
-  const image_height = image_metadata.height;
+  let file_data: ImageUploadJSON | FileUploadJSON | undefined = undefined;
 
-  if (!fields.key) return NextResponse.error();
-  const file_data = {
-    url: `${url}${fields.key}`,
-    // url: encodeURI(`${url}${fields.key}`),
-    width: image_width,
-    height: image_height,
-  };
+  if (file_type === "image") {
+    const image_buffer = await file.arrayBuffer();
+    const image_metadata = await sharp(image_buffer).metadata();
+    const image_width = image_metadata.width;
+    const image_height = image_metadata.height;
 
-  const response_json = { success: 1, file: file_data } as FileUploadResponse;
+    if (!fields.key) return NextResponse.error();
+    file_data = {
+      url: `${url}${fields.key}`,
+      width: image_width,
+      height: image_height,
+    };
+  } else {
+    file_data = {
+      url: `${url}${fields.key}`,
+      title: file.name,
+      size: file.size,
+    };
+  }
+
+  console.log("upload_file_to_s3", file_data);
+  const response_json = {
+    success: 1,
+    file: file_data,
+  } satisfies FileUploadResponse;
   return uploadResponse.ok
     ? NextResponse.json(response_json)
     : NextResponse.error();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 
 import { cn } from "@acme/ui";
@@ -13,7 +13,9 @@ import {
   CarouselPrevious,
 } from "@acme/ui/carousel";
 
+import type { ImageUploadJSON } from "~/app/api/upload_file_to_s3/route";
 import { editor_store } from "./editor-store";
+import { upload_image_by_file } from "./upload-file";
 
 interface ImageCarouselProps {
   onImageUrlChange: (value: string) => void;
@@ -30,6 +32,12 @@ export const ImageCarousel = React.forwardRef<
   /* const editor = useEditor();
 
   if (!editor) return null; */
+
+  useEffect(() => {
+    if (!uploadedUrl) return;
+    console.log("uploadedUrl", uploadedUrl);
+    onImageUrlChange(uploadedUrl);
+  }, [onImageUrlChange, uploadedUrl]);
 
   return (
     <Carousel
@@ -82,28 +90,18 @@ export const ImageCarousel = React.forwardRef<
             onChange={async (event) => {
               if (!event.target.files?.[0]) return;
 
-              const form_data = new FormData();
-              form_data.append("image", event.target.files[0]);
+              const response = await upload_image_by_file(
+                event.target.files[0],
+              );
+              const file_data = response.file as ImageUploadJSON;
 
-              const response = await fetch("/api/upload_image_by_file", {
-                method: "POST",
-                body: form_data,
-              });
-
-              const image_json = (await response.json()) as {
-                success: number;
-                file: {
-                  url: string;
-                  width: number;
-                  height: number;
-                };
-              };
-
-              // TODO: ko se shrani, se image_data prepiše iz articla
-              if (!image_json.success) return;
-              // settings_store.set.image_data([...image_data, image_json.file]);
-              setUploadedUrl(image_json.file.url);
-              onImageUrlChange(image_json.file.url);
+              if (response.success === 1 && !response.error) {
+                console.log("success, image uploaded", response);
+                setUploadedUrl(file_data.url);
+                // onImageUrlChange(file_data.url);
+              } else {
+                console.error("Error uploading image", response.error);
+              }
             }}
             id="fileid"
             type="file"

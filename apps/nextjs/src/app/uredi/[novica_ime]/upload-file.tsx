@@ -19,13 +19,14 @@ export async function upload_file(
     };
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("directory", novica_url);
+  const form_data = new FormData();
+  form_data.append("file", file);
+  form_data.append("directory", novica_url);
+  form_data.append("type", "file");
 
   const file_data = await fetch("/api/upload_file_to_s3", {
     method: "POST",
-    body: formData,
+    body: form_data,
   });
 
   return await parse_s3_response(file_data /* novica_url, file.name, toast */);
@@ -58,13 +59,14 @@ export async function upload_image_by_file(
     };
   }
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("directory", novica_url);
+  const form_data = new FormData();
+  form_data.append("file", file);
+  form_data.append("directory", novica_url);
+  form_data.append("type", "image");
 
   const file_data = await fetch("/api/upload_file_to_s3", {
     method: "POST",
-    body: formData,
+    body: form_data,
   });
 
   return await parse_s3_response(file_data /* novica_url, file.name, toast */);
@@ -88,14 +90,15 @@ export async function upload_image_by_url(
     };
   }
 
-  const formData = new FormData();
-  formData.append("url", url);
-  formData.append("title", title);
-  formData.append("directory", novica_url);
+  const form_data = new FormData();
+  form_data.append("url", url);
+  form_data.append("title", title);
+  form_data.append("directory", novica_url);
+  form_data.append("type", "image");
 
   const file_data = await fetch("/api/upload_file_to_s3", {
     method: "POST",
-    body: formData,
+    body: form_data,
   });
 
   return await parse_s3_response(file_data /* novica_url, title, toast */);
@@ -148,6 +151,7 @@ export async function parse_s3_response(
 
   if (file_data.ok) {
     if (file_json.error == "File exists") {
+      console.log("File exists", file_json);
       /* toast.toast({
         title: "Slika s takim imenom že obstaja",
         description: `Novica: ${novica_url}, ime: ${filename}`,

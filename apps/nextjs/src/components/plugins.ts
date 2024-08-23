@@ -72,6 +72,15 @@ export function EDITOR_JS_PLUGINS(): Record<
         },
       },
     },
+    attaches: {
+      class: AttachesTool,
+      config: {
+        uploader: {
+          uploadByFile: (file: File) => upload_file(file),
+        },
+        // endpoint: "/api/upload_file",
+      },
+    },
     paragraph: {
       class: Paragraph,
       inlineToolbar: true,
@@ -99,15 +108,6 @@ export function EDITOR_JS_PLUGINS(): Record<
     warning: Warning,
     code: Code,
     // linkTool: LinkTool,
-    attaches: {
-      class: AttachesTool,
-      config: {
-        uploader: {
-          uploadByFile: (file: File) => upload_file(file),
-        },
-        // endpoint: "/api/upload_file",
-      },
-    },
     header: {
       // @ts-expect-error no types
       class: Header,

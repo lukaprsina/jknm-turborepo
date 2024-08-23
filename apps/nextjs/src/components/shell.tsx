@@ -8,7 +8,7 @@ import { Separator } from "@acme/ui/separator";
 
 import { sign_out } from "~/server/auth";
 import { HydrateClient } from "~/trpc/server";
-import { TestHeader } from "./header";
+import { DesktopHeader, MobileHeader } from "./header";
 
 interface ShellProps {
   children: React.ReactNode;
@@ -45,84 +45,22 @@ async function Header({
 
   return (
     <>
-      <TestHeader article={article} session={session ?? undefined} />
+      <DesktopHeader
+        className="hidden md:flex"
+        article={article}
+        session={session ?? undefined}
+      />
+      <MobileHeader
+        className="flex md:hidden"
+        article={article}
+        session={session ?? undefined}
+      />
       {/* <DesktopHeader className="hidden xl:flex" article={article} /> */}
       {/* <TabletHeader className="hidden md:flex xl:hidden" article={article} />
       <MobileHeader className="md:hidden" /> */}
     </>
   );
 }
-
-/* async function DesktopHeader({
-  article,
-  className,
-  ...props
-}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
-  const session = await auth();
-
-  return (
-    <div
-      className={cn("container flex items-center justify-between", className)}
-      {...props}
-    >
-      <LogoAndTitle />
-      <div className="flex gap-6">
-        <LinksMenu />
-        <div className="flex gap-1">
-          <EditingButtons article={article} session={session ?? undefined} />
-          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <ShowDraftsSwitch />
-          <NoviceAutocomplete detached="" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-async function TabletHeader({
-  article,
-  className,
-  ...props
-}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
-  const session = await auth();
-
-  return (
-    <div
-      className={cn("flex items-center justify-between", className)}
-      {...props}
-    >
-      <LogoAndTitle />
-      <div className="container flex flex-col gap-2">
-        <div className="flex justify-end">
-          <LinksMenu />
-        </div>
-        <div className="flex gap-4">
-          <NoviceAutocomplete />
-          <EditingButtons article={article} session={session ?? undefined} />
-          <ThemeToggle className="dark:bg-primary/80 dark:text-primary-foreground" />
-          <ShowDraftsSwitch />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MobileHeader({
-  className,
-  ...props
-}: React.ComponentProps<"div"> & { article?: typeof Article.$inferSelect }) {
-  return (
-    <div
-      className={cn("container flex items-center justify-between", className)}
-      {...props}
-    >
-      <LogoAndTitle />
-      <Button>
-        <MenuIcon />
-      </Button>
-    </div>
-  );
-} */
 
 async function Footer() {
   const session = await auth();

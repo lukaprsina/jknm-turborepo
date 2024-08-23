@@ -431,36 +431,38 @@ const PROBLEMATIC_CONSTANTS = [
 
 const authors: { name: string; ids: string[] }[] = [];
 
-function get_authors(csv_article: CSVType, blocks: OutputBlockData[]) {
-  const last_block = blocks[blocks.length - 1];
-  if (!last_block) {
+function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
+  const blocks = all_blocks.splice(Math.max(0, all_blocks.length - 3));
+
+  if (blocks.length === 0) {
     throw new Error("No blocks in article: " + csv_article.id);
   }
 
-  console.log(last_block.type);
   const current_authors: string[] = [];
 
-  if (last_block.type == "paragraph") {
-    const paragraph_block = last_block.data as { text: string };
-    const root = html_parse(paragraph_block.text);
-    const strongs = root.querySelectorAll("strong");
+  for (const block of blocks) {
+    if (block.type == "paragraph") {
+      const paragraph_block = block.data as { text: string };
+      const root = html_parse(paragraph_block.text);
+      const strongs = root.querySelectorAll("strong");
 
-    for (const strong of strongs) {
-      const trimmed = strong.text.trim().replace(/\s+/g, " ");
+      for (const strong of strongs) {
+        const trimmed = strong.text.trim().replace(/\s+/g, " ");
 
-      if (trimmed === "") continue;
+        if (trimmed === "") continue;
 
-      const author = authors.find((a) => a.name === trimmed);
-      current_authors.push(trimmed);
+        const author = authors.find((a) => a.name === trimmed);
+        current_authors.push(trimmed);
 
-      if (author) {
-        author.ids.push(csv_article.id);
-      } else {
-        authors.push({ name: trimmed, ids: [csv_article.id] });
+        if (author) {
+          author.ids.push(csv_article.id);
+        } else {
+          authors.push({ name: trimmed, ids: [csv_article.id] });
+        }
       }
+    } else {
+      articles_without_authors.add(parseInt(csv_article.id));
     }
-  } else {
-    articles_without_authors.add(parseInt(csv_article.id));
   }
 
   return current_authors;

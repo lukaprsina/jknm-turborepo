@@ -24,10 +24,10 @@ import EditingButtons from "./editing-buttons";
 import { Logo } from "./logo";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
-export function TestHeader({
+export function DesktopHeader({
   article,
-  className,
   session,
+  className,
   ...props
 }: React.ComponentProps<"div"> & {
   article?: typeof Article.$inferSelect;
@@ -101,11 +101,31 @@ export function TestHeader({
         className={cn(
           "relative z-40 flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
           sticky ? "fixed top-0 bg-white/80 transition-colors" : null,
+          className,
         )}
       >
         <LinksMenu />
       </div>
     </>
+  );
+}
+
+export function MobileHeader({
+  article,
+  session,
+  className,
+  ...props
+}: React.ComponentProps<"div"> & {
+  article?: typeof Article.$inferSelect;
+  session?: Session;
+}) {
+  return (
+    <div
+      className={cn("flex items-center justify-between px-6 py-4", className)}
+      {...props}
+    >
+      Mobile Header
+    </div>
   );
 }
 

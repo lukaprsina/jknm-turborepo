@@ -48,6 +48,9 @@ export function Search({ session }: { session?: Session }) {
               </TabsList>
             </div>
           </div>
+          <div className="w-full text-right">
+            <MyStats />
+          </div>
           <div className="flex w-full items-center justify-between">
             <TimelineRefinement />
           </div>
@@ -56,9 +59,6 @@ export function Search({ session }: { session?: Session }) {
           value="card"
           className="flex flex-col justify-between gap-4"
         >
-          <div className="w-full text-right">
-            <MyStats />
-          </div>
           <Hits
             hitComponent={ArticleAlgoliaCard}
             classNames={{

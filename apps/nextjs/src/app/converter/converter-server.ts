@@ -39,6 +39,10 @@ export async function delete_articles() {
   await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
 }
 
+export async function make_every_article_public() {
+  await db.update(Article).set({ published: true });
+}
+
 export interface TempArticleType {
   serial_id: number;
   objave_id: string;
@@ -66,6 +70,7 @@ export async function upload_articles(articles: TempArticleType[]) {
           updated_at: article.updated_at,
           preview_image: article.preview_image,
           url: article.csv_url,
+          published: true,
         })),
       )
       .returning();

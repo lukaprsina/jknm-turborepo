@@ -59,6 +59,8 @@ export const articleRouter = {
         },
       });
 
+      console.log("data", data.length);
+
       const last = data[data.length - 1];
 
       return {
@@ -100,18 +102,24 @@ export const articleRouter = {
     .input(
       z.object({
         id: z.number(),
-        content: content_validator,
-        preview_image: z.string(),
+        // content: content_validator,
+        // preview_image: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       if (!input.id) return;
 
+      const article = await ctx.db.query.Article.findFirst({
+        where: eq(Article.id, input.id),
+      });
+
+      if (!article) return;
+
       return ctx.db
         .update(Article)
         .set({
-          draft_content: input.content,
-          draft_preview_image: input.preview_image,
+          draft_content: article.content,
+          draft_preview_image: article.preview_image,
         })
         .where(eq(Article.id, input.id))
         .returning();

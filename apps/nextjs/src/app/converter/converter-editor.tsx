@@ -11,6 +11,7 @@ import {
   add_authors,
   delete_articles,
   get_article_count,
+  make_every_article_public,
   read_articles,
   sync_with_algolia,
   upload_images,
@@ -43,6 +44,13 @@ export function ArticleConverter() {
           }}
         >
           Sync with Algolia
+        </Button>
+        <Button
+          onClick={async () => {
+            await make_every_article_public();
+          }}
+        >
+          Make every article public
         </Button>
         <Button
           onClick={async () => {

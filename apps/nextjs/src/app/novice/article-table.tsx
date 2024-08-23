@@ -32,6 +32,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditButton } from "~/components/editing-buttons";
+import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { delete_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
@@ -50,9 +51,9 @@ export function ArticleTable({
         <TableRow>
           <TableHead>ID</TableHead>
           <TableHead>Naslov</TableHead>
-          <TableHead>Datum nastanka</TableHead>
           <TableHead>Avtorji</TableHead>
-          {session && <TableHead className="text-right"></TableHead>}
+          <TableHead>Datum nastanka</TableHead>
+          {session && <TableHead className="text-right">Avtorji</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -62,7 +63,7 @@ export function ArticleTable({
       </TableBody>
       <TableFooter>
         <TableRow>
-          <TableCell colSpan={3}></TableCell>
+          <TableCell colSpan={4}></TableCell>
           <TableCell className="text-right">
             <MyStats />
           </TableCell>
@@ -94,13 +95,20 @@ function ArticleTableRow({
           </Link>
         </Button>
       </TableCell>
-      <TableCell>{hit.url}</TableCell>
+      <TableCell>
+        {hit.authors.map((author, index) => (
+          <span key={index}>
+            {author}
+            {index !== hit.authors.length - 1 && ",\u00A0"}
+          </span>
+        ))}
+      </TableCell>
+      <TableCell>{format_date(new Date(hit.created_at))}</TableCell>
       {session && (
-        <TableCell className="flex justify-end gap-2">
+        <TableCell className="flex flex-grow justify-end gap-2">
           <EditButton
             id={parseInt(hit.objectID)}
             url={hit.url}
-            preview_image={hit.image}
             content_preview={hit.content_preview}
             has_draft={hit.has_draft}
             variant="outline"
