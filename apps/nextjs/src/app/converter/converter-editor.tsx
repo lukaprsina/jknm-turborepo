@@ -14,9 +14,11 @@ import {
   make_every_article_public,
   read_articles,
   sync_with_algolia,
+  test_google_admin,
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
+import { get_jwt_token } from "./jwt";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -44,6 +46,20 @@ export function ArticleConverter() {
           }}
         >
           Sync with Algolia
+        </Button>
+        <Button
+          onClick={async () => {
+            await test_google_admin();
+          }}
+        >
+          Test Google admin
+        </Button>
+        <Button
+          onClick={async () => {
+            await get_jwt_token();
+          }}
+        >
+          Get JWT Token
         </Button>
         <Button
           onClick={async () => {
