@@ -14,6 +14,7 @@ import open from "open";
 import destroyer from "server-destroy";
 
 import type { ArticleHit } from "@acme/validators";
+import { auth } from "@acme/auth";
 import { db } from "@acme/db/client";
 import {
   Article,
@@ -51,75 +52,23 @@ export async function make_every_article_public() {
 }
 
 export async function test_google_admin() {
-  const login = new Promise<OAuth2Client>((resolve, reject) => {
-    // create an oAuth client to authorize the API call.  Secrets are kept in a `keys.json` file,
-    // which should be downloaded from the Google Developers Console.
-    const oAuth2Client = new OAuth2Client(
-      env.AUTH_GOOGLE_ID,
-      env.AUTH_GOOGLE_SECRET,
-      "http://localhost:3001/oauth2callback",
-    );
+  const session = await auth();
 
-    // Generate the url that will be used for the consent dialog.
-    const authorizeUrl = oAuth2Client.generateAuthUrl({
-      access_type: "offline",
-      scope: "https://www.googleapis.com/auth/admin.directory.user.readonly",
-    });
+  const client = new OAuth2Client({});
 
-    // Open an http server to accept the oauth callback. In this simple example, the
-    // only request to our webserver is to /oauth2callback?code=<code>
-    const server = http
-      .createServer((req, res) => {
-        try {
-          if (req.url?.includes("/oauth2callback")) {
-            // acquire the code from the querystring, and close the web server.
-            const qs = new url.URL(req.url, "http://localhost:3001")
-              .searchParams;
-            const code = qs.get("code");
-            console.log(`Code is ${code}`);
-            res.end("Authentication successful! Please return to the console.");
-            server.destroy();
-
-            // Now that we have the code, use that to acquire tokens.
-            const a = async () => {
-              if (!code) {
-                reject(new Error("No code found"));
-                return;
-              }
-
-              const r = await oAuth2Client.getToken(code);
-              // Make sure to set the credentials on the OAuth2 client.
-              oAuth2Client.setCredentials(r.tokens);
-              console.info("Tokens acquired.");
-              resolve(oAuth2Client);
-            };
-
-            void a();
-          }
-        } catch (e) {
-          if (e instanceof Error) {
-            reject(e);
-          }
-        }
-      })
-      .listen(3001, () => {
-        // open the browser to the authorize url to start the workflow
-        void open(authorizeUrl, { wait: false }).then((cp) => cp.unref());
-      });
-
-    destroyer(server);
+  client.setCredentials({
+    access_token: session?.accessToken,
   });
 
-  const client = await login;
   const service = google.admin({
     version: "directory_v1",
     auth: client,
   });
 
   const result = await service.users.list({
-    // customer: "my_customer",
-    // maxResults: 10,
-    // orderBy: "email",
+    customer: "my_customer",
+    maxResults: 10,
+    orderBy: "email",
   });
 
   console.log("result", result);

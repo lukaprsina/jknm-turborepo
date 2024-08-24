@@ -1,12 +1,12 @@
-import fs_promises from "fs/promises";
 import type {
   DefaultSession,
   NextAuthConfig,
   Session as NextAuthSession,
 } from "next-auth";
-import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Google from "next-auth/providers/google";
+
+import "next-auth/jwt";
 
 import { db } from "@acme/db/client";
 import { Account, Session, User } from "@acme/db/schema";
@@ -15,10 +15,16 @@ import { env } from "../env";
 
 declare module "next-auth" {
   interface Session {
+    accessToken?: string;
     user: {
       id: string;
-      // token?: string;
     } & DefaultSession["user"];
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string;
   }
 }
 
@@ -32,13 +38,14 @@ export const isSecureContext = env.NODE_ENV !== "development";
 
 export const authConfig = {
   adapter,
-  // In development, we need to skip checks to allow Expo to work
-  ...(!isSecureContext
+  // TODO: In development, we need to skip checks to allow Expo to work
+  /* ...(!isSecureContext
     ? {
         skipCSRFCheck: skipCSRFCheck,
         trustHost: true,
       }
-    : {}),
+    : {}), */
+
   secret: env.AUTH_SECRET,
   providers: [
     Google({
@@ -60,7 +67,35 @@ export const authConfig = {
       },
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
+    jwt({ token, trigger, session, account }) {
+      // console.error("JWTTTTTTTTTTTTTTTTTTTTT", { token, account });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      if (trigger === "update") token.name = session.user.name;
+      if (account?.provider === "google") {
+        return { ...token, accessToken: account.access_token };
+      }
+      return token;
+    },
+    session({ session, token }) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (token?.accessToken) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+        session.accessToken = token.accessToken as string;
+      }
+      return session;
+    },
+    /* jwt({ token, account }) {
+      console.error("JWTTTTTTTTTTTTTTTTTTTTT", { token, account });
+
+      return { ...token, accessToken: account.access_token };
+      // if (account?.provider === "google") {}
+
+      return token;
+    },
     session: (opts) => {
       if (!("user" in opts))
         throw new Error("unreachable with session strategy");
@@ -73,28 +108,10 @@ export const authConfig = {
         },
       };
 
-      /* console.log("session", opts.token);
-      // @ts-expect-error lol
-      session.user.token = opts.token.access_token as string; */
-
-      console.log("afafasfasfasfsaf", opts, session);
-
+      console.log("SESSION ACCESS TOKEN", opts.token);
+      // session.accessToken = opts.token.accessToken;
       return session;
-    },
-    async jwt({ token, account }) {
-      console.warn("jwt", { token, account });
-      await fs_promises.writeFile(
-        "D:/jwt.txt",
-        JSON.stringify({ token, account }),
-      );
-
-      /* // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (token?.account && account?.access_token) {
-        token.access_token = account.access_token;
-      } */
-
-      return token;
-    },
+    }, */
     /* signIn: ({ account, profile }) => {
       if (account?.provider != "google") return false;
       if (!(profile as GoogleProfile).email_verified) return false;

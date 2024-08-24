@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Open_Sans } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
+import { SessionProvider } from "next-auth/react";
 
 import { cn } from "@acme/ui";
 import { ThemeProvider } from "@acme/ui/theme";
@@ -61,12 +62,14 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <TooltipProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            <TRPCReactProvider>{props.children}</TRPCReactProvider>
-            <Toaster />
-          </ThemeProvider>
-        </TooltipProvider>
+        <SessionProvider refetchInterval={5 * 60}>
+          <TooltipProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+              <TRPCReactProvider>{props.children}</TRPCReactProvider>
+              <Toaster />
+            </ThemeProvider>
+          </TooltipProvider>
+        </SessionProvider>
       </body>
     </html>
   );
