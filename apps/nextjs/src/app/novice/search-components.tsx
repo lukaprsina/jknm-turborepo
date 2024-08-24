@@ -2,6 +2,7 @@
 
 import type { RefinementListItem } from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 import type {
+  ClearRefinementsProps,
   UseRefinementListProps,
   UseSearchBoxProps,
   UseSortByProps,
@@ -62,6 +63,7 @@ export function MySearchBox() {
     <Input
       placeholder="Iskanje ..."
       value={search_api.query}
+      className="max-w-xl"
       onChange={(e) => search_api.refine(e.target.value)}
     />
   );
@@ -100,7 +102,7 @@ export function TimelineRefinement(
   }, [refinement_list]); */
 
   return (
-    <ol className="flex items-center justify-center pb-2 pl-1 sm:flex">
+    <ol className="space-t-4 flex flex-wrap items-center justify-start pb-2 pl-1">
       {refinement_list.items.map((item) => (
         <TimelineItem
           onClick={() => {
@@ -137,7 +139,8 @@ export function TimelineItem({
         <span>{item.value}</span>
       </Button>
       <div className="flex items-center">
-        <div className="z-10 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-blue-200 ring-0 ring-background dark:bg-blue-900 dark:ring-background sm:ring-8">
+        {/* bg-blue-200 */}
+        <div className="z-10 flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-muted-foreground ring-0 ring-background dark:bg-blue-900 dark:ring-background sm:ring-8">
           <button onClick={props.onClick}>
             <svg
               className="h-2.5 w-2.5"
@@ -242,4 +245,10 @@ export function TimelineOriginal() {
       </li>
     </ol>
   );
+}
+
+export function CustomClearRefinements(props: ClearRefinementsProps) {
+  const { refine } = useClearRefinements(props);
+
+  return <Button onClick={() => refine()}>Počisti filtre</Button>;
 }

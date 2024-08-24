@@ -5,6 +5,7 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 
 import type { CarouselApi } from "@acme/ui/carousel";
+import { Button } from "@acme/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -16,55 +17,27 @@ import {
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
 
-/* return (
-    <>
-      {createPortal(
-        <div className="absolute left-0 top-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm">
-          <div className="h-full w-full">
-            <CarouselDemo defaultValue={gallery_image} />
-          </div>
-        </div>,
-        document.body,
-      )}
-    </>
-  ); */
+export function GalleryStorePreview() {
+  const gallery = gallery_store.useStore();
 
-/* return (
-    <Dialog
-      open={!!gallery_image}
-      onOpenChange={(open) => {
-        if (!open) {
+  return (
+    <>
+      <Button
+        onClick={() => {
           gallery_store.set.default_image(undefined);
-        }
-      }}
-    >
-      <DialogContent className="backdrop-blur-sm">
-        <DialogHeader>
-          <DialogTitle>Galerija</DialogTitle>
-          <DialogDescription>Test</DialogDescription>
-        </DialogHeader>
-        <CarouselDemo defaultValue={gallery_image} />
-      </DialogContent>
-    </Dialog>
-  ); */
+        }}
+      >
+        AAAAAA
+      </Button>
+      <pre>{JSON.stringify(gallery, null, 2)}</pre>
+    </>
+  );
+}
 
 export function ImageGallery() {
   const galleryImage = gallery_store.use.default_image();
-  /* const image_data = gallery_store.use.images();
-  return <RedditGallery images={image_data} />; */
-  /* const search_params = useSearchParams();
-  const [galleryImage, setGalleryImage] = useState<string | undefined>(); */
-
-  /* useEffect(() => {
-    const image = search_params.get("image");
-    setGalleryImage(image ?? undefined);
-  }, [search_params]); */
-
-  /* <div className="absolute left-0 top-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm">
-          <div className="h-full w-full">
-            <CarouselDemo first_image={galleryImage?.file.url} />
-          </div>
-        </div>, */
+  const aaaa = gallery_store.useStore();
+  // const galleryImage = undefined;
 
   useEffect(() => {
     if (!galleryImage) return;
@@ -90,49 +63,30 @@ export function ImageGallery() {
     };
   }, [galleryImage]);
 
-  const portal = useCallback(
-    () =>
-      createPortal(
-        <div
-          className="fixed inset-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm"
-          onClick={() => {
-            gallery_store.set.default_image(undefined);
-          }}
-        >
-          <div className="h-full w-full">
-            <div className="flex h-full w-full items-center justify-center">
-              <CarouselDemo first_image={galleryImage?.file.url} />
-            </div>
+  useEffect(() => {
+    console.log("galleryImage useEffect", galleryImage, aaaa);
+  }, [galleryImage, aaaa]);
+
+  const portal = useCallback(() => {
+    console.log("portal", galleryImage);
+    return createPortal(
+      <div
+        className="fixed inset-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm"
+        onClick={() => {
+          gallery_store.set.default_image(undefined);
+        }}
+      >
+        <div className="h-full w-full">
+          <div className="flex h-full w-full items-center justify-center">
+            <CarouselDemo first_image={galleryImage?.file.url} />
           </div>
-        </div>,
-        document.body,
-      ),
-    [galleryImage],
-  );
+        </div>
+      </div>,
+      document.body,
+    );
+  }, [galleryImage]);
 
   return <>{galleryImage ? portal() : null}</>;
-
-  /* return (
-    <Dialog
-      open={!!galleryImage}
-      onOpenChange={(open) => {
-        if (!open) {
-          gallery_store.set.default_image(undefined);
-        }
-      }}
-    >
-      <DialogContent
-        aria-describedby={galleryImage?.caption}
-        // max-w-fit
-        className="mx-6 px-20"
-      >
-        <DialogHeader>
-          <DialogTitle>Galerija</DialogTitle>
-        </DialogHeader>
-        <CarouselDemo first_image={galleryImage?.file.url} />
-      </DialogContent>
-    </Dialog>
-  ); */
 }
 
 export function CarouselDemo({ first_image }: { first_image?: string }) {
@@ -148,6 +102,8 @@ export function CarouselDemo({ first_image }: { first_image?: string }) {
       const index = image_data.findIndex(
         (image) => image.file.url === first_image,
       );
+
+      console.log("scrolling to", index, first_image);
 
       api.scrollTo(index);
     }

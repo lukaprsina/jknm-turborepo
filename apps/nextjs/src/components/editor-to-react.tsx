@@ -4,21 +4,14 @@ import type { RenderFn } from "editorjs-blocks-react-renderer";
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-// @ts-expect-error no types
-import AttachesTool from "@editorjs/attaches";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import { ChevronDownIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@acme/ui/card";
+import { buttonVariants } from "@acme/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
 import {
@@ -84,18 +77,6 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
 }) => {
-  // const image_data = gallery_store.use.images();
-  // const router = useRouter();
-
-  /* const priority = useMemo(
-    () => image_data.at(0)?.file.url == data.file.url,
-    [data.file.url, image_data],
-  ); */
-
-  /* useEffect(() => {
-    console.log("Image data", data.file);
-  }, [data.file]); */
-
   const dimensions = useMemo(
     () => data.file.width && data.file.height,
     [data.file.height, data.file.width],
@@ -142,13 +123,17 @@ const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
   console.log(data);
   // "flex w-full gap-2",
   return (
-    <Card className={cn(className)}>
+    <Card className={cn("flex items-center justify-between", className)}>
       <CardHeader>
-        <CardTitle>{data.title}</CardTitle>
-        <CardDescription>{data.file.size} bytes</CardDescription>
+        <h3>{data.title}</h3>
+        <CardDescription>{data.file.size} bajtov</CardDescription>
       </CardHeader>
-      <CardContent>
-        <Link target="_blank" href={data.file.url}>
+      <CardContent className="flex h-full items-center justify-between py-0">
+        <Link
+          target="_blank"
+          className={buttonVariants({ variant: "ghost" })}
+          href={data.file.url}
+        >
           <ChevronDownIcon />
         </Link>
       </CardContent>
@@ -157,7 +142,7 @@ const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
 };
 
 // https://github.com/editor-js/attaches
-const EXTENSIONS = {
+const _EXTENSIONS = {
   doc: "#1483E9",
   docx: "#1483E9",
   odt: "#1483E9",

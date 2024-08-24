@@ -2,9 +2,10 @@
 
 import type { Hit as SearchHit } from "instantsearch.js";
 import type { UseHitsProps } from "react-instantsearch";
+import { useEffect } from "react";
 import Link from "next/link";
-import { TrashIcon } from "lucide-react";
-import { useHits } from "react-instantsearch";
+import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
+import { useHits, useSortBy } from "react-instantsearch";
 
 import type { Session } from "@acme/auth";
 import type { ArticleHit } from "@acme/validators";
@@ -43,6 +44,20 @@ export function ArticleTable({
   ...props
 }: { session?: Session } & UseHitsProps<ArticleHit>) {
   const { items } = useHits(props);
+  const sort_api = useSortBy({
+    items: [
+      { value: "novice", label: "Najnovejše" },
+      { value: "novice_date_asc", label: "Najstarejše" },
+      { value: "novice_id_asc", label: "ID naraščajoče" },
+      { value: "novice_id_desc", label: "ID padajoče" },
+      { value: "novice_name_asc", label: "Ime naraščajoče" },
+      { value: "novice_name_desc", label: "Ime padajoče" },
+    ],
+  });
+
+  useEffect(() => {
+    console.log("sort_api", sort_api, !!session);
+  }, [sort_api, session]);
 
   return (
     <Table>
@@ -50,9 +65,45 @@ export function ArticleTable({
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
-          <TableHead>Naslov</TableHead>
+          <TableHead>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                sort_api.refine(
+                  sort_api.currentRefinement === "novice_name_asc"
+                    ? "novice_name_desc"
+                    : "novice_name_asc",
+                );
+              }}
+            >
+              Naslov
+              {sort_api.currentRefinement === "novice_name_asc" && (
+                <ChevronDownIcon />
+              )}
+              {sort_api.currentRefinement === "novice_name_desc" && (
+                <ChevronUpIcon />
+              )}
+            </Button>
+          </TableHead>
           <TableHead>Avtorji</TableHead>
-          <TableHead>Datum nastanka</TableHead>
+          <TableHead>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                sort_api.refine(
+                  sort_api.currentRefinement === "novice_date_asc"
+                    ? "novice"
+                    : "novice_date_asc",
+                );
+              }}
+            >
+              Datum nastanka
+              {sort_api.currentRefinement === "novice_date_asc" && (
+                <ChevronDownIcon />
+              )}
+              {sort_api.currentRefinement === "novice" && <ChevronUpIcon />}
+            </Button>
+          </TableHead>
           {session && <TableHead className="text-right">Avtorji</TableHead>}
         </TableRow>
       </TableHeader>

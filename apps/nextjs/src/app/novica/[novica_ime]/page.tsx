@@ -7,7 +7,9 @@ import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
-import { ImageGallery } from "./image-gallery";
+import { GalleryStorePreview } from "./image-gallery";
+
+// import { ImageGallery } from "./image-gallery";
 
 interface NovicaProps {
   params: {
@@ -63,11 +65,13 @@ export default async function NovicaPage({
   return (
     <EditableProvider editable="readonly">
       <Shell article={article_by_url}>
+        <GalleryStorePreview />
         {session ? (
           <TabbedContent article={article_by_url} />
         ) : (
           <PublishedContent article={article_by_url} />
         )}
+        {/* <ImageGallery /> */}
       </Shell>
     </EditableProvider>
   );
@@ -89,7 +93,6 @@ function PublishedContent({
     // {/* lg:prose-xl  */}
     <div className="prose dark:prose-invert container w-full pb-6 pt-8">
       <EditorToReact article={article} />
-      <ImageGallery />
     </div>
     // </div>
   );
@@ -109,31 +112,26 @@ async function TabbedContent({
   }
 
   return (
-    <>
-      {/* <SwiperGallery /> */}
-
-      <Tabs
-        defaultValue={article.draft_content ? "draft" : "published"}
-        /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
-        className="prose dark:prose-invert container w-full pt-8"
-      >
-        <TabsList>
-          <TabsTrigger disabled={!article.draft_content} value="draft">
-            Osnutek
-          </TabsTrigger>
-          <TabsTrigger disabled={!article.content} value="published">
-            Objavljeno
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="draft" className="py-6">
-          <EditorToReact draft article={article} />
-        </TabsContent>
-        <TabsContent value="published" className="py-6">
-          <EditorToReact article={article} />
-        </TabsContent>
-      </Tabs>
-      <ImageGallery />
-    </>
+    <Tabs
+      defaultValue={article.draft_content ? "draft" : "published"}
+      /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
+      className="prose dark:prose-invert container w-full pt-8"
+    >
+      <TabsList>
+        <TabsTrigger disabled={!article.draft_content} value="draft">
+          Osnutek
+        </TabsTrigger>
+        <TabsTrigger disabled={!article.content} value="published">
+          Objavljeno
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="draft" className="py-6">
+        <EditorToReact draft article={article} />
+      </TabsContent>
+      <TabsContent value="published" className="py-6">
+        <EditorToReact article={article} />
+      </TabsContent>
+    </Tabs>
   );
 }
 

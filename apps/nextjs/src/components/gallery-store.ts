@@ -1,8 +1,27 @@
+"use client";
+
+import immer from "immer";
 import { createStore } from "zustand-x";
+import { createJSONStorage, devtools, persist } from "zustand/middleware";
 
 import type { EditorJSImageData } from "./plugins";
 
-export const gallery_store = createStore("gallery")({
-  images: [] as EditorJSImageData[],
-  default_image: undefined as EditorJSImageData | undefined,
-});
+interface GalleryStoreType {
+  images: EditorJSImageData[];
+  default_image: EditorJSImageData | undefined;
+}
+
+export const gallery_store = createStore("gallery")<GalleryStoreType>(
+  {
+    images: [],
+    default_image: undefined,
+  },
+  {
+    // middlewares: [persist, immer, devtools],
+    persist: {
+      enabled: true,
+      name: "gallery-local",
+      storage: createJSONStorage(() => sessionStorage),
+    },
+  },
+);

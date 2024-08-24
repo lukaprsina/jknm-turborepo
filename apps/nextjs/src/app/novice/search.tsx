@@ -12,6 +12,7 @@ import { articles_variants } from "../articles";
 import { ArticleTable } from "./article-table";
 import { MyPagination } from "./pagination";
 import {
+  CustomClearRefinements,
   MySearchBox,
   MySortBy,
   MyStats,
@@ -28,9 +29,9 @@ export function Search({ session }: { session?: Session }) {
       <Tabs defaultValue="card" className="pb-6 pt-2">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
-            <div className="flex items-center justify-between space-x-2">
-              <MySearchBox />
-            </div>
+            <MySearchBox />
+            {/* <div className="flex items-center justify-between space-x-2">
+            </div> */}
             <div className="flex flex-col items-center justify-between gap-6 text-nowrap sm:flex-row">
               <MySortBy
                 items={[
@@ -48,8 +49,9 @@ export function Search({ session }: { session?: Session }) {
               </TabsList>
             </div>
           </div>
-          <div className="w-full text-right">
+          <div className="flex w-full items-center justify-end gap-6">
             <MyStats />
+            <CustomClearRefinements />
           </div>
           <div className="flex w-full items-center justify-between">
             <TimelineRefinement />
