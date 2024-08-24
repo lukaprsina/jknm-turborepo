@@ -29,3 +29,5 @@ https://craft.mxkaske.dev/post/fancy-box
 
 http://localhost:3000/novica/jamarski-te%C4%8Daj-2023-596
 nbsp
+
+slike podnapisi, width, height

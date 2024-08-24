@@ -59,7 +59,8 @@ export default {
             maxWidth: "1280px",
             p: {
               fontWeight: "400",
-              fontSize: "18px",
+              fontSize: "16px",
+              lineHeight: "1.5",
             },
             h1: {
               fontWeight: "500", // 500

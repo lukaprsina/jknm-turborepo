@@ -1,17 +1,14 @@
 "use server";
 
-import http from "http";
 import fs from "node:fs";
 import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
-import url from "url";
 import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
 import { count, eq, sql } from "drizzle-orm";
 import { OAuth2Client } from "google-auth-library";
 import { google } from "googleapis";
-import open from "open";
-import destroyer from "server-destroy";
+import sharp from "sharp";
 
 import type { ArticleHit } from "@acme/validators";
 import { auth } from "@acme/auth";
@@ -27,7 +24,6 @@ import type {
   ImageToSave,
   ProblematicArticleType,
 } from "./converter-spaghetti";
-import { env } from "~/env";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
 import { AUTHORS } from "./authors";
@@ -45,6 +41,7 @@ export async function delete_articles() {
   await db.execute(sql`TRUNCATE TABLE ${CreditedPeople} CASCADE;`);
   await db.execute(sql`TRUNCATE TABLE ${ArticlesToCreditedPeople} CASCADE;`);
   await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
+  console.log("done");
 }
 
 export async function make_every_article_public() {
@@ -72,6 +69,13 @@ export async function test_google_admin() {
   });
 
   console.log("result", result);
+}
+
+export async function get_image_dimensions(src: string) {
+  const result = await fetch(src);
+  const buffer = await result.arrayBuffer(); // Convert the Response object to a Buffer
+  const { width, height } = await sharp(buffer).metadata(); // Pass the Buffer to the sharp function
+  return { width, height };
 }
 
 export interface TempArticleType {
@@ -359,6 +363,7 @@ export async function add_authors() {
   await db
     .insert(CreditedPeople)
     .values(Array.from(all_authors).map((name) => ({ name, email: "" })));
+  console.log("done");
 }
 
 /* for (const image of json.images) {

@@ -18,14 +18,18 @@ import {
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
 import { AUTHORS } from "./authors";
-import { get_problematic_html, upload_articles } from "./converter-server";
+import {
+  get_image_dimensions,
+  get_problematic_html,
+  upload_articles,
+} from "./converter-server";
 
 export interface ProblematicArticleType {
   csv: CSVType;
   html: string;
 }
 
-const do_splice = false as boolean;
+const do_splice = true as boolean;
 let wrong_divs = 0;
 let videos = 0;
 const problematic_articles: ProblematicArticleType[] = [];
@@ -145,21 +149,16 @@ async function parse_csv_article(
 
   for (const node of root.childNodes) {
     if (node.nodeType == NodeType.ELEMENT_NODE) {
-      const is_problem = parse_node(
-        node,
-        blocks,
-        csv_article,
-        csv_url,
-        article_id,
-      );
+      // const is_problem =
+      await parse_node(node, blocks, csv_article, csv_url, article_id);
 
-      if (is_problem) {
+      /* if (is_problem) {
         problematic_articles.push({
           html: sanitized,
           csv: csv_article,
         });
         break;
-      }
+      } */
     } else if (node.nodeType == NodeType.TEXT_NODE) {
       if (node.text.trim() !== "") throw new Error("Some text: " + node.text);
     } else {
@@ -171,7 +170,13 @@ async function parse_csv_article(
   const new_authors = new Set<string>();
   for (const current_author of current_authors) {
     const author = AUTHORS.find((a) => a.name === current_author);
-    if (!author) throw new Error("No author found: " + current_author);
+    // add authors first
+    if (!author) {
+      // throw new Error("No author found: " + current_author);
+      console.error("No author found: " + current_author);
+      new_authors.add(current_author);
+      continue;
+    }
 
     if (author.change_to) {
       console.log("Change author", current_author, author.change_to);
@@ -193,7 +198,7 @@ async function parse_csv_article(
   if (!content) throw new Error("No content");
 
   const images = get_image_data_from_editor(content);
-  const preview_image = images[0] ? images[0]?.file.url : undefined;
+  const preview_image = images.length !== 0 ? images[0]?.file.url : undefined;
 
   if (typeof preview_image === "undefined") {
     console.error("No images in article", csv_article.title);
@@ -212,13 +217,13 @@ async function parse_csv_article(
   } satisfies TempArticleType;
 }
 
-function parse_node(
+async function parse_node(
   node: ParserNode,
   blocks: OutputBlockData[],
   csv_article: CSVType,
   csv_url: string,
   article_id: number,
-): boolean {
+): Promise<boolean> {
   if (!(node instanceof ParserHTMLElement))
     throw new Error("Not an HTMLElement");
 
@@ -245,11 +250,6 @@ function parse_node(
       if (node.attributes.class?.includes("video")) {
         let param = node.querySelector('param[name="movie"]');
         let src = param?.attributes.value;
-        // if (!src) throw new Error("No video src, " + csv_article.id);
-        /* if (!src) {
-          console.error("No video src, " + csv_article.id);
-          return false;
-        } */
 
         // TODO: video caption
         let id = youtube_url_to_id(src);
@@ -291,24 +291,24 @@ function parse_node(
       let src: string | undefined;
       let already_set_src = false;
 
-      for (const div_child of node.querySelectorAll("img")) {
-        if (div_child.nodeType == NodeType.ELEMENT_NODE) {
-          if (!(div_child instanceof ParserHTMLElement))
+      for (const img_tag of node.querySelectorAll("img")) {
+        if (img_tag.nodeType == NodeType.ELEMENT_NODE) {
+          if (!(img_tag instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
 
           if (already_set_src)
             throw new Error("Already set source once " + csv_article.id);
 
           already_set_src = true;
-          const src_attr = div_child.attributes.src;
+          const src_attr = img_tag.attributes.src;
           if (!src_attr) throw new Error("No src attribute " + csv_article.id);
 
-          const src_parts = src_attr.split("/");
+          const src_parts = src_attr.trim().split("/");
           const image_name = src_parts[src_parts.length - 1];
           src = `${AWS_PREFIX}/${csv_url}-${article_id}/${image_name}`;
-        } else if (div_child.nodeType == NodeType.TEXT_NODE) {
-          if (div_child.text.trim() !== "")
-            console.error("Some text in div: " + csv_article.id);
+        } else if (img_tag.nodeType == NodeType.TEXT_NODE) {
+          console.error("Image is just text: " + csv_article.id);
+          // if (img_tag.text.trim() !== "")
         } else {
           throw new Error("Unexpected comment: " + node.text);
         }
@@ -320,26 +320,55 @@ function parse_node(
         if (div_child.nodeType == NodeType.ELEMENT_NODE) {
           if (!(div_child instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
-        } else if (div_child.nodeType == NodeType.TEXT_NODE) {
-          if (div_child.text.trim() !== "") {
+
+          const trimmed = div_child.text.trim();
+          if (trimmed !== "") {
             if (already_set_caption)
               throw new Error("Already set caption once " + csv_article.id);
             already_set_caption = true;
 
-            caption = div_child.text;
+            caption = trimmed;
           } else {
-            throw new Error("Empty caption: " + csv_article.id);
+            console.error(
+              "Empty caption: ",
+              csv_article.id,
+              div_child.outerHTML,
+            );
+            continue;
           }
+        } else if (div_child.nodeType == NodeType.TEXT_NODE) {
+          throw new Error(
+            "Caption is just text" +
+              csv_article.id +
+              ", " +
+              div_child.outerHTML,
+          );
         } else {
           throw new Error("Unexpected comment: " + node.text);
         }
       }
+
+      if (!src) {
+        console.error("No image src", csv_article.id);
+        return false;
+      }
+
+      if (!caption) {
+        console.log("No image caption", csv_article.id, {
+          inner: node.innerHTML,
+        });
+        return false;
+      }
+
+      const { width, height } = await get_image_dimensions(src);
 
       blocks.push({
         type: "image",
         data: {
           file: {
             url: src,
+            width,
+            height,
           },
           caption,
         },

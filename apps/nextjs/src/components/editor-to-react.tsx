@@ -1,7 +1,7 @@
 "use client";
 
 import type { RenderFn } from "editorjs-blocks-react-renderer";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
@@ -81,9 +81,9 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
     [data.file.url, image_data],
   ); */
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log("Image data", data.file);
-  }, [data.file]);
+  }, [data.file]); */
 
   const dimensions = useMemo(
     () => data.file.width && data.file.height,

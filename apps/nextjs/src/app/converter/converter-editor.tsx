@@ -39,7 +39,7 @@ export function ArticleConverter() {
   return (
     <div className="prose container mx-auto py-8">
       <h1>Article Converter: {article_count} novičk</h1>
-      <div className="flex w-full gap-4">
+      <div className="flex w-full flex-wrap gap-4">
         <Button
           onClick={async () => {
             await sync_with_algolia();
