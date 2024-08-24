@@ -25,6 +25,8 @@ export interface FileUploadJSON {
   url: string;
   title: string;
   size: number;
+  name: string;
+  extension: string;
 }
 
 export async function POST(request: NextRequest) {
@@ -130,6 +132,8 @@ export async function POST(request: NextRequest) {
       url: `${url}${fields.key}`,
       title: file.name,
       size: file.size,
+      name: file.name,
+      extension: file.name.split(".").pop() ?? "",
     };
   }
 

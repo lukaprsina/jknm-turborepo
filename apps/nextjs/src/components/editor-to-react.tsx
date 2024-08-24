@@ -3,12 +3,22 @@
 import type { RenderFn } from "editorjs-blocks-react-renderer";
 import { useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+// @ts-expect-error no types
+import AttachesTool from "@editorjs/attaches";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
+import { ChevronDownIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
-import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
 import {
@@ -62,6 +72,7 @@ export function EditorToReact({
           data={editor_data}
           renderers={{
             image: NextImageRenderer,
+            attaches: AttachesRenderer,
           }}
         />
       </CardContent>
@@ -112,4 +123,68 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
       <figcaption>{HTMLReactParser(data.caption)}</figcaption>
     </figure>
   );
+};
+
+interface EditorJSAttachesData {
+  file: {
+    url: string;
+    size: number;
+    name: string;
+    extension?: string;
+  };
+  title: string;
+}
+
+const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
+  data,
+  className,
+}) => {
+  console.log(data);
+  // "flex w-full gap-2",
+  return (
+    <Card className={cn(className)}>
+      <CardHeader>
+        <CardTitle>{data.title}</CardTitle>
+        <CardDescription>{data.file.size} bytes</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Link target="_blank" href={data.file.url}>
+          <ChevronDownIcon />
+        </Link>
+      </CardContent>
+    </Card>
+  );
+};
+
+// https://github.com/editor-js/attaches
+const EXTENSIONS = {
+  doc: "#1483E9",
+  docx: "#1483E9",
+  odt: "#1483E9",
+  pdf: "#DB2F2F",
+  rtf: "#744FDC",
+  tex: "#5a5a5b",
+  txt: "#5a5a5b",
+  pptx: "#E35200",
+  ppt: "#E35200",
+  mp3: "#eab456",
+  mp4: "#f676a6",
+  xls: "#11AE3D",
+  html: "#2988f0",
+  htm: "#2988f0",
+  png: "#AA2284",
+  jpg: "#D13359",
+  jpeg: "#D13359",
+  gif: "#f6af76",
+  zip: "#4f566f",
+  rar: "#4f566f",
+  exe: "#e26f6f",
+  svg: "#bf5252",
+  key: "#00B2FF",
+  sketch: "#FFC700",
+  ai: "#FB601D",
+  psd: "#388ae5",
+  dmg: "#e26f6f",
+  json: "#2988f0",
+  csv: "#11AE3D",
 };
