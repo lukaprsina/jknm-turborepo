@@ -7,9 +7,7 @@ import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
-import { GalleryStorePreview } from "./image-gallery";
-
-// import { ImageGallery } from "./image-gallery";
+import { ImageGallery } from "./image-gallery";
 
 interface NovicaProps {
   params: {
@@ -65,13 +63,12 @@ export default async function NovicaPage({
   return (
     <EditableProvider editable="readonly">
       <Shell article={article_by_url}>
-        <GalleryStorePreview />
         {session ? (
           <TabbedContent article={article_by_url} />
         ) : (
           <PublishedContent article={article_by_url} />
         )}
-        {/* <ImageGallery /> */}
+        <ImageGallery />
       </Shell>
     </EditableProvider>
   );

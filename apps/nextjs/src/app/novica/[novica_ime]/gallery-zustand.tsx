@@ -1,13 +1,29 @@
 import { create } from "zustand";
+import { devtools, persist } from "zustand/middleware";
 
-import { EditorJSImageData } from "~/components/plugins";
+import type { EditorJSImageData } from "~/components/plugins";
 
-interface GalleryStoreType {
+export interface GalleryStoreType {
   images: EditorJSImageData[];
   default_image: EditorJSImageData | undefined;
+  clear_default_image: () => void;
+  set_default_image: (image: EditorJSImageData) => void;
+  set_images: (images: EditorJSImageData[]) => void;
 }
 
-const useGalleryStore = create<GalleryStoreType>()((set) => ({
-  images: [],
-  default_image: undefined,
-}));
+export const useGalleryStore = create<GalleryStoreType>()(
+  devtools(
+    persist(
+      (set) => ({
+        images: [],
+        default_image: undefined,
+        clear_default_image: () => set({ default_image: undefined }),
+        set_default_image: (image) => set({ default_image: image }),
+        set_images: (images) => set({ images }),
+      }),
+      {
+        name: "gallery-local",
+      },
+    ),
+  ),
+);

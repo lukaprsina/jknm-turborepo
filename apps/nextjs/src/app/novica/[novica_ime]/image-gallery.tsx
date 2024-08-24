@@ -5,7 +5,6 @@ import Image from "next/image";
 import { createPortal } from "react-dom";
 
 import type { CarouselApi } from "@acme/ui/carousel";
-import { Button } from "@acme/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -16,40 +15,22 @@ import {
 
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
-
-export function GalleryStorePreview() {
-  const gallery = gallery_store.useStore();
-
-  return (
-    <>
-      <Button
-        onClick={() => {
-          gallery_store.set.default_image(undefined);
-        }}
-      >
-        AAAAAA
-      </Button>
-      <pre>{JSON.stringify(gallery, null, 2)}</pre>
-    </>
-  );
-}
+import { useGalleryStore } from "./gallery-zustand";
 
 export function ImageGallery() {
-  const galleryImage = gallery_store.use.default_image();
-  const aaaa = gallery_store.useStore();
-  // const galleryImage = undefined;
+  const gallery = useGalleryStore();
 
   useEffect(() => {
-    if (!galleryImage) return;
+    if (!gallery.default_image) return;
 
     const scroll_callback = (event: WheelEvent | TouchEvent) => {
-      if (event instanceof WheelEvent && event.deltaY > 0) {
-        gallery_store.set.default_image(undefined);
+      if (event instanceof WheelEvent) {
+        gallery.clear_default_image();
       } else if (event instanceof TouchEvent) {
         // Handle touch scroll logic here
         const touch = event.touches[0];
-        if (typeof touch?.clientY !== "undefined" && touch.clientY > 0) {
-          gallery_store.set.default_image(undefined);
+        if (typeof touch?.clientY !== "undefined") {
+          gallery.clear_default_image();
         }
       }
     };
@@ -61,14 +42,18 @@ export function ImageGallery() {
       window.removeEventListener("wheel", scroll_callback);
       window.removeEventListener("touchmove", scroll_callback);
     };
-  }, [galleryImage]);
+  }, [gallery]);
 
   useEffect(() => {
-    console.log("galleryImage useEffect", galleryImage, aaaa);
-  }, [galleryImage, aaaa]);
+    console.log(
+      "galleryImage useEffect",
+      gallery.images,
+      gallery.default_image,
+    );
+  }, [gallery.default_image, gallery.images]);
 
   const portal = useCallback(() => {
-    console.log("portal", galleryImage);
+    console.log("portal", gallery.images);
     return createPortal(
       <div
         className="fixed inset-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm"
@@ -78,19 +63,20 @@ export function ImageGallery() {
       >
         <div className="h-full w-full">
           <div className="flex h-full w-full items-center justify-center">
-            <CarouselDemo first_image={galleryImage?.file.url} />
+            <CarouselDemo first_image={gallery.default_image?.file.url} />
           </div>
         </div>
       </div>,
       document.body,
     );
-  }, [galleryImage]);
+  }, [gallery.default_image?.file.url, gallery.images]);
 
-  return <>{galleryImage ? portal() : null}</>;
+  return <>{gallery.default_image ? portal() : null}</>;
 }
 
 export function CarouselDemo({ first_image }: { first_image?: string }) {
-  const image_data = gallery_store.use.images();
+  // const image_data = gallery_store.use.images();
+  const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
   // const router = useRouter();
   // const ref = useDetectClickOutside({ onTriggered: () => router.back() });
@@ -99,7 +85,7 @@ export function CarouselDemo({ first_image }: { first_image?: string }) {
     if (!api) return;
 
     if (first_image) {
-      const index = image_data.findIndex(
+      const index = gallery.images.findIndex(
         (image) => image.file.url === first_image,
       );
 
@@ -107,7 +93,7 @@ export function CarouselDemo({ first_image }: { first_image?: string }) {
 
       api.scrollTo(index);
     }
-  }, [api, first_image, image_data]);
+  }, [api, first_image, gallery.images]);
 
   return (
     <Carousel
@@ -119,7 +105,7 @@ export function CarouselDemo({ first_image }: { first_image?: string }) {
       // className="flex h-full w-full items-center justify-center"
     >
       <CarouselContent className="items-center" /* ref={ref} */>
-        {image_data.map((image, index) => (
+        {gallery.images.map((image, index) => (
           <CarouselItem
             className="flex items-center justify-center"
             key={index}

@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
+import _ from "lodash";
 import { ChevronDownIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
@@ -14,12 +15,12 @@ import { buttonVariants } from "@acme/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
+import { useGalleryStore } from "~/app/novica/[novica_ime]/gallery-zustand";
 import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
 import { format_date } from "~/lib/format-date";
-import { gallery_store } from "./gallery-store";
 
 export function EditorToReact({
   article,
@@ -29,6 +30,8 @@ export function EditorToReact({
   draft?: boolean;
 }) {
   const [heading, setHeading] = useState<string | undefined>();
+  const gallery = useGalleryStore();
+
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
     if (!content) return undefined;
@@ -43,14 +46,17 @@ export function EditorToReact({
     setHeading(heading_info.title);
 
     const image_data = get_image_data_from_editor(content);
-    gallery_store.set.images(image_data);
+    if (!_.isEqual(gallery.images, image_data)) {
+      gallery.set_images(image_data);
+    }
+    // gallery_store.set.images(image_data);
 
     return {
       version: content.version ?? "unknown version",
       blocks: content.blocks.slice(1), // remove first heading
       time: content.time ?? Date.now(),
     };
-  }, [article?.content, article?.draft_content, draft]);
+  }, [article?.content, article?.draft_content, draft, gallery]);
 
   if (!editor_data || !article) return;
 
@@ -77,6 +83,7 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
 }) => {
+  const gallery = useGalleryStore();
   const dimensions = useMemo(
     () => data.file.width && data.file.height,
     [data.file.height, data.file.width],
@@ -87,7 +94,8 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
       <Image
         onClick={() => {
           // router.push(`?image=${data.file.url}`);
-          gallery_store.set.default_image(data);
+          // gallery_store.set.default_image(data);
+          gallery.set_default_image(data);
         }}
         className={cn(
           "cursor-pointer",

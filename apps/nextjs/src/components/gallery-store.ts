@@ -1,8 +1,7 @@
 "use client";
 
-import immer from "immer";
 import { createStore } from "zustand-x";
-import { createJSONStorage, devtools, persist } from "zustand/middleware";
+import { createJSONStorage } from "zustand/middleware";
 
 import type { EditorJSImageData } from "./plugins";
 
