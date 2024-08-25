@@ -22,6 +22,7 @@ import { NoviceAutocomplete } from "./autocomplete";
 import { ShowDraftsSwitch } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
 import { Logo } from "./logo";
+import { MobileSheet } from "./mobile-sheet";
 import { NavigationMenuTrigger } from "./navigation-menu-trigger";
 
 export function DesktopHeader({
@@ -99,7 +100,7 @@ export function DesktopHeader({
       <div
         ref={sticky_navbar}
         className={cn(
-          "relative z-40 flex w-full items-center justify-center px-6 py-4 backdrop-blur-sm md:px-12",
+          "relative z-40 flex w-full items-center justify-center px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-12",
           sticky ? "fixed top-0 bg-white/80 transition-colors" : null,
           className,
         )}
@@ -111,8 +112,8 @@ export function DesktopHeader({
 }
 
 export function MobileHeader({
-  article,
-  session,
+  // article,
+  // session,
   className,
   ...props
 }: React.ComponentProps<"div"> & {
@@ -121,10 +122,17 @@ export function MobileHeader({
 }) {
   return (
     <div
-      className={cn("flex items-center justify-between px-6 py-4", className)}
+      className={cn(
+        "fixed top-0 z-40 flex w-full items-center justify-between bg-white/90 px-6 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+        className,
+      )}
       {...props}
     >
-      Mobile Header
+      {/* <Logo className="w-4" /> */}
+      <Link className="text-2xl font-bold" href="/">
+        Jamarski klub Novo mesto
+      </Link>
+      <MobileSheet />
     </div>
   );
 }
