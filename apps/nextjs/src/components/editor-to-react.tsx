@@ -1,5 +1,7 @@
 "use client";
 
+import "./editorjs-attaches.css";
+
 import type { RenderFn } from "editorjs-blocks-react-renderer";
 import { useMemo, useState } from "react";
 import Image from "next/image";
@@ -7,11 +9,9 @@ import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import _ from "lodash";
-import { ChevronDownIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
-import { buttonVariants } from "@acme/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
@@ -21,6 +21,7 @@ import {
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
 import { format_date } from "~/lib/format-date";
+import { human_file_size } from "./../lib/human-file-size";
 
 export function EditorToReact({
   article,
@@ -124,33 +125,75 @@ interface EditorJSAttachesData {
   title: string;
 }
 
+const EXTENSION_MAX_LENGTH = 4;
+
 const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
   data,
   className,
 }) => {
-  console.log(data);
-  // "flex w-full gap-2",
+  const extension = useMemo(() => {
+    if (!data.file.extension) return "";
+    let visible_extension = data.file.extension.trim().toUpperCase();
+
+    if (data.file.extension.length > EXTENSION_MAX_LENGTH) {
+      visible_extension = extension.substring(0, EXTENSION_MAX_LENGTH) + "…";
+    }
+
+    return visible_extension;
+  }, [data.file.extension]);
+
+  const backgroundColor = useMemo(() => {
+    const ext = data.file.extension;
+    if (!ext) return "#333";
+    return _EXTENSIONS[ext] ?? "#333";
+  }, [data.file.extension]);
+
   return (
-    <Card className={cn("flex items-center justify-between", className)}>
-      <CardHeader>
-        <h3>{data.title}</h3>
-        <CardDescription>{data.file.size} bajtov</CardDescription>
-      </CardHeader>
-      <CardContent className="flex h-full items-center justify-between py-0">
-        <Link
-          target="_blank"
-          className={buttonVariants({ variant: "ghost" })}
-          href={data.file.url}
+    <Link
+      className={cn(className, "cdx-attaches cdx-attaches--with-file")}
+      href={data.file.url}
+      target="_blank"
+    >
+      <div className="cdx-attaches__file-icon">
+        <div
+          className="cdx-attaches__file-icon-background"
+          style={{ backgroundColor }}
+        ></div>
+        <div
+          className="cdx-attaches__file-icon-label"
+          title="json"
+          style={{ backgroundColor }}
         >
-          <ChevronDownIcon />
-        </Link>
-      </CardContent>
-    </Card>
+          {extension}
+        </div>
+      </div>
+      <div className="cdx-attaches__file-info">
+        <div className="cdx-attaches__title">{data.title}</div>
+        <div className="cdx-attaches__size">
+          {human_file_size(data.file.size)}
+        </div>
+      </div>
+
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke="currentColor"
+          strokeLinecap="round"
+          strokeWidth={2}
+          d="M7 10L11.8586 14.8586C11.9367 14.9367 12.0633 14.9367 12.1414 14.8586L17 10"
+        ></path>
+      </svg>
+    </Link>
   );
 };
 
 // https://github.com/editor-js/attaches
-const _EXTENSIONS = {
+const _EXTENSIONS: Record<string, string> = {
   doc: "#1483E9",
   docx: "#1483E9",
   odt: "#1483E9",

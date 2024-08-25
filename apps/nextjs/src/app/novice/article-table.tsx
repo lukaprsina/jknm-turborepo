@@ -7,24 +7,38 @@ import Link from "next/link";
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { useHits, useSortBy } from "react-instantsearch";
 
-
-
 import type { Session } from "@acme/auth";
 import type { ArticleHit } from "@acme/validators";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@acme/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@acme/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@acme/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
-
-
 
 import { EditButton } from "~/components/editing-buttons";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { delete_algolia_article } from "~/server/algolia";
+import { delete_s3_directory } from "~/server/image-s3";
 import { api } from "~/trpc/react";
 import { MyStats, SORT_BY_ITEMS } from "./search-components";
-
 
 export function ArticleTable({
   session,
@@ -159,8 +173,8 @@ function DeleteDialog({ article_id }: { article_id: number }) {
       const returned_data = data.at(0);
       if (!returned_data) return;
 
-      console.log("delete article", returned_data);
       await delete_algolia_article(returned_data.id.toString());
+      await delete_s3_directory(`${returned_data.url}-${returned_data.id}`);
 
       await trpc_utils.article.invalidate();
     },

@@ -1,3 +1,6 @@
+PRIORITY
+- duplicate url of image, attachement
+
 store update instead of image duplicate toast
 
 ko objaviš, zbriši druge slike

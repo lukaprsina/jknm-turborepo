@@ -63,10 +63,7 @@ export function UploadDialog() {
                 return;
               }
 
-              await editor.configure_article_before_publish();
-
-              const editor_content = await editor.editor?.save();
-
+              const editor_content =                await editor.configure_article_before_publish();
               editor.mutations.publish({
                 id: editor.article.id,
                 created_at: editor.article.created_at,

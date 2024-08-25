@@ -63,7 +63,7 @@ export function ImageGallery() {
       >
         <div className="h-full w-full">
           <div className="flex h-full w-full items-center justify-center">
-            <CarouselDemo first_image={gallery.default_image?.file.url} />
+            <MyCarousel first_image={gallery.default_image?.file.url} />
           </div>
         </div>
       </div>,
@@ -74,7 +74,7 @@ export function ImageGallery() {
   return <>{gallery.default_image ? portal() : null}</>;
 }
 
-export function CarouselDemo({ first_image }: { first_image?: string }) {
+export function MyCarousel({ first_image }: { first_image?: string }) {
   // const image_data = gallery_store.use.images();
   const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
@@ -129,14 +129,17 @@ export function CarouselDemo({ first_image }: { first_image?: string }) {
 
 function GalleryImage({ image }: { image: EditorJSImageData }) {
   return (
-    <figure>
+    <figure className="p-20">
       <Image
+        className="max-h-[1500] max-w-[1500] rounded-xl shadow-2xl"
         src={image.file.url}
         alt={image.caption}
         width={image.file.width ?? 1500}
         height={image.file.height ?? 1000}
       />
-      <figcaption>{image.caption}</figcaption>
+      <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4 shadow-2xl">
+        {image.caption}
+      </figcaption>
     </figure>
   );
 }

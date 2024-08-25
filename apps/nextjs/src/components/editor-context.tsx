@@ -2,48 +2,37 @@
 
 import type { OutputData } from "@editorjs/editorjs";
 import type { ReactNode } from "react";
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 // @ts-expect-error no types
 import DragDrop from "editorjs-drag-drop";
 // @ts-expect-error no types
 import Undo from "editorjs-undo";
+import _ from "lodash";
+
+
 
 import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
-import { rename_s3_directory } from "~/app/uredi/[novica_ime]/editor-server";
+
+
 import { editor_store } from "~/app/uredi/[novica_ime]/editor-store";
-import {
-  get_clean_url,
-  get_heading_from_editor,
-  get_image_data_from_editor,
-} from "~/app/uredi/[novica_ime]/editor-utils";
+import { get_clean_url, get_heading_from_editor, get_image_data_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
 import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
-import {
-  delete_algolia_article,
-  update_algolia_article,
-} from "~/server/algolia";
-import { clean_directory } from "~/server/image-s3";
+import { delete_algolia_article, update_algolia_article } from "~/server/algolia";
+import { clean_s3_directory, delete_s3_directory, rename_s3_directory } from "~/server/image-s3";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
+
 
 export interface EditorContextType {
   editor?: EditorJS;
   article?: typeof Article.$inferSelect;
-  configure_article_before_publish: () => Promise<void>;
+  configure_article_before_publish: () => Promise<OutputData | undefined>;
   update_settings_from_editor: (
     editor_content: OutputData,
     title?: string,
@@ -236,7 +225,10 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       const content_preview = content_to_text(
         returned_data.content ?? undefined,
       );
-      if (!content_preview) return;
+
+      if (!content_preview) {
+        console.error("No content preview", returned_data);
+      }
 
       await update_algolia_article({
         objectID: returned_data.id.toString(),
@@ -261,6 +253,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         article,
         returned_data,
       });
+
       if (old_article_url !== new_article_url) {
         await rename_s3_directory(old_article_url, new_article_url);
       }
@@ -282,7 +275,12 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         return decodeURIComponent(filename);
       });
 
-      await clean_directory(new_article_url, spliced_urls);
+      console.log("Cleaning S3 directory", {
+        new_article_url,
+        spliced_urls,
+      });
+
+      await clean_s3_directory(new_article_url, spliced_urls);
 
       router.replace(`/novica/${generate_encoded_url(returned_data)}`);
     },
@@ -315,7 +313,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!returned_data) return;
 
       await delete_algolia_article(returned_data.id.toString());
-
+      await delete_s3_directory(`${returned_data.url}-${returned_data.id}`);
       await trpc_utils.article.invalidate();
 
       router.replace(`/`);
@@ -357,7 +355,14 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
     const new_article_url = `${new_url}-${article.id}`;
 
-    await rename_images_in_editor(editorJS.current, new_article_url);
+    editor_content = await editorJS.current.save();
+    rename_images_in_editor(editor_content, new_article_url);
+
+    console.warn(
+      "configure_article_before_publish after renaming",
+      editor_content,
+    );
+    update_settings_from_editor(editor_content, new_title, new_url);
 
     const preview_image = editor_store.get.preview_image();
 
@@ -365,10 +370,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       ? rename_image(preview_image, new_article_url)
       : undefined;
 
-    editor_content = await editorJS.current.save();
-    update_settings_from_editor(editor_content, new_title, new_url);
-
     editor_store.set.preview_image(new_preview_image);
+
+    return editor_content;
   };
 
   return (
@@ -440,21 +444,17 @@ function WrongHeadingButton({
   );
 }
 
-async function rename_images_in_editor(editor: EditorJS, new_dir: string) {
-  const editor_content = await editor.save();
-
+function rename_images_in_editor(editor_content: OutputData, new_dir: string) {
   for (const block of editor_content.blocks) {
-    // TODO: files
-    if (!block.id || block.type !== "image") continue;
+    if (!block.id || !["image", "attaches"].includes(block.type)) {
+      console.log("Skipping block", block);
+      continue;
+    }
 
     const image_data = block.data as { file: { url: string } };
     const new_url = rename_image(image_data.file.url, new_dir);
+    console.log("Renamed image", { old_url: image_data.file.url, new_url });
     image_data.file.url = new_url;
-    console.log("Renaming image", { old_url: image_data.file.url, new_url });
-
-    await editor.blocks.update(block.id, {
-      data: image_data,
-    });
   }
 }
 
