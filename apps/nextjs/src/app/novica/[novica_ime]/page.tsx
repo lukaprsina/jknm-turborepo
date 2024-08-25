@@ -1,6 +1,14 @@
+import Link from "next/link";
+
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
-import { Card, CardHeader, CardTitle } from "@acme/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import { EditableProvider } from "~/components/editable-context";
@@ -25,13 +33,10 @@ export default async function NovicaPage({
 
   if (!novica_id_string) {
     console.error("No article ID found in URL", novica_ime_raw);
+
     return (
       <Shell>
-        <Card>
-          <CardHeader>
-            <CardTitle>Novica ne obstaja</CardTitle>
-          </CardHeader>
-        </Card>
+        <ArticleNotFound />
       </Shell>
     );
   }
@@ -45,13 +50,10 @@ export default async function NovicaPage({
       novica_id_string,
       novica_id,
     });
+
     return (
       <Shell>
-        <Card>
-          <CardHeader>
-            <CardTitle>Novica ID je NAN</CardTitle>
-          </CardHeader>
-        </Card>
+        <ArticleNotFound />
       </Shell>
     );
   }
@@ -132,11 +134,21 @@ async function TabbedContent({
   );
 }
 
-function ArticleNotFound() {
+export function ArticleNotFound() {
   return (
-    <div className="container h-full min-h-screen pt-8">
+    <div className="prose dark:prose-invert container min-h-screen w-full pb-6 pt-8">
       <Card>
-        <CardHeader>Novica ne obstaja</CardHeader>
+        <CardHeader>
+          <CardTitle>Novica ne obstaja</CardTitle>
+          <CardDescription>
+            Prosim, preverite URL naslov in poskusite znova.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p>Če menite, da je prišlo do napake, nas kontaktirajte.</p>
+          <p>Naša e-pošta: </p>
+          <Link href="mailto:info@jknm.si">info@jknm.si</Link>
+        </CardContent>
       </Card>
     </div>
   );

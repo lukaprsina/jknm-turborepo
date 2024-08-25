@@ -27,7 +27,7 @@ export function EditorToReact({
   article,
   draft,
 }: {
-  article?: typeof Article.$inferSelect;
+  article?: Partial<typeof Article.$inferSelect>;
   draft?: boolean;
 }) {
   const [heading, setHeading] = useState<string | undefined>();
@@ -65,7 +65,9 @@ export function EditorToReact({
     <Card className="pt-8">
       <CardHeader>
         <h1>{heading}</h1>
-        <CardDescription>{format_date(article.created_at)}</CardDescription>
+        {article.created_at && (
+          <CardDescription>{format_date(article.created_at)}</CardDescription>
+        )}
       </CardHeader>
       <CardContent>
         <Blocks
