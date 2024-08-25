@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 
@@ -15,7 +15,7 @@ import {
 
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
-import { useOutsideClick } from "~/hooks/use-outside-click";
+import { useOutsideClickMultipleRefs } from "~/hooks/use-outside-click";
 import { useGalleryStore } from "./gallery-zustand";
 
 const GALLERY_CANCEL_KEYS: string[] = [
@@ -48,7 +48,6 @@ export function ImageGallery() {
         gallery.clear_default_image();
         event.preventDefault();
       } else if (event instanceof TouchEvent) {
-        // Handle touch scroll logic here
         const touch = event.touches[0];
         if (typeof touch?.clientY !== "undefined") {
           gallery.clear_default_image();
@@ -84,6 +83,7 @@ export function ImageGallery() {
 
   const portal = useCallback(() => {
     console.log("portal", gallery.images);
+
     return createPortal(
       <div
         className="fixed inset-0 z-50 h-screen w-screen bg-black/40 backdrop-blur-sm"
@@ -94,7 +94,7 @@ export function ImageGallery() {
         <div className="h-full w-full">
           {/* "flex h-full w-full items-center justify-center" */}
           {/* p-16 */}
-          <div className="flex h-full min-h-[350px] w-full items-center justify-center">
+          <div className="flex h-full min-h-[350px] w-full items-center justify-center p-10">
             <MyCarousel first_image={gallery.default_image?.file.url} />
           </div>
         </div>
@@ -109,9 +109,13 @@ export function ImageGallery() {
 export function MyCarousel({ first_image }: { first_image?: string }) {
   const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
-  const ref = useOutsideClick(() => {
+  const carousel_ref = useRef<HTMLDivElement | null>(null);
+  const previous_ref = useRef<HTMLButtonElement | null>(null);
+  const next_ref = useRef<HTMLButtonElement | null>(null);
+
+  useOutsideClickMultipleRefs(() => {
     gallery.clear_default_image();
-  });
+  }, [carousel_ref, previous_ref, next_ref]);
 
   useEffect(() => {
     if (!api) return;
@@ -130,14 +134,17 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
   return (
     <Carousel
       setApi={setApi}
+      opts={{
+        align: "center",
+      }}
       // max-h-[90vh] max-w-[90vw]
-      className="relative w-full max-w-xs"
+      className="w-full max-w-[80%] p-10"
       // max-w-xs h-full w-full
       // fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
       // className="flex h-full w-full items-center justify-center"
     >
-      <CarouselContent ref={ref}>
+      <CarouselContent ref={carousel_ref}>
         {gallery.images.map((image, index) => (
           <CarouselItem
             className="flex items-center justify-center"
@@ -154,24 +161,26 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious ref={previous_ref} />
+      <CarouselNext ref={next_ref} />
     </Carousel>
   );
 }
 
 function GalleryImage({ image }: { image: EditorJSImageData }) {
   return (
-    <figure /* className="p-20" */>
+    <figure>
       <Image
-        className="max-h-[1500] max-w-[1500] rounded-xl shadow-2xl"
+        /* max-h-[1500px] max-w-[1500px] */
+        className="rounded-xl"
         src={image.file.url}
         alt={image.caption}
+        sizes="(max-width: 1500px) 100vw, 1500px"
         width={image.file.width ?? 1500}
         height={image.file.height ?? 1000}
       />
       {image.caption && (
-        <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4 shadow-2xl">
+        <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4">
           {image.caption}
         </figcaption>
       )}
