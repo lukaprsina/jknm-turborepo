@@ -15,6 +15,7 @@ import {
 
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
+import { useBreakpoint } from "~/hooks/use-breakpoint";
 import { useOutsideClickMultipleRefs } from "~/hooks/use-outside-click";
 import { useGalleryStore } from "./gallery-zustand";
 
@@ -23,8 +24,8 @@ const GALLERY_CANCEL_KEYS: string[] = [
   "Esc",
   "Enter",
   "Return",
-  "ArrowLeft",
-  "ArrowRight",
+  // "ArrowLeft",
+  // "ArrowRight",
   "ArrowUp",
   "ArrowDown",
   "Space",
@@ -73,16 +74,16 @@ export function ImageGallery() {
     };
   }, [gallery]);
 
-  useEffect(() => {
+  /* useEffect(() => {
     console.log(
       "galleryImage useEffect",
       gallery.images,
       gallery.default_image,
     );
-  }, [gallery.default_image, gallery.images]);
+  }, [gallery.default_image, gallery.images]); */
 
   const portal = useCallback(() => {
-    console.log("portal", gallery.images);
+    // console.log("portal", gallery.images);
 
     return createPortal(
       <div
@@ -94,14 +95,14 @@ export function ImageGallery() {
         <div className="h-full w-full">
           {/* "flex h-full w-full items-center justify-center" */}
           {/* p-16 */}
-          <div className="flex h-full min-h-[350px] w-full items-center justify-center p-10">
+          <div className="flex h-full min-h-[350px] w-full items-center justify-around p-10">
             <MyCarousel first_image={gallery.default_image?.file.url} />
           </div>
         </div>
       </div>,
       document.body,
     );
-  }, [gallery.default_image?.file.url, gallery.images]);
+  }, [gallery.default_image?.file.url]);
 
   return <>{gallery.default_image ? portal() : null}</>;
 }
@@ -112,6 +113,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
   const carousel_ref = useRef<HTMLDivElement | null>(null);
   const previous_ref = useRef<HTMLButtonElement | null>(null);
   const next_ref = useRef<HTMLButtonElement | null>(null);
+  const md_breakpoint = useBreakpoint("md", true);
 
   useOutsideClickMultipleRefs(() => {
     gallery.clear_default_image();
@@ -125,7 +127,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
         (image) => image.file.url === first_image,
       );
 
-      console.log("scrolling to", index, first_image);
+      // console.log("scrolling to", index, first_image);
 
       api.scrollTo(index);
     }
@@ -137,8 +139,8 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
       opts={{
         align: "center",
       }}
-      // max-h-[90vh] max-w-[90vw]
-      className="flex h-full w-full max-w-[80%] items-center justify-center p-10"
+      // max-h-[90vh] max-w-[90vw]  p-10
+      className="flex h-full w-full max-w-[80%] items-center justify-center"
       // max-w-xs h-full w-full
       // fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
@@ -161,8 +163,12 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious ref={previous_ref} />
-      <CarouselNext ref={next_ref} />
+      {md_breakpoint && (
+        <>
+          <CarouselPrevious ref={previous_ref} />
+          <CarouselNext ref={next_ref} />
+        </>
+      )}
     </Carousel>
   );
 }
@@ -172,7 +178,7 @@ function GalleryImage({ image }: { image: EditorJSImageData }) {
     <figure>
       <Image
         /* max-h-[1500px] max-w-[1500px] */
-        className="rounded-xl"
+        className="max-h-[90vh] rounded-xl"
         src={image.file.url}
         alt={image.caption}
         sizes="(max-width: 1500px) 100vw, 1500px"

@@ -1,59 +1,49 @@
-import { useEffect, useRef } from "react";
+"use client";
 
-export const useOutsideClick = (
-  callback: (event: MouseEvent | TouchEvent) => void,
-) => {
-  const ref = useRef<HTMLDivElement>(null);
+import { useEffect, useState } from "react";
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        event.stopPropagation();
-        // event.preventDefault();
-        callback(event);
-      }
-    };
 
-    document.addEventListener("mouseup", handleClickOutside);
-    document.addEventListener("touchend", handleClickOutside);
 
-    return () => {
-      document.removeEventListener("mouseup", handleClickOutside);
-      document.removeEventListener("touchend", handleClickOutside);
-    };
-  }, [callback]);
 
-  return ref;
-};
+
 export const useOutsideClickMultipleRefs = (
   callback: (event: MouseEvent | TouchEvent) => void,
   refs: React.RefObject<HTMLElement | null>[],
 ) => {
   useEffect(() => {
+    const handleClick = (event: MouseEvent | TouchEvent) => {
+      event.stopPropagation();
+      console.log("handling click", event);
+    };
+
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
-      let no_refs_contain_target = true;
+      let should_callback = true;
 
       for (const ref of refs) {
         if (!ref.current) continue;
 
         if (ref.current.contains(event.target as Node)) {
-          no_refs_contain_target = false;
+          should_callback = false;
           break;
         }
       }
 
-      if (no_refs_contain_target) {
+      console.log({ no_refs_contain_target: should_callback });
+      if (should_callback) {
+        document.addEventListener("pointerup", handleClick);
         event.stopPropagation();
+        console.log("calling callback", event);
         callback(event);
       }
     };
 
     document.addEventListener("mouseup", handleClickOutside);
-    document.addEventListener("touchend", handleClickOutside);
+    document.addEventListener("pointerdown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mouseup", handleClickOutside);
-      document.removeEventListener("touchend", handleClickOutside);
+      document.removeEventListener("pointerdown", handleClickOutside);
+      document.removeEventListener("pointerup", handleClick);
     };
   }, [callback, refs]);
 };

@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { devtools, persist } from "zustand/middleware";
 
 import type { EditorJSImageData } from "~/components/plugins";
 
@@ -11,19 +10,10 @@ export interface GalleryStoreType {
   set_images: (images: EditorJSImageData[]) => void;
 }
 
-export const useGalleryStore = create<GalleryStoreType>()(
-  devtools(
-    persist(
-      (set) => ({
-        images: [],
-        default_image: undefined,
-        clear_default_image: () => set({ default_image: undefined }),
-        set_default_image: (image) => set({ default_image: image }),
-        set_images: (images) => set({ images }),
-      }),
-      {
-        name: "gallery-local",
-      },
-    ),
-  ),
-);
+export const useGalleryStore = create<GalleryStoreType>()((set) => ({
+  images: [],
+  default_image: undefined,
+  clear_default_image: () => set({ default_image: undefined }),
+  set_default_image: (image) => set({ default_image: image }),
+  set_images: (images) => set({ images }),
+}));

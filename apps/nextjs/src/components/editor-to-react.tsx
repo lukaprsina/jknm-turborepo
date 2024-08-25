@@ -112,6 +112,12 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
           // gallery_store.set.default_image(data);
           gallery.set_default_image(data);
         }}
+        /* onMouseDown={() => {
+          gallery.set_default_image(data);
+        }}
+        onPointerDown={() => {
+          gallery.set_default_image(data);
+        }} */
         className={cn(
           "cursor-pointer",
           className,

@@ -159,6 +159,9 @@ importers:
       '@editorjs/warning':
         specifier: ^1.4.0
         version: 1.4.0
+      '@kodingdotninja/use-tailwind-breakpoint':
+        specifier: ^1.0.0
+        version: 1.0.0(react@19.0.0-rc-6ebfd5b0-20240818)(tailwindcss@3.4.9(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4)))
       '@radix-ui/react-avatar':
         specifier: ^1.1.0
         version: 1.1.0(react-dom@19.0.0-rc-6ebfd5b0-20240818(react@19.0.0-rc-6ebfd5b0-20240818))(react@19.0.0-rc-6ebfd5b0-20240818)(types-react-dom@19.0.0-rc.1)(types-react@19.0.0-rc.1)
@@ -2840,6 +2843,17 @@ packages:
 
   '@juggle/resize-observer@3.4.0':
     resolution: {integrity: sha512-dfLbk+PwWvFzSxwk3n5ySL0hfBog779o8h68wK/7/APo/7cgyWp5jcXockbxdk5kFRkbeXWm4Fbi9FrdN381sA==}
+
+  '@kodingdotninja/use-tailwind-breakpoint@1.0.0':
+    resolution: {integrity: sha512-UVN3Au5qBg7H7tkLxInvbozpigout08AWj6wQORtvAO/F67Gb3sAayuOgppHZTjMuQPAUbVL+TWMLwivuIxWtw==}
+    peerDependencies:
+      react: '>=16.8'
+      tailwindcss: '*'
+    peerDependenciesMeta:
+      react:
+        optional: true
+      tailwindcss:
+        optional: true
 
   '@neondatabase/serverless@0.9.4':
     resolution: {integrity: sha512-D0AXgJh6xkf+XTlsO7iwE2Q1w8981E1cLCPAALMU2YKtkF/1SF6BiAzYARZFYo175ON+b1RNIy9TdSFHm5nteg==}
@@ -11883,6 +11897,11 @@ snapshots:
       '@jridgewell/sourcemap-codec': 1.5.0
 
   '@juggle/resize-observer@3.4.0': {}
+
+  '@kodingdotninja/use-tailwind-breakpoint@1.0.0(react@19.0.0-rc-6ebfd5b0-20240818)(tailwindcss@3.4.9(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4)))':
+    optionalDependencies:
+      react: 19.0.0-rc-6ebfd5b0-20240818
+      tailwindcss: 3.4.9(ts-node@10.9.2(@types/node@20.14.15)(typescript@5.5.4))
 
   '@neondatabase/serverless@0.9.4':
     dependencies:
