@@ -85,13 +85,25 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   className,
 }) => {
   const gallery = useGalleryStore();
-  const dimensions = useMemo(
-    () => data.file.width && data.file.height,
-    [data.file.height, data.file.width],
-  );
+
+  const image_props = useMemo(() => {
+    if (!data.file.width || !data.file.height)
+      return { width: 1500, height: 1000, dimensions_exist: false };
+
+    if (data.file.width < 500 && data.file.height < 500)
+      return {
+        width: data.file.width * 2,
+        height: data.file.height * 2,
+        dimensions_exist: true,
+      };
+  }, [data.file.height, data.file.width]);
+
+  /* useEffect(() => {
+    console.log(data, image_props);
+  }, [data, image_props]); */
 
   return (
-    <figure>
+    <figure className="max-h-[1500] max-w-[1500]">
       <Image
         onClick={() => {
           // router.push(`?image=${data.file.url}`);
@@ -101,14 +113,14 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
         className={cn(
           "cursor-pointer",
           className,
-          !dimensions && "object-contain",
+          !image_props?.dimensions_exist && "object-contain",
         )}
         src={data.file.url}
         alt={data.caption}
-        width={dimensions ? data.file.width : 1500}
-        height={dimensions ? data.file.height : 1000}
+        width={image_props?.width ?? 1500}
+        height={image_props?.height ?? 1000}
         priority={true}
-        // fill={!dimensions}
+        // fill={!image_props?.dimensions_exist}
       />
       <figcaption>{HTMLReactParser(data.caption)}</figcaption>
     </figure>

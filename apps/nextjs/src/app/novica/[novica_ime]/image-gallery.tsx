@@ -15,7 +15,27 @@ import {
 
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
+import { useOutsideClick } from "~/hooks/use-outside-click";
 import { useGalleryStore } from "./gallery-zustand";
+
+const GALLERY_CANCEL_KEYS: string[] = [
+  "Escape",
+  "Esc",
+  "Enter",
+  "Return",
+  "ArrowLeft",
+  "ArrowRight",
+  "ArrowUp",
+  "ArrowDown",
+  "Space",
+  "PageUp",
+  "PageDown",
+  "Home",
+  "End",
+  "Tab",
+  "Backspace",
+  "Delete",
+];
 
 export function ImageGallery() {
   const gallery = useGalleryStore();
@@ -26,21 +46,31 @@ export function ImageGallery() {
     const scroll_callback = (event: WheelEvent | TouchEvent) => {
       if (event instanceof WheelEvent) {
         gallery.clear_default_image();
+        event.preventDefault();
       } else if (event instanceof TouchEvent) {
         // Handle touch scroll logic here
         const touch = event.touches[0];
         if (typeof touch?.clientY !== "undefined") {
           gallery.clear_default_image();
+          event.preventDefault();
         }
+      }
+    };
+
+    const keypress_callback = (event: KeyboardEvent) => {
+      if (GALLERY_CANCEL_KEYS.includes(event.key)) {
+        gallery.clear_default_image();
       }
     };
 
     window.addEventListener("wheel", scroll_callback);
     window.addEventListener("touchmove", scroll_callback);
+    window.addEventListener("keydown", keypress_callback);
 
     return () => {
       window.removeEventListener("wheel", scroll_callback);
       window.removeEventListener("touchmove", scroll_callback);
+      window.removeEventListener("keydown", keypress_callback);
     };
   }, [gallery]);
 
@@ -56,13 +86,15 @@ export function ImageGallery() {
     console.log("portal", gallery.images);
     return createPortal(
       <div
-        className="fixed inset-0 z-50 h-screen w-screen bg-white/10 backdrop-blur-sm"
+        className="fixed inset-0 z-50 h-screen w-screen bg-black/40 backdrop-blur-sm"
         onClick={() => {
           gallery_store.set.default_image(undefined);
         }}
       >
         <div className="h-full w-full">
-          <div className="flex h-full w-full items-center justify-center">
+          {/* "flex h-full w-full items-center justify-center" */}
+          {/* p-16 */}
+          <div className="flex h-full min-h-[350px] w-full items-center justify-center">
             <MyCarousel first_image={gallery.default_image?.file.url} />
           </div>
         </div>
@@ -75,11 +107,11 @@ export function ImageGallery() {
 }
 
 export function MyCarousel({ first_image }: { first_image?: string }) {
-  // const image_data = gallery_store.use.images();
   const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
-  // const router = useRouter();
-  // const ref = useDetectClickOutside({ onTriggered: () => router.back() });
+  const ref = useOutsideClick(() => {
+    gallery.clear_default_image();
+  });
 
   useEffect(() => {
     if (!api) return;
@@ -98,13 +130,14 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
   return (
     <Carousel
       setApi={setApi}
-      className="max-h-[90vh] max-w-[90vw]"
+      // max-h-[90vh] max-w-[90vw]
+      className="relative w-full max-w-xs"
       // max-w-xs h-full w-full
       // fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
       // className="flex h-full w-full items-center justify-center"
     >
-      <CarouselContent className="items-center" /* ref={ref} */>
+      <CarouselContent ref={ref}>
         {gallery.images.map((image, index) => (
           <CarouselItem
             className="flex items-center justify-center"
@@ -129,7 +162,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
 
 function GalleryImage({ image }: { image: EditorJSImageData }) {
   return (
-    <figure className="p-20">
+    <figure /* className="p-20" */>
       <Image
         className="max-h-[1500] max-w-[1500] rounded-xl shadow-2xl"
         src={image.file.url}
@@ -137,9 +170,11 @@ function GalleryImage({ image }: { image: EditorJSImageData }) {
         width={image.file.width ?? 1500}
         height={image.file.height ?? 1000}
       />
-      <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4 shadow-2xl">
-        {image.caption}
-      </figcaption>
+      {image.caption && (
+        <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4 shadow-2xl">
+          {image.caption}
+        </figcaption>
+      )}
     </figure>
   );
 }

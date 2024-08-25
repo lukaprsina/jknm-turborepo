@@ -2,7 +2,16 @@
 
 import type { OutputData } from "@editorjs/editorjs";
 import type { ReactNode } from "react";
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import EditorJS from "@editorjs/editorjs";
 // @ts-expect-error no types
@@ -11,23 +20,30 @@ import DragDrop from "editorjs-drag-drop";
 import Undo from "editorjs-undo";
 import _ from "lodash";
 
-
-
 import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
 import { toast } from "@acme/ui/use-toast";
 
-
-
 import { editor_store } from "~/app/uredi/[novica_ime]/editor-store";
-import { get_clean_url, get_heading_from_editor, get_image_data_from_editor } from "~/app/uredi/[novica_ime]/editor-utils";
+import {
+  get_clean_url,
+  get_file_data_from_editor,
+  get_heading_from_editor,
+  get_image_data_from_editor,
+} from "~/app/uredi/[novica_ime]/editor-utils";
 import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
-import { delete_algolia_article, update_algolia_article } from "~/server/algolia";
-import { clean_s3_directory, delete_s3_directory, rename_s3_directory } from "~/server/image-s3";
+import {
+  delete_algolia_article,
+  update_algolia_article,
+} from "~/server/algolia";
+import {
+  clean_s3_directory,
+  delete_s3_directory,
+  rename_s3_directory,
+} from "~/server/image-s3";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
-
 
 export interface EditorContextType {
   editor?: EditorJS;
@@ -260,7 +276,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       const editor_content = await editorJS.current.save();
       const image_data = get_image_data_from_editor(editor_content);
+      const file_data = get_file_data_from_editor(editor_content);
       const urls_to_keep = image_data.map((image) => image.file.url);
+      urls_to_keep.push(...file_data.map((file) => file.file.url));
 
       if (returned_data.preview_image)
         urls_to_keep.push(returned_data.preview_image);
@@ -356,18 +374,14 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
     const new_article_url = `${new_url}-${article.id}`;
 
     editor_content = await editorJS.current.save();
-    rename_images_in_editor(editor_content, new_article_url);
+    rename_files_in_editor(editor_content, new_article_url);
 
-    console.warn(
-      "configure_article_before_publish after renaming",
-      editor_content,
-    );
     update_settings_from_editor(editor_content, new_title, new_url);
 
     const preview_image = editor_store.get.preview_image();
 
     const new_preview_image = preview_image
-      ? rename_image(preview_image, new_article_url)
+      ? rename_file(preview_image, new_article_url)
       : undefined;
 
     editor_store.set.preview_image(new_preview_image);
@@ -444,21 +458,23 @@ function WrongHeadingButton({
   );
 }
 
-function rename_images_in_editor(editor_content: OutputData, new_dir: string) {
+function rename_files_in_editor(editor_content: OutputData, new_dir: string) {
+  console.log("Renaming files in editor", { editor_content, new_dir });
+
   for (const block of editor_content.blocks) {
     if (!block.id || !["image", "attaches"].includes(block.type)) {
-      console.log("Skipping block", block);
+      console.log("Skipping block", block.type);
       continue;
     }
 
-    const image_data = block.data as { file: { url: string } };
-    const new_url = rename_image(image_data.file.url, new_dir);
-    console.log("Renamed image", { old_url: image_data.file.url, new_url });
-    image_data.file.url = new_url;
+    const file_data = block.data as { file: { url: string } };
+    const new_url = rename_file(file_data.file.url, new_dir);
+    console.log("Renamed file", { old_url: file_data.file.url, new_url });
+    file_data.file.url = new_url;
   }
 }
 
-function rename_image(old_url: string, new_dir: string) {
+function rename_file(old_url: string, new_dir: string) {
   const url_parts = new URL(old_url);
   const file_name = url_parts.pathname.split("/").pop();
   if (!file_name) {

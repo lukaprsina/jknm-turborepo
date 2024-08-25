@@ -35,10 +35,24 @@ export function get_heading_from_editor(
   }
 }
 
-export function get_image_data_from_editor(
-  editor_content: OutputData,
-): EditorJSImageData[] {
+export function get_image_data_from_editor(editor_content: OutputData) {
   return editor_content.blocks
     .filter((block) => block.type === "image")
     .map((block) => block.data as EditorJSImageData);
+}
+
+export interface EditorJSFileData {
+  file: {
+    url: string;
+    size: number;
+    name: string;
+    extension: string;
+  };
+  title: string;
+}
+
+export function get_file_data_from_editor(editor_content: OutputData) {
+  return editor_content.blocks
+    .filter((block) => block.type === "attaches")
+    .map((block) => block.data as EditorJSFileData);
 }

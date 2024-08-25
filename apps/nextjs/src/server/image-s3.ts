@@ -117,6 +117,7 @@ export async function delete_s3_directory(prefix: string) {
       return object.Key;
     });
 
+    console.log("delete_s3_directory", keys);
     if (keys.length > 0) await delete_objects(keys);
   } catch (error) {
     console.error("Error deleting directory:", error);
