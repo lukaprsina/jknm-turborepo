@@ -7,37 +7,24 @@ import Link from "next/link";
 import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "lucide-react";
 import { useHits, useSortBy } from "react-instantsearch";
 
+
+
 import type { Session } from "@acme/auth";
 import type { ArticleHit } from "@acme/validators";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@acme/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@acme/ui/table";
+import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@acme/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
+
+
 
 import { EditButton } from "~/components/editing-buttons";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { delete_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
-import { MyStats } from "./search-components";
+import { MyStats, SORT_BY_ITEMS } from "./search-components";
+
 
 export function ArticleTable({
   session,
@@ -45,14 +32,7 @@ export function ArticleTable({
 }: { session?: Session } & UseHitsProps<ArticleHit>) {
   const { items } = useHits(props);
   const sort_api = useSortBy({
-    items: [
-      { value: "novice", label: "Najnovejše" },
-      { value: "novice_date_asc", label: "Najstarejše" },
-      { value: "novice_id_asc", label: "ID naraščajoče" },
-      { value: "novice_id_desc", label: "ID padajoče" },
-      { value: "novice_name_asc", label: "Ime naraščajoče" },
-      { value: "novice_name_desc", label: "Ime padajoče" },
-    ],
+    items: SORT_BY_ITEMS,
   });
 
   useEffect(() => {
@@ -104,7 +84,7 @@ export function ArticleTable({
               {sort_api.currentRefinement === "novice" && <ChevronUpIcon />}
             </Button>
           </TableHead>
-          {session && <TableHead className="text-right">Avtorji</TableHead>}
+          {session && <TableHead className="text-right">Admin</TableHead>}
         </TableRow>
       </TableHeader>
       <TableBody>

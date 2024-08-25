@@ -33,12 +33,7 @@ export function Search({ session }: { session?: Session }) {
             {/* <div className="flex items-center justify-between space-x-2">
             </div> */}
             <div className="flex flex-col items-center justify-between gap-6 text-nowrap sm:flex-row">
-              <MySortBy
-                items={[
-                  { value: "novice", label: "Najnovejše" },
-                  { value: "novice_date_asc", label: "Najstarejše" },
-                ]}
-              />
+              <MySortBy />
               <TabsList>
                 <TabsTrigger value="card">
                   <LayoutDashboard />

@@ -31,7 +31,7 @@ export const form_schema = z.object({
 
 export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
   const editor = useEditor();
-  const preview_image = editor_store.use.preview_image();
+  // const preview_image = editor_store.use.preview_image();
 
   const form = useForm<z.infer<typeof form_schema>>({
     resolver: zodResolver(form_schema),
@@ -48,7 +48,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
       <form className="space-y-4">
         <FormField
           control={form.control}
-          defaultValue={preview_image}
+          defaultValue={editor_store.get.preview_image()}
           name="preview_image"
           render={({ field }) => (
             <FormItem>

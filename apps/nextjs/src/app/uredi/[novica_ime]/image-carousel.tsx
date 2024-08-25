@@ -29,6 +29,7 @@ export const ImageCarousel = React.forwardRef<
   const file_ref = useRef<HTMLInputElement>(null);
   const [uploadedUrl, setUploadedUrl] = useState<string | undefined>(undefined);
   const image_data = editor_store.use.image_data();
+  const preview_image = editor_store.use.preview_image();
   /* const editor = useEditor();
 
   if (!editor) return null; */
@@ -98,7 +99,7 @@ export const ImageCarousel = React.forwardRef<
               if (response.success === 1 && !response.error) {
                 console.log("success, image uploaded", response);
                 setUploadedUrl(file_data.url);
-                // onImageUrlChange(file_data.url);
+                onImageUrlChange(file_data.url);
               } else {
                 console.error("Error uploading image", response.error);
               }

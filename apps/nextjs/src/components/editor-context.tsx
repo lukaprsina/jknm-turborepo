@@ -99,19 +99,15 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       editor_store.set.image_data(image_data);
 
       const preview_image = editor_store.get.preview_image();
-      console.log("Updating settings from editor", {
-        title,
-        url,
-        image_data,
-        preview_image,
-      });
-      // TODO: check if preview image exists
+
       if (!preview_image) {
-        console.log(
-          "Setting preview image as the first",
-          image_data.at(0)?.file.url,
-        );
-        editor_store.set.preview_image(image_data.at(0)?.file.url);
+        if (article.draft_preview_image) {
+          editor_store.set.preview_image(article.draft_preview_image);
+        } else if (article.preview_image) {
+          editor_store.set.preview_image(article.preview_image);
+        } else {
+          editor_store.set.preview_image(image_data.at(0)?.file.url);
+        }
       }
 
       editor_store.set.id(article.id);
