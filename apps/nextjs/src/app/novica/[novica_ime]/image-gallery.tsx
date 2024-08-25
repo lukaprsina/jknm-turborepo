@@ -138,7 +138,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
         align: "center",
       }}
       // max-h-[90vh] max-w-[90vw]
-      className="w-full max-w-[80%] p-10"
+      className="h-full max-h-[80%] w-full max-w-[80%] p-10"
       // max-w-xs h-full w-full
       // fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%]
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
