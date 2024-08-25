@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
+import { useOnClickOutside } from "usehooks-ts";
 
 import type { CarouselApi } from "@acme/ui/carousel";
 import {
@@ -16,7 +18,6 @@ import {
 import type { EditorJSImageData } from "~/components/plugins";
 import { gallery_store } from "~/components/gallery-store";
 import { useBreakpoint } from "~/hooks/use-breakpoint";
-import { useOutsideClickMultipleRefs } from "~/hooks/use-outside-click";
 import { useGalleryStore } from "./gallery-zustand";
 
 const GALLERY_CANCEL_KEYS: string[] = [
@@ -110,14 +111,26 @@ export function ImageGallery() {
 export function MyCarousel({ first_image }: { first_image?: string }) {
   const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
-  const carousel_ref = useRef<HTMLDivElement | null>(null);
-  const previous_ref = useRef<HTMLButtonElement | null>(null);
-  const next_ref = useRef<HTMLButtonElement | null>(null);
+  const carousel_ref = useRef<HTMLElement>(null);
+  const previous_ref = useRef<HTMLButtonElement>(null);
+  const next_ref = useRef<HTMLButtonElement>(null);
   const md_breakpoint = useBreakpoint("md", true);
 
-  useOutsideClickMultipleRefs(() => {
+  /* useOutsideClickMultipleRefs(() => {
     gallery.clear_default_image();
-  }, [carousel_ref, previous_ref, next_ref]);
+  }, [carousel_ref, previous_ref, next_ref]); */
+  const ref_filter = (
+    ref: RefObject<HTMLElement | null>,
+  ): ref is RefObject<HTMLElement> => Boolean(ref.current);
+
+  const refs: RefObject<HTMLElement>[] = useMemo(
+    () => [carousel_ref, previous_ref, next_ref].filter(ref_filter),
+    [carousel_ref, previous_ref, next_ref],
+  );
+
+  useOnClickOutside(refs, () => {
+    gallery.clear_default_image();
+  });
 
   useEffect(() => {
     if (!api) return;
@@ -146,7 +159,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
       // className="flex h-full w-full items-center justify-center"
     >
-      <CarouselContent ref={carousel_ref}>
+      <CarouselContent ref={carousel_ref as RefObject<HTMLDivElement>}>
         {gallery.images.map((image, index) => (
           <CarouselItem
             className="flex items-center justify-center"
