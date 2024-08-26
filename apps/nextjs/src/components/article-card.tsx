@@ -2,7 +2,7 @@
 
 import type { Hit as SearchHit } from "instantsearch.js";
 import type { IntersectionObserverHookRefCallback } from "react-intersection-observer-hook";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -15,6 +15,7 @@ import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
 import type { ArticleWithCreditedPeople } from "~/app/articles";
+import { Authors, useAuthors } from "~/components/authors";
 import { content_to_text } from "~/lib/content-to-text";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
@@ -29,11 +30,7 @@ export const ArticleDrizzleCard = ({
   featured?: boolean;
   ref?: IntersectionObserverHookRefCallback;
 }) => {
-  const authors = useMemo(() => {
-    return article.credited_people.map(
-      (credited_person) => credited_person.credited_people.name,
-    );
-  }, [article.credited_people]);
+  const authors = useAuthors(article.credited_people);
 
   return (
     <ArticleCard
@@ -86,7 +83,7 @@ export function ArticleCard({
   preview_image?: string;
   content_preview?: string;
   created_at: Date;
-  authors: string[];
+  authors?: string[];
   ref?: IntersectionObserverHookRefCallback;
 }) {
   const theme = useTheme();
@@ -136,25 +133,13 @@ export function ArticleCard({
               <div
                 className={cn(
                   "flex w-full items-center gap-3",
-                  authors.length === 0 ? "justify-end" : "justify-between",
+                  authors?.length === 0 ? "justify-end" : "justify-between",
                 )}
               >
-                {authors.length !== 0 ? (
-                  <>
-                    {/* <DotIcon /> */}
-                    <CardDescription className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden text-ellipsis text-nowrap">
-                      {authors.map((author, index) => (
-                        <span
-                          className="flex items-center text-foreground"
-                          key={index}
-                        >
-                          {author}
-                          {index !== authors.length - 1 && ",\u00A0"}
-                        </span>
-                      ))}
-                    </CardDescription>
-                  </>
-                ) : undefined}
+                <Authors
+                  authors={authors}
+                  className="line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap"
+                />
                 <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
                   {format_date(created_at)}
                 </CardDescription>

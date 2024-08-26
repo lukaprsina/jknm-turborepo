@@ -59,25 +59,27 @@ export async function iterate_over_articles(
   /* const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
     : csv_articles; */
-  const first_index = csv_articles.findIndex(
+  let first_index = csv_articles.findIndex(
     (a) => a.id === first_article.toString(),
   );
-  const last_index = csv_articles.findIndex(
+  let last_index = csv_articles.findIndex(
     (a) => a.id === last_article.toString(),
   );
+
+  if (first_index === -1) first_index = 0;
+  if (last_index === -1) last_index = csv_articles.length - 1;
 
   const sliced_csv_articles = do_splice
     ? csv_articles.slice(first_index, last_index)
     : csv_articles;
 
-  console.log("spliced_csv_articles", sliced_csv_articles);
+  console.log("spliced_csv_articles", first_index, last_index);
 
   const articles: TempArticleType[] = [];
   let article_id = 1 + first_index;
 
   for (const csv_article of sliced_csv_articles) {
     const article = await parse_csv_article(csv_article, editorJS, article_id);
-    console.log("article", article);
     articles.push(article);
     article_id++;
   }
@@ -87,20 +89,25 @@ export async function iterate_over_articles(
 
   // await save_images(images_to_save);
   // await write_article_html_to_file(problematic_articles);
-  console.log("Total articles:", csv_articles.length);
-  console.log({ wrong_divs, videos });
   console.log(
-    "Problematic articles:",
+    "Total articles (csv, uploaded):",
+    csv_articles.length,
+    articles.length,
+  );
+  console.log(
+    "Problematic:",
     problematic_articles.map((a) => `${a.csv.id}-${a.csv.title}`),
     problematic_articles.map((a) => a.csv.id),
+    { wrong_divs, videos },
   );
 
   console.log(
-    "authors",
+    "Authors (all, articles without authors):",
     authors.sort((a, b) => a.name.localeCompare(b.name)),
+    Array.from(articles_without_authors),
   );
 
-  console.log(Array.from(articles_without_authors));
+  console.log();
 }
 
 const AWS_PREFIX =
@@ -202,8 +209,10 @@ async function parse_csv_article(
   const preview_image = images.length !== 0 ? images[0]?.file.url : undefined;
 
   if (typeof preview_image === "undefined") {
-    console.error("No images in article", csv_article.title, content);
+    console.error("No images in article", csv_article.id, csv_article.title);
   }
+
+  console.log({ blocks, content });
 
   return {
     serial_id: article_id,
@@ -337,11 +346,11 @@ async function parse_node(
             caption = trimmed;
             already_set_caption = true;
           } else {
-            console.error(
+            /* console.error(
               "Empty caption: ",
               csv_article.id,
               div_child.outerHTML,
-            );
+            ); */
             continue;
           }
         } else if (div_child.nodeType == NodeType.TEXT_NODE) {
@@ -357,15 +366,17 @@ async function parse_node(
       }
 
       if (!src) {
-        console.error("No image src", csv_article.id);
-        return false;
+        throw new Error("No image src " + csv_article.id);
+        /* console.error("No image src", csv_article.id);
+        return false; */
       }
 
       if (!caption) {
-        console.log("No image caption", csv_article.id, {
+        throw new Error("No caption " + csv_article.id);
+        /* console.log("No image caption", csv_article.id, {
           inner: node.innerHTML,
         });
-        return false;
+        return false; */
       }
 
       // console.log({ src, caption });
@@ -466,16 +477,27 @@ function youtube_url_to_id(url?: string) {
 }
 
 const PROBLEMATIC_CONSTANTS = [
-  40, 43, 46, 47, 48, 49, 50, 51, 53, 54, 57, 59, 64, 66, 67, 68, 80, 90, 92,
-  114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
+  33, 40, 43, 46, 47, 48, 49, 50, 51, 53, 54, 57, 59, 64, 66, 67, 68, 80, 90,
+  92, 114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
   538, 566, 571, 615,
 ];
 
 function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
-  const blocks = all_blocks.splice(Math.max(0, all_blocks.length - 3));
+  let number_of_paragraphs = 3;
+
+  let first_index;
+  for (first_index = all_blocks.length - 1; first_index >= 0; first_index--) {
+    if (all_blocks[first_index]?.type === "paragraph") {
+      number_of_paragraphs--;
+    }
+
+    if (number_of_paragraphs <= 0) break;
+  }
+
+  const blocks = all_blocks.slice(first_index);
 
   if (blocks.length === 0) {
-    throw new Error("No blocks in article: " + csv_article.id);
+    console.error("get authors -> no paragraphs: " + csv_article.id);
   }
 
   const current_authors: string[] = [];
@@ -487,7 +509,11 @@ function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
       const strongs = root.querySelectorAll("strong");
 
       for (const strong of strongs) {
-        const trimmed = strong.text.trim().replace(/\s+/g, " ");
+        const trimmed = strong.text
+          .trim()
+          .replace(/\s+/g, " ")
+          .replace(":", "")
+          .replace(".", "");
 
         if (trimmed === "") continue;
 

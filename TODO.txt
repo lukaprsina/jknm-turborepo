@@ -2,7 +2,7 @@ PRIORITY
 - duplicate url of image, attachement
 - zgornje strani
 - novice algolia preview tekst ne dela
-
+- četrti od zadaj bold text http://localhost:3000/novica/raziskovalni-tabor-in-zaklju%C4%8Dek-te%C4%8Daja-55
 
 store update instead of image duplicate toast
 

@@ -34,7 +34,7 @@ export function ArticleConverter() {
   }, []);
 
   const [doSplice, setDoSplice] = useState(true);
-  const [firstArticle, setFirstArticle] = useState(65); // 20 - 60
+  const [firstArticle, setFirstArticle] = useState(1); // 20 - 60
   const [lastArticle, setLastArticle] = useState(66);
 
   return (

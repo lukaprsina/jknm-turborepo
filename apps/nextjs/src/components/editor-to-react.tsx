@@ -10,16 +10,17 @@ import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import _ from "lodash";
 
-import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 
 import type { EditorJSImageData } from "./plugins";
+import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { useGalleryStore } from "~/app/novica/[novica_ime]/gallery-zustand";
 import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
+import { Authors, useAuthors } from "~/components/authors";
 import { format_date } from "~/lib/format-date";
 import { human_file_size } from "./../lib/human-file-size";
 
@@ -27,9 +28,10 @@ export function EditorToReact({
   article,
   draft,
 }: {
-  article?: Partial<typeof Article.$inferSelect>;
+  article?: Partial<ArticleWithCreditedPeople>;
   draft?: boolean;
 }) {
+  const authors = useAuthors(article?.credited_people);
   const [heading, setHeading] = useState<string | undefined>();
   const gallery_set_images = useGalleryStore((state) => state.set_images);
 
@@ -63,7 +65,10 @@ export function EditorToReact({
       <CardHeader>
         <h1>{heading}</h1>
         {article.created_at && (
-          <CardDescription>{format_date(article.created_at)}</CardDescription>
+          <>
+            <Authors authors={authors} />
+            <CardDescription>{format_date(article.created_at)}</CardDescription>
+          </>
         )}
       </CardHeader>
       <CardContent>

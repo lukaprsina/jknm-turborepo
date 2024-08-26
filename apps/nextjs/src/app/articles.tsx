@@ -21,7 +21,7 @@ type ArticlesToCreditedPeopleType =
   typeof ArticlesToCreditedPeople.$inferSelect;
 type PartialCreditedPeopleType = typeof CreditedPeople.$inferSelect;
 
-type FullCreditedPeopleType = ArticlesToCreditedPeopleType & {
+export type FullCreditedPeopleType = ArticlesToCreditedPeopleType & {
   credited_people: PartialCreditedPeopleType;
 };
 

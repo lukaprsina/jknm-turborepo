@@ -11,6 +11,7 @@ import {
 } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
+import { ArticleWithCreditedPeople } from "~/app/articles";
 import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
@@ -79,7 +80,7 @@ export default async function NovicaPage({
 function PublishedContent({
   article,
 }: {
-  article?: typeof Article.$inferSelect;
+  article?: ArticleWithCreditedPeople;
 }) {
   console.log("published", article);
 
@@ -100,7 +101,7 @@ function PublishedContent({
 async function TabbedContent({
   article,
 }: {
-  article?: typeof Article.$inferSelect;
+  article?: ArticleWithCreditedPeople;
 }) {
   const session = await auth();
 
