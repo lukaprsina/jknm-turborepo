@@ -5,6 +5,7 @@ import type { OutputBlockData } from "@editorjs/editorjs";
 import type { Node as ParserNode } from "node-html-parser";
 import { parse as parseDate } from "date-format-parse";
 import dom_serialize from "dom-serializer";
+import { decode } from "html-entities";
 import { parseDocument } from "htmlparser2";
 import {
   parse as html_parse,
@@ -29,16 +30,16 @@ export interface ProblematicArticleType {
   html: string;
 }
 
-let wrong_divs = 0;
-let videos = 0;
-const problematic_articles: ProblematicArticleType[] = [];
-
 export interface ImageToSave {
   objave_id: string;
   serial_id: string;
   url: string;
   images: string[];
 }
+
+let wrong_divs = 0;
+let videos = 0;
+const problematic_articles: ProblematicArticleType[] = [];
 
 const images_to_save: ImageToSave[] = [];
 const articles_without_authors = new Set<number>();
@@ -55,6 +56,8 @@ export async function iterate_over_articles(
   videos = 0;
   problematic_articles.length = 0;
   images_to_save.length = 0;
+  articles_without_authors.clear();
+  authors.length = 0;
 
   /* const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
@@ -73,10 +76,17 @@ export async function iterate_over_articles(
     ? csv_articles.slice(first_index, last_index)
     : csv_articles;
 
-  console.log("spliced_csv_articles", first_index, last_index);
+  console.log("spliced_csv_articles", {
+    first_index,
+    last_index,
+    first_article,
+    last_article,
+    do_splice,
+    csv_articles,
+  });
 
   const articles: TempArticleType[] = [];
-  let article_id = 1 + first_index;
+  let article_id = do_splice && first_index !== -1 ? first_index + 1 : 1;
 
   for (const csv_article of sliced_csv_articles) {
     const article = await parse_csv_article(csv_article, editorJS, article_id);
@@ -227,6 +237,9 @@ async function parse_csv_article(
   } satisfies TempArticleType;
 }
 
+const p_allowed_tags = ["STRONG", "BR", "A", "IMG", "EM", "SUB", "SUP"];
+const caption_allowed_tags = ["STRONG", "EM", "A", "SUB", "SUP"];
+
 async function parse_node(
   node: ParserNode,
   blocks: OutputBlockData[],
@@ -239,21 +252,20 @@ async function parse_node(
 
   switch (node.tagName) {
     case "P": {
-      blocks.push({ type: "paragraph", data: { text: node.innerHTML } });
       for (const p_child of node.childNodes) {
         if (p_child.nodeType == NodeType.ELEMENT_NODE) {
           if (!(p_child instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
 
-          const allowed_tags = ["STRONG", "BR", "A", "IMG", "EM", "SUB", "SUP"];
-          if (!allowed_tags.includes(p_child.tagName))
+          if (!p_allowed_tags.includes(p_child.tagName))
             throw new Error("Unexpected tag in p element: " + p_child.tagName);
-        } else if (p_child.nodeType == NodeType.TEXT_NODE) {
-          // editorJS?.blocks.insert("paragraph", { text: p_child.text });
-        } else {
+        } else if (p_child.nodeType === NodeType.COMMENT_NODE) {
           throw new Error("Unexpected comment: " + node.text);
         }
       }
+
+      const text = decode(node.innerHTML).trim();
+      blocks.push({ type: "paragraph", data: { text } });
       break;
     }
     case "DIV": {
@@ -310,9 +322,10 @@ async function parse_node(
             throw new Error("Already set source once " + csv_article.id);
 
           const src_attr = img_tag.attributes.src;
-          if (!src_attr) throw new Error("No src attribute " + csv_article.id);
+          const trimmed = decode(src_attr).trim();
+          if (!trimmed) throw new Error("No src attribute " + csv_article.id);
 
-          const src_parts = src_attr.trim().split("/");
+          const src_parts = trimmed.trim().split("/");
           const image_name = src_parts[src_parts.length - 1];
           src = `${AWS_PREFIX}/${csv_url}-${article_id}/${image_name}`;
           /* console.log("Image", csv_article.id, {
@@ -331,17 +344,50 @@ async function parse_node(
         }
       }
 
+      // console.log("p children");
       let caption: string | undefined;
       let already_set_caption = false;
-      for (const div_child of node.querySelectorAll("p")) {
-        if (div_child.nodeType == NodeType.ELEMENT_NODE) {
-          if (!(div_child instanceof ParserHTMLElement))
+      for (const p_child of node.querySelectorAll("p")) {
+        if (p_child.nodeType == NodeType.ELEMENT_NODE) {
+          if (!(p_child instanceof ParserHTMLElement))
             throw new Error("Not an HTMLElement");
 
-          const trimmed = div_child.text.trim();
+          /* console.log(
+            "p_child",
+            p_child.tagName,
+            p_child.innerHTML,
+            p_child.childNodes,
+          ); */
+
+          let is_wrong = false;
+          for (const p_child_child of p_child.childNodes) {
+            if (p_child_child.nodeType == NodeType.ELEMENT_NODE) {
+              if (!(p_child_child instanceof ParserHTMLElement))
+                throw new Error("Not an HTMLElement");
+
+              if (!caption_allowed_tags.includes(p_child_child.tagName)) {
+                /* throw new Error(
+                  "Unexpected tag in caption element: " + p_child_child.tagName,
+                ); */
+                console.error(
+                  "Unexpected tag in caption element",
+                  csv_article.id,
+                  p_child_child.tagName,
+                );
+                is_wrong = true;
+              }
+            } else if (p_child_child.nodeType === NodeType.COMMENT_NODE) {
+              throw new Error("Unexpected comment: " + node.text);
+            }
+          }
+          if (is_wrong) continue;
+
+          const trimmed = decode(p_child.innerHTML).trim();
           if (trimmed !== "") {
-            if (already_set_caption)
+            if (already_set_caption) {
+              console.log({ previous: caption, current: trimmed });
               throw new Error("Already set caption once " + csv_article.id);
+            }
 
             caption = trimmed;
             already_set_caption = true;
@@ -353,17 +399,15 @@ async function parse_node(
             ); */
             continue;
           }
-        } else if (div_child.nodeType == NodeType.TEXT_NODE) {
+        } else if (p_child.nodeType == NodeType.TEXT_NODE) {
           throw new Error(
-            "Caption is just text" +
-              csv_article.id +
-              ", " +
-              div_child.outerHTML,
+            "Caption is just text" + csv_article.id + ", " + p_child.outerHTML,
           );
         } else {
           throw new Error("Unexpected comment: " + node.text);
         }
       }
+      // console.log("p children done");
 
       if (!src) {
         throw new Error("No image src " + csv_article.id);
@@ -412,7 +456,8 @@ async function parse_node(
               "Unexpected element in ul element: " + ul_child.tagName,
             );
 
-          items.push(ul_child.innerHTML);
+          const trimmed = decode(ul_child.innerHTML).trim();
+          items.push(trimmed);
         } else if (ul_child.nodeType == NodeType.TEXT_NODE) {
           if (ul_child.text.trim() !== "")
             throw new Error("Some text: " + ul_child.text);
@@ -436,10 +481,11 @@ async function parse_node(
       const level = node.tagName.trim()[1];
       if (!level) throw new Error("No level in header tag");
 
+      const trimmed = decode(node.innerHTML).trim();
       blocks.push({
         type: "header",
         data: {
-          text: node.text,
+          text: trimmed,
           level: parseInt(level),
         },
       });
@@ -476,6 +522,7 @@ function youtube_url_to_id(url?: string) {
   return match && match[7]?.length == 11 ? match[7] : false;
 }
 
+// TODO: 33 isn't the only one. search for img in p.
 const PROBLEMATIC_CONSTANTS = [
   33, 40, 43, 46, 47, 48, 49, 50, 51, 53, 54, 57, 59, 64, 66, 67, 68, 80, 90,
   92, 114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
@@ -485,51 +532,63 @@ const PROBLEMATIC_CONSTANTS = [
 function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
   let number_of_paragraphs = 3;
 
-  let first_index;
-  for (first_index = all_blocks.length - 1; first_index >= 0; first_index--) {
-    if (all_blocks[first_index]?.type === "paragraph") {
-      number_of_paragraphs--;
-    }
+  const last_paragraphs: string[] = [];
+  // console.log("get_authors", all_blocks);
 
-    if (number_of_paragraphs <= 0) break;
+  for (let i = all_blocks.length - 1; i >= 0; i--) {
+    const block = all_blocks.at(i);
+    if (!block) throw new Error("No block at index " + i);
+
+    if (block.type !== "paragraph") continue;
+
+    const paragraph_data = block.data as { text: string };
+    const trimmed = decode(paragraph_data.text).trim();
+    if (trimmed === "") continue;
+
+    last_paragraphs.push(trimmed);
+    number_of_paragraphs--;
+    if (number_of_paragraphs === 0) {
+      break;
+    }
   }
 
-  const blocks = all_blocks.slice(first_index);
+  last_paragraphs.reverse();
 
-  if (blocks.length === 0) {
+  if (last_paragraphs.length === 0) {
     console.error("get authors -> no paragraphs: " + csv_article.id);
   }
 
   const current_authors: string[] = [];
 
-  for (const block of blocks) {
-    if (block.type == "paragraph") {
-      const paragraph_block = block.data as { text: string };
-      const root = html_parse(paragraph_block.text);
-      const strongs = root.querySelectorAll("strong");
+  for (const paragraph of last_paragraphs) {
+    const root = html_parse(paragraph);
+    const strongs = root.querySelectorAll("strong");
 
-      for (const strong of strongs) {
-        const trimmed = strong.text
-          .trim()
-          .replace(/\s+/g, " ")
-          .replace(":", "")
-          .replace(".", "");
+    for (const strong of strongs) {
+      const trimmed = strong.text
+        .trim()
+        .replace(/\s+/g, " ")
+        .replace(":", "")
+        .replace(".", "");
 
-        if (trimmed === "") continue;
+      if (trimmed === "") continue;
 
-        const author = authors.find((a) => a.name === trimmed);
-        current_authors.push(trimmed);
+      const author = authors.find((a) => a.name === trimmed);
+      current_authors.push(trimmed);
 
-        if (author) {
-          author.ids.push(csv_article.id);
-        } else {
-          authors.push({ name: trimmed, ids: [csv_article.id] });
-        }
+      if (author) {
+        author.ids.push(csv_article.id);
+      } else {
+        authors.push({ name: trimmed, ids: [csv_article.id] });
       }
-    } else {
-      articles_without_authors.add(parseInt(csv_article.id));
     }
   }
+  /* console.log("get_authors done", {
+    all_blocks,
+    last_paragraphs,
+    number_of_paragraphs,
+    authors,
+  }); */
 
   return current_authors;
 }

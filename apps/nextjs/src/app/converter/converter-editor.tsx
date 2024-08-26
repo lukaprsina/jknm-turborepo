@@ -34,8 +34,8 @@ export function ArticleConverter() {
   }, []);
 
   const [doSplice, setDoSplice] = useState(true);
-  const [firstArticle, setFirstArticle] = useState(1); // 20 - 60
-  const [lastArticle, setLastArticle] = useState(66);
+  const [firstArticle, setFirstArticle] = useState(32); // 20 - 60
+  const [lastArticle, setLastArticle] = useState(33);
 
   return (
     <div className="prose container mx-auto py-8">

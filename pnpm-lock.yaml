@@ -68,7 +68,7 @@ importers:
         version: 3.3.3
       turbo:
         specifier: canary
-        version: 2.0.15-canary.3
+        version: 2.0.15-canary.4
       typescript:
         specifier: 'catalog:'
         version: 5.5.4
@@ -405,6 +405,9 @@ importers:
       googleapis:
         specifier: ^142.0.0
         version: 142.0.0
+      html-entities:
+        specifier: ^2.5.2
+        version: 2.5.2
       html-react-parser:
         specifier: ^5.1.12
         version: 5.1.12(react@19.0.0-rc-6ebfd5b0-20240818)(types-react@19.0.0-rc.1)
@@ -9120,38 +9123,38 @@ packages:
       typescript:
         optional: true
 
-  turbo-darwin-64@2.0.15-canary.3:
-    resolution: {integrity: sha512-1qBQSfmFxqEGousjp/Os5lSG5PHyxKlhQFjQ3gVVu+i8OrGYqYX1dx9xYauaGUKXl650LZ4cDYewzHv1NxdS7g==}
+  turbo-darwin-64@2.0.15-canary.4:
+    resolution: {integrity: sha512-eC6EjLwDTDXb43H7U7cvynGIsfaGfDrkdKvHlLmVMOfCXu+rZz80CWUizzQKcc15fcu+O+0CaXt0B8k2Y9Haow==}
     cpu: [x64]
     os: [darwin]
 
-  turbo-darwin-arm64@2.0.15-canary.3:
-    resolution: {integrity: sha512-kmZt8aClNjc/UaYLr18wlvHsg9EOE5dDnCIYOqs6Gvd/WCuQhKukBJ/FIzUOxogMejHXfdTJdxNxA6Ov31/U1Q==}
+  turbo-darwin-arm64@2.0.15-canary.4:
+    resolution: {integrity: sha512-lXJmrBbpZ09i3XwjD25YfzeoY/Xhg7vzmD3MmIhBPfXSTR9sNpFafvsTsmsdn/rzlgkmzdoJ7MUnxKP+SNNfhw==}
     cpu: [arm64]
     os: [darwin]
 
-  turbo-linux-64@2.0.15-canary.3:
-    resolution: {integrity: sha512-DOd4cczCVwJD7TiHyXukG23E6HY4j72lvS9mehGa0IP1QtLzLq/3rATJGIPaMNl7oLqGSiSH3oTvHvev1bz9cA==}
+  turbo-linux-64@2.0.15-canary.4:
+    resolution: {integrity: sha512-zEXlMef+v5pxEZvkWtf8F8sB1nqoXAmaVyIwSaMUOiUPJsBiiOw22+PrMmNb7hiAP7dcA29jb38V4aNdeO9asA==}
     cpu: [x64]
     os: [linux]
 
-  turbo-linux-arm64@2.0.15-canary.3:
-    resolution: {integrity: sha512-XyIhx9xu+pQxkUrFP/2cfzhy4ut5kl6ODGMOCywOsqxAhq8vjCIRMYoET21PTl/A4CTtM0EP0/CrNOYhdz9tag==}
+  turbo-linux-arm64@2.0.15-canary.4:
+    resolution: {integrity: sha512-Vqij2z4P8g+Z85TsSCU2K8JApV+kN7QdDcZSb5UUknId7hy07CZjpuoAjy+AmraIV8ZKhRjujWyXk7Xo1ibVhg==}
     cpu: [arm64]
     os: [linux]
 
-  turbo-windows-64@2.0.15-canary.3:
-    resolution: {integrity: sha512-zO4DR3LSeXvMPz4VVy1eq90rcky7GGUd5pQO71dsA4dlMzRsUHh/xUYx7/HW/2MDzkihM4DAWMbbKokjqWpycw==}
+  turbo-windows-64@2.0.15-canary.4:
+    resolution: {integrity: sha512-Xh+3lcK+HNreskl0glsV9qxKm4GLk9TZISSat7jWUM31c3T3GO9VQqsjKacbbbOwCUslHeciJirRxaQ/TWLrBQ==}
     cpu: [x64]
     os: [win32]
 
-  turbo-windows-arm64@2.0.15-canary.3:
-    resolution: {integrity: sha512-wH6JNb5D+MGl2mcA0l8habMzjL9iFHGmh9L3dEIDXtJCYX5Rn71exLhJoqktLLPc3nKDKqJ7E+QI5s//5dDaHg==}
+  turbo-windows-arm64@2.0.15-canary.4:
+    resolution: {integrity: sha512-2Nka2r4lt8FCcf3r9yh718fnceL9OEHVkvDv4YUyuYgDVId4Ej9xToPlUo0gT+6uxw0wRFAxt5xorGoTDrlLvw==}
     cpu: [arm64]
     os: [win32]
 
-  turbo@2.0.15-canary.3:
-    resolution: {integrity: sha512-j1T7mCim07T5Rq9QIc5B5t+7qnkcwOzGzXKrnJW/4fHttAuDIt2+/oRXpATuu9H4lLq59Ay7067BIKkptlWIjw==}
+  turbo@2.0.15-canary.4:
+    resolution: {integrity: sha512-x1X4Fh9mjYNNQjyRiIXerIBFWzKGo8ty8qwSWhKUWAX8/h1ooLz4lDOoAe5Ya3dv7TJLnDVXukomR52/zD89Zw==}
     hasBin: true
 
   type-check@0.4.0:
@@ -19760,32 +19763,32 @@ snapshots:
       - supports-color
       - ts-node
 
-  turbo-darwin-64@2.0.15-canary.3:
+  turbo-darwin-64@2.0.15-canary.4:
     optional: true
 
-  turbo-darwin-arm64@2.0.15-canary.3:
+  turbo-darwin-arm64@2.0.15-canary.4:
     optional: true
 
-  turbo-linux-64@2.0.15-canary.3:
+  turbo-linux-64@2.0.15-canary.4:
     optional: true
 
-  turbo-linux-arm64@2.0.15-canary.3:
+  turbo-linux-arm64@2.0.15-canary.4:
     optional: true
 
-  turbo-windows-64@2.0.15-canary.3:
+  turbo-windows-64@2.0.15-canary.4:
     optional: true
 
-  turbo-windows-arm64@2.0.15-canary.3:
+  turbo-windows-arm64@2.0.15-canary.4:
     optional: true
 
-  turbo@2.0.15-canary.3:
+  turbo@2.0.15-canary.4:
     optionalDependencies:
-      turbo-darwin-64: 2.0.15-canary.3
-      turbo-darwin-arm64: 2.0.15-canary.3
-      turbo-linux-64: 2.0.15-canary.3
-      turbo-linux-arm64: 2.0.15-canary.3
-      turbo-windows-64: 2.0.15-canary.3
-      turbo-windows-arm64: 2.0.15-canary.3
+      turbo-darwin-64: 2.0.15-canary.4
+      turbo-darwin-arm64: 2.0.15-canary.4
+      turbo-linux-64: 2.0.15-canary.4
+      turbo-linux-arm64: 2.0.15-canary.4
+      turbo-windows-64: 2.0.15-canary.4
+      turbo-windows-arm64: 2.0.15-canary.4
 
   type-check@0.4.0:
     dependencies:
