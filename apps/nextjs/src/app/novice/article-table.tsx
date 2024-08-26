@@ -36,7 +36,7 @@ import { EditButton } from "~/components/editing-buttons";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { delete_algolia_article } from "~/server/algolia";
-import { delete_s3_directory } from "~/server/image-s3";
+import { delete_s3_directory } from "~/server/s3-file";
 import { api } from "~/trpc/react";
 import { MyStats, SORT_BY_ITEMS } from "./search-components";
 

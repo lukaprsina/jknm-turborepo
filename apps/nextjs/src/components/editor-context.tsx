@@ -41,7 +41,7 @@ import {
   clean_s3_directory,
   delete_s3_directory,
   rename_s3_directory,
-} from "~/server/image-s3";
+} from "~/server/s3-file";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 

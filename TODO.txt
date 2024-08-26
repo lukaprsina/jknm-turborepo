@@ -1,5 +1,8 @@
 PRIORITY
 - duplicate url of image, attachement
+- zgornje strani
+- novice algolia preview tekst ne dela
+
 
 store update instead of image duplicate toast
 

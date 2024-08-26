@@ -30,10 +30,10 @@ const GALLERY_CANCEL_KEYS: string[] = [
   "ArrowUp",
   "ArrowDown",
   "Space",
-  "PageUp",
-  "PageDown",
-  "Home",
-  "End",
+  // "PageUp",
+  // "PageDown",
+  // "Home",
+  // "End",
   "Tab",
   "Backspace",
   "Delete",
@@ -108,23 +108,20 @@ export function ImageGallery() {
   return <>{gallery.default_image ? portal() : null}</>;
 }
 
+/* useOutsideClickMultipleRefs(() => {
+    gallery.clear_default_image();
+  }, [carousel_ref, previous_ref, next_ref]); */
+
 export function MyCarousel({ first_image }: { first_image?: string }) {
   const gallery = useGalleryStore();
   const [api, setApi] = useState<CarouselApi>();
-  const carousel_ref = useRef<HTMLElement>(null);
+  const md_breakpoint = useBreakpoint("md", true);
+  const carousel_ref = useRef<HTMLDivElement>(null);
   const previous_ref = useRef<HTMLButtonElement>(null);
   const next_ref = useRef<HTMLButtonElement>(null);
-  const md_breakpoint = useBreakpoint("md", true);
-
-  /* useOutsideClickMultipleRefs(() => {
-    gallery.clear_default_image();
-  }, [carousel_ref, previous_ref, next_ref]); */
-  const ref_filter = (
-    ref: RefObject<HTMLElement | null>,
-  ): ref is RefObject<HTMLElement> => Boolean(ref.current);
 
   const refs: RefObject<HTMLElement>[] = useMemo(
-    () => [carousel_ref, previous_ref, next_ref].filter(ref_filter),
+    () => [carousel_ref, previous_ref, next_ref] as RefObject<HTMLElement>[],
     [carousel_ref, previous_ref, next_ref],
   );
 
@@ -159,7 +156,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
       // className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-md border-4 bg-white/90"
       // className="flex h-full w-full items-center justify-center"
     >
-      <CarouselContent ref={carousel_ref as RefObject<HTMLDivElement>}>
+      <CarouselContent ref={carousel_ref}>
         {gallery.images.map((image, index) => (
           <CarouselItem
             className="flex items-center justify-center"
