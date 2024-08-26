@@ -29,7 +29,6 @@ export interface ProblematicArticleType {
   html: string;
 }
 
-const do_splice = true as boolean;
 let wrong_divs = 0;
 let videos = 0;
 const problematic_articles: ProblematicArticleType[] = [];
@@ -43,10 +42,12 @@ export interface ImageToSave {
 
 const images_to_save: ImageToSave[] = [];
 const articles_without_authors = new Set<number>();
+const authors: { name: string; ids: string[] }[] = [];
 
 export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
+  do_splice: boolean,
   first_article: number,
   last_article: number,
 ) {
@@ -55,38 +56,34 @@ export async function iterate_over_articles(
   problematic_articles.length = 0;
   images_to_save.length = 0;
 
-  const spliced_csv_articles = do_splice
+  /* const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
+    : csv_articles; */
+  const first_index = csv_articles.findIndex(
+    (a) => a.id === first_article.toString(),
+  );
+  const last_index = csv_articles.findIndex(
+    (a) => a.id === last_article.toString(),
+  );
+
+  const sliced_csv_articles = do_splice
+    ? csv_articles.slice(first_index, last_index)
     : csv_articles;
 
-  console.log("spliced_csv_articles", spliced_csv_articles);
+  console.log("spliced_csv_articles", sliced_csv_articles);
 
   const articles: TempArticleType[] = [];
-  let article_id = 1;
-  for (const csv_article of spliced_csv_articles) {
+  let article_id = 1 + first_index;
+
+  for (const csv_article of sliced_csv_articles) {
     const article = await parse_csv_article(csv_article, editorJS, article_id);
+    console.log("article", article);
     articles.push(article);
     article_id++;
   }
 
   console.log("done", articles);
   await upload_articles(articles);
-
-  /* if (true as boolean) {
-    article_create.mutate({
-      id: article_id,
-      title: csv_article.title,
-      preview_image,
-      content,
-      draft_content: null,
-      url: csv_url,
-      created_at,
-      updated_at,
-      published: true,
-    });
-
-    article_id++;
-  } */
 
   // await save_images(images_to_save);
   // await write_article_html_to_file(problematic_articles);
@@ -98,7 +95,10 @@ export async function iterate_over_articles(
     problematic_articles.map((a) => a.csv.id),
   );
 
-  console.log(authors.sort((a, b) => a.name.localeCompare(b.name)));
+  console.log(
+    "authors",
+    authors.sort((a, b) => a.name.localeCompare(b.name)),
+  );
 
   console.log(Array.from(articles_without_authors));
 }
@@ -167,13 +167,14 @@ async function parse_csv_article(
   }
 
   const current_authors = get_authors(csv_article, blocks);
+
   const new_authors = new Set<string>();
   for (const current_author of current_authors) {
     const author = AUTHORS.find((a) => a.name === current_author);
     // add authors first
     if (!author) {
       // throw new Error("No author found: " + current_author);
-      console.error("No author found: " + current_author);
+      // console.error("No author found: " + current_author);
       new_authors.add(current_author);
       continue;
     }
@@ -201,7 +202,7 @@ async function parse_csv_article(
   const preview_image = images.length !== 0 ? images[0]?.file.url : undefined;
 
   if (typeof preview_image === "undefined") {
-    console.error("No images in article", csv_article.title);
+    console.error("No images in article", csv_article.title, content);
   }
 
   return {
@@ -299,15 +300,22 @@ async function parse_node(
           if (already_set_src)
             throw new Error("Already set source once " + csv_article.id);
 
-          already_set_src = true;
           const src_attr = img_tag.attributes.src;
           if (!src_attr) throw new Error("No src attribute " + csv_article.id);
 
           const src_parts = src_attr.trim().split("/");
           const image_name = src_parts[src_parts.length - 1];
           src = `${AWS_PREFIX}/${csv_url}-${article_id}/${image_name}`;
+          /* console.log("Image", csv_article.id, {
+            src,
+            src_parts,
+            src_attr,
+            already_set_src,
+          }); */
+          already_set_src = true;
         } else if (img_tag.nodeType == NodeType.TEXT_NODE) {
-          console.error("Image is just text: " + csv_article.id);
+          // console.error("Image is just text: " + csv_article.id);
+          throw new Error("Image is just text: " + csv_article.id);
           // if (img_tag.text.trim() !== "")
         } else {
           throw new Error("Unexpected comment: " + node.text);
@@ -325,9 +333,9 @@ async function parse_node(
           if (trimmed !== "") {
             if (already_set_caption)
               throw new Error("Already set caption once " + csv_article.id);
-            already_set_caption = true;
 
             caption = trimmed;
+            already_set_caption = true;
           } else {
             console.error(
               "Empty caption: ",
@@ -360,15 +368,20 @@ async function parse_node(
         return false;
       }
 
-      const { width, height } = await get_image_dimensions(src);
+      // console.log({ src, caption });
+      const dimensions = await get_image_dimensions(src);
+      if (!dimensions) {
+        console.error("No dimensions for image", csv_article.id, src);
+        break;
+      }
 
       blocks.push({
         type: "image",
         data: {
           file: {
             url: src,
-            width,
-            height,
+            width: dimensions.width,
+            height: dimensions.height,
           },
           caption,
         },
@@ -457,8 +470,6 @@ const PROBLEMATIC_CONSTANTS = [
   114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
   538, 566, 571, 615,
 ];
-
-const authors: { name: string; ids: string[] }[] = [];
 
 function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
   const blocks = all_blocks.splice(Math.max(0, all_blocks.length - 3));

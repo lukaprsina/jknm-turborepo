@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 
 import { Button } from "@acme/ui/button";
+import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
 
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
@@ -18,7 +19,6 @@ import {
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
-import { get_jwt_token } from "./jwt";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -33,8 +33,9 @@ export function ArticleConverter() {
     })();
   }, []);
 
-  const [firstArticle, setFirstArticle] = useState(0); // 20 - 60
-  const [lastArticle, setLastArticle] = useState(30);
+  const [doSplice, setDoSplice] = useState(true);
+  const [firstArticle, setFirstArticle] = useState(65); // 20 - 60
+  const [lastArticle, setLastArticle] = useState(66);
 
   return (
     <div className="prose container mx-auto py-8">
@@ -53,13 +54,6 @@ export function ArticleConverter() {
           }}
         >
           Test Google admin
-        </Button>
-        <Button
-          onClick={async () => {
-            await get_jwt_token();
-          }}
-        >
-          Get JWT Token
         </Button>
         <Button
           onClick={async () => {
@@ -100,6 +94,19 @@ export function ArticleConverter() {
             value={lastArticle}
             onChange={(event) => setLastArticle(parseInt(event.target.value))}
           />
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={doSplice}
+              onCheckedChange={(checked) => setDoSplice(checked === true)}
+              id="do_splice"
+            />
+            <label
+              htmlFor="do_splice"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Splice?
+            </label>
+          </div>
         </div>
         <Button
           onClick={async () => {
@@ -109,6 +116,7 @@ export function ArticleConverter() {
             await iterate_over_articles(
               csv_articles,
               editorJS.current,
+              doSplice,
               firstArticle,
               lastArticle,
             );

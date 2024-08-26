@@ -26,6 +26,7 @@ import type {
 } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
+// import { buildConflictUpdateColumns } from "~/lib/drizzle";
 import { AUTHORS } from "./authors";
 
 export interface CSVType {
@@ -72,10 +73,21 @@ export async function test_google_admin() {
 }
 
 export async function get_image_dimensions(src: string) {
-  const result = await fetch(src);
-  const buffer = await result.arrayBuffer(); // Convert the Response object to a Buffer
-  const { width, height } = await sharp(buffer).metadata(); // Pass the Buffer to the sharp function
-  return { width, height };
+  try {
+    const result = await fetch(src);
+    if (!result.ok) {
+      console.error("Image fetch error", src, result.status);
+      return;
+    }
+
+    const buffer = await result.arrayBuffer(); // Convert the Response object to a Buffer
+    const sharp_result = sharp(buffer);
+    const metadata = await sharp_result.metadata();
+    return { width: metadata.width, height: metadata.height };
+  } catch (e: unknown) {
+    console.error("Sharp error", e);
+    return;
+  }
 }
 
 export interface TempArticleType {
@@ -92,23 +104,45 @@ export interface TempArticleType {
 
 export async function upload_articles(articles: TempArticleType[]) {
   console.log("uploading articles", articles.length);
+  if (articles.length === 0) return;
+
   await db.transaction(async (tx) => {
-    await tx
-      .insert(Article)
-      .values(
-        articles.map((article) => ({
-          id: article.serial_id,
-          old_id: parseInt(article.objave_id),
-          title: article.title,
-          content: article.content,
-          created_at: article.created_at,
-          updated_at: article.updated_at,
-          preview_image: article.preview_image,
-          url: article.csv_url,
-          published: true,
-        })),
-      )
-      .returning();
+    try {
+      await tx
+        .insert(Article)
+        .values(
+          articles.map((article) => ({
+            id: article.serial_id,
+            old_id: parseInt(article.objave_id),
+            title: article.title,
+            content: article.content,
+            created_at: article.created_at,
+            updated_at: article.updated_at,
+            preview_image: article.preview_image,
+            url: article.csv_url,
+            published: true,
+          })),
+        )
+        /* .onConflictDoUpdate({
+          target: Article.id,
+          set: buildConflictUpdateColumns(Article, [
+            "title",
+            "content",
+            "created_at",
+            "preview_image",
+            "updated_at",
+            "url",
+            "published",
+          ]),
+        }) */
+        .returning();
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.error("Error uploading articles", e.message);
+      } else {
+        console.error("Unknown", e);
+      }
+    }
 
     const authors: (typeof ArticlesToCreditedPeople.$inferInsert)[] = [];
 
@@ -130,31 +164,12 @@ export async function upload_articles(articles: TempArticleType[]) {
       }
     }
 
-    await tx.insert(ArticlesToCreditedPeople).values(authors);
-
-    /* await tx.insert(ArticlesToCreditedPeople).values(
-      await Promise.all(
-        articles.flatMap(async (article) => {
-          const authors = article.author_names.map((author_name) => {
-            const author = await db.query.CreditedPeople.findFirst({
-              where: eq(CreditedPeople.name, author_name),
-            });
-
-            if(!author) return;
-
-            return {
-              article_id: article.serial_id,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              credited_people_id: author.id,
-            };
-          });
-
-          if(!authors) return;
-
-          return authors;
-        }),
-      ),
-    ); */
+    if (authors.length === 0) return;
+    try {
+      await tx.insert(ArticlesToCreditedPeople).values(authors);
+    } catch (e) {
+      console.error("Error inserting authors", e);
+    }
   });
 
   console.log("done uploading articles");
@@ -192,6 +207,8 @@ export async function read_articles() {
 
 // sync just the published articles
 export async function sync_with_algolia() {
+  console.log("Syncing articles");
+
   const articles = await db.query.Article.findMany({
     // limit: 10,
     with: {
@@ -235,9 +252,9 @@ export async function sync_with_algolia() {
     })
     .filter((article) => typeof article !== "undefined");
 
-  console.log("Syncing articles:", objects.length);
-
   await index.saveObjects(objects);
+
+  console.log("Done", objects.length);
 }
 
 export async function write_article_html_to_file(

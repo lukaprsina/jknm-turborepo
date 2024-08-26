@@ -31,7 +31,7 @@ export function EditorToReact({
   draft?: boolean;
 }) {
   const [heading, setHeading] = useState<string | undefined>();
-  const gallery = useGalleryStore();
+  const gallery_set_images = useGalleryStore((state) => state.set_images);
 
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
@@ -47,17 +47,14 @@ export function EditorToReact({
     setHeading(heading_info.title);
 
     const image_data = get_image_data_from_editor(content);
-    if (!_.isEqual(gallery.images, image_data)) {
-      gallery.set_images(image_data);
-    }
-    // gallery_store.set.images(image_data);
+    gallery_set_images(image_data);
 
     return {
       version: content.version ?? "unknown version",
       blocks: content.blocks.slice(1), // remove first heading
       time: content.time ?? Date.now(),
     };
-  }, [article?.content, article?.draft_content, draft, gallery]);
+  }, [article?.content, article?.draft_content, draft, gallery_set_images]);
 
   if (!editor_data || !article) return;
 
