@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
+import { test_google_admin_file } from "~/app/converter/google-admin";
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
@@ -28,9 +29,23 @@ interface EditorPageProps {
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
+  const users = await test_google_admin_file();
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
   const novica_ime = novica_parts.slice(0, -1).join("-");
+
+  if (!users) {
+    console.error("No users found in Google Admin API");
+    return (
+      <Shell>
+        <Card>
+          <CardHeader>
+            <CardTitle>Uporabniki ne obstajajo</CardTitle>
+          </CardHeader>
+        </Card>
+      </Shell>
+    );
+  }
 
   if (!novica_id_string) {
     console.error("No article ID found in URL", novica_ime_raw);
@@ -60,7 +75,7 @@ export default async function EditorPage({
     <Shell>
       <div className="container mb-4 mt-8 h-full min-h-screen">
         {article_by_url ? (
-          <Editor article={article_by_url} />
+          <Editor users={users} article={article_by_url} />
         ) : (
           <CreateNewArticle novica_ime={novica_ime} />
         )}

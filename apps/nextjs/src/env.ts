@@ -23,6 +23,8 @@ export const env = createEnv({
     AWS_REGION: z.string(),
     AWS_BUCKET_NAME: z.string(),
     ALGOLIA_ADMIN_KEY: z.string(),
+    JKNM_WORKSPACE_ID: z.string(),
+    JKNM_SERVICE_ACCOUNT_CREDENTIALS: z.string(),
   },
 
   /**

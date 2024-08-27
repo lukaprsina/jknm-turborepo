@@ -4,7 +4,8 @@ import { SaveIcon, XIcon } from "lucide-react";
 
 import "./editor.css";
 
-import { useCallback, useEffect } from "react";
+import type { admin_directory_v1 } from "googleapis";
+import { useCallback, useContext, useEffect, useMemo } from "react";
 
 import type { Article } from "@acme/db/schema";
 import {
@@ -19,31 +20,36 @@ import {
   AlertDialogTrigger,
 } from "@acme/ui/alert-dialog";
 import { Button } from "@acme/ui/button";
+import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
-import { AuthorTags } from "./author-tags";
+import UsersContext from "~/components/users-context";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
 
 export default function MyEditor({
   article,
+  users,
 }: {
   article?: typeof Article.$inferSelect;
+  users: admin_directory_v1.Schema$User[];
 }) {
   return (
-    <EditorProvider article={article}>
-      <div className="mx-auto w-full outline outline-1">
-        <MyToolbar />
-        <div
-          id="editorjs"
-          /* lg:prose-xl  */
-          className="prose dark:prose-invert container"
-        />
-      </div>
-      <SettingsSummary />
-    </EditorProvider>
+    <UsersContext.Provider value={{ users }}>
+      <EditorProvider article={article}>
+        <div className="mx-auto w-full outline outline-1">
+          <MyToolbar />
+          <div
+            id="editorjs"
+            /* lg:prose-xl  */
+            className="prose dark:prose-invert container"
+          />
+        </div>
+        <SettingsSummary />
+      </EditorProvider>
+    </UsersContext.Provider>
   );
 }
 
@@ -65,11 +71,18 @@ export interface SaveCallbackProps {
 export type SaveCallbackType = (props: SaveCallbackProps) => Promise<void>;
 
 function MyToolbar() {
+  const users_context = useContext(UsersContext);
   const editor = useEditor();
 
-  useEffect(() => {
-    console.log("editor dirty:", editor?.dirty);
-  }, [editor?.dirty]);
+  const users = useMemo(() => {
+    if (!users_context.users) return [];
+
+    return users_context.users.map((user) => ({
+      label: user.name?.fullName ?? "",
+      value: user.id ?? "",
+      // icon: user?. ?? "",
+    }));
+  }, [users_context.users]);
 
   if (!editor) return null;
   return (
@@ -83,7 +96,17 @@ function MyToolbar() {
           <ClearButton />
         </div>
       </div>
-      <AuthorTags />
+      <MultiSelect
+        onValueChange={(value) => {
+          console.log("MultiSelect onValueChange", value);
+        }}
+        defaultValue={[]}
+        options={users}
+        placeholder="Select options"
+        variant="inverted"
+        animation={2}
+        maxCount={3}
+      />
     </div>
   );
 }

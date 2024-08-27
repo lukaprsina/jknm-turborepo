@@ -7,7 +7,6 @@ import { ArticlesClient } from "./articles-client";
 
 export default async function HomePageServer() {
   const session = await auth();
-
   const infinite_articles = await api.article.last_n(50);
 
   return (

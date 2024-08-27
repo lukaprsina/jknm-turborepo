@@ -6,12 +6,9 @@ import { finished } from "node:stream/promises";
 import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
 import { count, eq, sql } from "drizzle-orm";
-import { OAuth2Client } from "google-auth-library";
-import { google } from "googleapis";
 import sharp from "sharp";
 
 import type { ArticleHit } from "@acme/validators";
-import { auth } from "@acme/auth";
 import { db } from "@acme/db/client";
 import {
   Article,
@@ -47,29 +44,6 @@ export async function delete_articles() {
 
 export async function make_every_article_public() {
   await db.update(Article).set({ published: true });
-}
-
-export async function test_google_admin() {
-  const session = await auth();
-
-  const client = new OAuth2Client({});
-
-  client.setCredentials({
-    access_token: session?.accessToken,
-  });
-
-  const service = google.admin({
-    version: "directory_v1",
-    auth: client,
-  });
-
-  const result = await service.users.list({
-    customer: "my_customer",
-    maxResults: 10,
-    orderBy: "email",
-  });
-
-  console.log("result", result);
 }
 
 export async function get_image_dimensions(src: string) {

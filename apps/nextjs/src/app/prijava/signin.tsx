@@ -12,13 +12,6 @@ export default async function SignIn() {
         <div className="dark:border-r> relative hidden h-full flex-col justify-center bg-muted p-10 text-white lg:flex">
           <div className="absolute inset-0 bg-zinc-900" />
           <div className="z-10 flex items-center justify-center text-lg font-medium">
-            {/* <Image
-              src={logo}
-              alt="logo"
-              sizes="100vw"
-              placeholder="blur"
-              className="w-1/2"
-            /> */}
             <Logo />
           </div>
         </div>
