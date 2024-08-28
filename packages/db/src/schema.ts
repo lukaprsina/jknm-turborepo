@@ -135,6 +135,7 @@ export const CreditedPeople = pgTable("credited_people", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull(),
+  // suspended: boolean("suspended").default(false),
 });
 
 export const CreditedPeopleRelations = relations(

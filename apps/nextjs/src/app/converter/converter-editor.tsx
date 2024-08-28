@@ -18,7 +18,7 @@ import {
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
-import { test_google_admin_file } from "./google-admin";
+import { get_google_admin_users } from "./google-admin";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -50,7 +50,7 @@ export function ArticleConverter() {
         </Button>
         <Button
           onClick={async () => {
-            const result = await test_google_admin_file();
+            const result = await get_google_admin_users();
             console.log(result);
           }}
         >

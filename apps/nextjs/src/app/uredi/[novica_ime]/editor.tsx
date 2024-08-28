@@ -4,10 +4,12 @@ import { SaveIcon, XIcon } from "lucide-react";
 
 import "./editor.css";
 
-import type { admin_directory_v1 } from "googleapis";
+import type { ComponentType } from "react";
 import { useCallback, useContext, useEffect, useMemo } from "react";
+import Image from "next/image";
 
 import type { Article } from "@acme/db/schema";
+import { cn } from "@acme/ui";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,6 +25,7 @@ import { Button } from "@acme/ui/button";
 import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
+import type { GoogleAdminUser } from "~/app/converter/google-admin";
 import { EditorProvider, useEditor } from "~/components/editor-context";
 import UsersContext from "~/components/users-context";
 import { editor_store } from "./editor-store";
@@ -34,10 +37,10 @@ export default function MyEditor({
   users,
 }: {
   article?: typeof Article.$inferSelect;
-  users: admin_directory_v1.Schema$User[];
+  users?: GoogleAdminUser[];
 }) {
   return (
-    <UsersContext.Provider value={{ users }}>
+    <UsersContext.Provider value={users}>
       <EditorProvider article={article}>
         <div className="mx-auto w-full outline outline-1">
           <MyToolbar />
@@ -70,34 +73,66 @@ export interface SaveCallbackProps {
 
 export type SaveCallbackType = (props: SaveCallbackProps) => Promise<void>;
 
+interface AuthorMultiSelectType {
+  label: string;
+  value: string;
+  icon?: ComponentType<{ className?: string | undefined }>;
+}
+
 function MyToolbar() {
   const users_context = useContext(UsersContext);
   const editor = useEditor();
 
-  const users = useMemo(() => {
-    if (!users_context.users) return [];
+  const authors = useMemo(() => {
+    if (!users_context) return [];
 
-    const test = users_context.users
-      .filter((user) => !user.suspended)
+    const mapped_authors = users_context
+      .filter((user) => {
+        if (user.suspended) return false;
+        return true;
+      })
       .map((user) => ({
-        label: user.name?.fullName ?? "",
-        value: user.id ?? "",
-        // icon: user?. ?? "",
-      }));
+        label: user.name,
+        value: user.id,
+        icon: ({ className }: { className: string | undefined }) => {
+          if (!user.thumbnail || !user.name) return;
 
-    console.log(
-      "test.length",
-      test.length,
-      users_context.users.filter((user) => user.suspended),
-    );
-    return test;
-  }, [users_context.users]);
+          return (
+            <Image
+              src={user.thumbnail}
+              alt={user.name}
+              width={16}
+              height={16}
+              className={cn("rounded-full", className)}
+            />
+          );
+        },
+      }))
+      .filter((mapped_user) => {
+        return mapped_user.label && mapped_user.value;
+      });
+
+    return mapped_authors as AuthorMultiSelectType[];
+  }, [users_context]);
 
   if (!editor) return null;
   return (
     <div className="flex flex-col justify-between gap-4">
       <div className="flex w-full items-baseline justify-between p-4">
-        <div>{editor.savingText}</div>
+        <div className="flex gap-2">
+          <MultiSelect
+            onValueChange={(value) => {
+              console.log("MultiSelect onValueChange", value);
+            }}
+            defaultValue={[]}
+            options={authors}
+            placeholder="Avtorji"
+            // variant="inverted"
+            animation={2}
+            maxCount={3}
+          />
+          {editor.savingText}
+        </div>
         <div className="flex">
           <SaveButton />
           <UploadDialog />
@@ -105,17 +140,6 @@ function MyToolbar() {
           <ClearButton />
         </div>
       </div>
-      <MultiSelect
-        onValueChange={(value) => {
-          console.log("MultiSelect onValueChange", value);
-        }}
-        defaultValue={[]}
-        options={users}
-        placeholder="Select options"
-        variant="inverted"
-        animation={2}
-        maxCount={3}
-      />
     </div>
   );
 }

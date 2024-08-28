@@ -12,7 +12,17 @@ import { auth } from "@acme/auth";
 
 import { env } from "~/env";
 
-export async function test_google_admin_file() {
+export interface GoogleAdminUser {
+  id?: string;
+  email?: string;
+  name?: string;
+  suspended?: boolean;
+  thumbnail?: string;
+}
+
+export async function get_google_admin_users(): Promise<
+  GoogleAdminUser[] | undefined
+> {
   const credentials_text = atob(env.JKNM_SERVICE_ACCOUNT_CREDENTIALS);
   const credentials_json = JSON.parse(credentials_text) as Partial<JWTInput>;
   const google_client = await google.auth.getClient({
@@ -29,7 +39,27 @@ export async function test_google_admin_file() {
     customer: "C049fks0l",
   });
 
-  return result.data.users;
+  if (!result.data.users) return;
+
+  const mapped_users = result.data.users.map((user) => ({
+    id: user.id ?? undefined,
+    email: user.primaryEmail ?? undefined,
+    name: user.name?.fullName ?? undefined,
+    suspended: user.suspended ?? undefined,
+    thumbnail: user.thumbnailPhotoUrl ?? undefined,
+  }));
+
+  mapped_users.push({
+    id: "Jamarji JKNM",
+    email: "info@jknm.si",
+    name: "Jamarji JKNM",
+    suspended: false,
+    // TODO
+    thumbnail: "https://jknm-turborepo.vercel.app/android-chrome-512x512.png",
+    // thumbnail: "https://jknm-turborepo.vercel.app/logo.svg",
+  });
+
+  return mapped_users;
 }
 
 export async function test_google_admin_server() {

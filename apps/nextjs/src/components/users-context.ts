@@ -1,12 +1,11 @@
 "use client";
 
-import type { admin_directory_v1 } from "googleapis";
 import { createContext } from "react";
 
-interface UsersContextValue {
-  users: admin_directory_v1.Schema$User[] | undefined;
-}
+import type { GoogleAdminUser } from "~/app/converter/google-admin";
 
-const UsersContext = createContext<UsersContextValue>({ users: [] });
+type UsersContextValue = GoogleAdminUser[] | undefined;
+
+const UsersContext = createContext<UsersContextValue>(undefined);
 
 export default UsersContext;

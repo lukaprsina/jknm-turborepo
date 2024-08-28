@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import {
   Card,
@@ -11,7 +10,7 @@ import {
 } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
-import { ArticleWithCreditedPeople } from "~/app/articles";
+import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";

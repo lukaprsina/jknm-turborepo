@@ -37,3 +37,11 @@ http://localhost:3000/novica/jamarski-te%C4%8Daj-2023-596
 nbsp
 
 slike podnapisi, width, height
+
+
+
+
+USERS:
+1. shrani userje v db, updataj ko se info@jknm.si prijavi (ali na gumb click)
+2. hardcodej ime, mail, photo v novico. posodobi, ko info@jknm.si naredi publish
+3. hard

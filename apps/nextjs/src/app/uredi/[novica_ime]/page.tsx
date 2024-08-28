@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { test_google_admin_file } from "~/app/converter/google-admin";
+import { get_google_admin_users } from "~/app/converter/google-admin";
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
@@ -26,38 +26,34 @@ interface EditorPageProps {
   };
 }
 
+export function ErrorCard({ title }: { title: string }) {
+  return (
+    <Shell>
+      <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>{title}</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    </Shell>
+  );
+}
+
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
-  const users = await test_google_admin_file();
+  const users = await get_google_admin_users();
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
   const novica_ime = novica_parts.slice(0, -1).join("-");
 
   if (!users) {
-    console.error("No users found in Google Admin API");
-    return (
-      <Shell>
-        <Card>
-          <CardHeader>
-            <CardTitle>Uporabniki ne obstajajo</CardTitle>
-          </CardHeader>
-        </Card>
-      </Shell>
-    );
+    return <ErrorCard title="Napaka pri pridobivanju uporabnikov" />;
   }
 
   if (!novica_id_string) {
-    console.error("No article ID found in URL", novica_ime_raw);
-    return (
-      <Shell>
-        <Card>
-          <CardHeader>
-            <CardTitle>Novica ne obstaja</CardTitle>
-          </CardHeader>
-        </Card>
-      </Shell>
-    );
+    return <ErrorCard title="Napaka pri pridobivanju ID-ja novičke" />;
   }
 
   const novica_id = parseInt(novica_id_string);
@@ -65,11 +61,6 @@ export default async function EditorPage({
   const article_by_url = await api.article.by_id({
     id: novica_id,
   });
-
-  /*<>
-      <ArticleBreadcrumb article={article_by_url} />
-      <Editor article={article_by_url} />
-    </> */
 
   return (
     <Shell>
@@ -116,27 +107,3 @@ function CreateNewArticle({ novica_ime }: { novica_ime: string }) {
     </>
   );
 }
-
-/* function ArticleBreadcrumb({
-  article,
-}: {
-  article: typeof Article.$inferSelect;
-}) {
-  return (
-    <Breadcrumb className="pb-4">
-      <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Domov</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>Uredi</BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href={`/novica/${generate_encoded_url(article)}`}>
-            {article.title}
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  );
-} */
