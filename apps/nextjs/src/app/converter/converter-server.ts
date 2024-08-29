@@ -179,13 +179,6 @@ export async function sync_with_algolia() {
 
   const articles = await db.query.Article.findMany({
     // limit: 10,
-    with: {
-      credited_people: {
-        with: {
-          credited_people: true,
-        },
-      },
-    },
   });
 
   const algolia = algolia_protected.getClient();

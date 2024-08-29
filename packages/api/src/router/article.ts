@@ -18,13 +18,6 @@ export const articleRouter = {
       limit: input,
       orderBy: desc(Article.created_at),
       where: !ctx.session ? eq(Article.published, true) : undefined,
-      with: {
-        credited_people: {
-          with: {
-            credited_people: true,
-          },
-        },
-      },
     });
   }),
 
@@ -50,13 +43,6 @@ export const articleRouter = {
               ? undefined
               : eq(Article.published, true),
         }),
-        with: {
-          credited_people: {
-            with: {
-              credited_people: true,
-            },
-          },
-        },
       });
 
       console.log("data", data.length);
@@ -77,13 +63,6 @@ export const articleRouter = {
         where: ctx.session
           ? eq(Article.id, input.id)
           : and(eq(Article.id, input.id), eq(Article.published, true)),
-        with: {
-          credited_people: {
-            with: {
-              credited_people: true,
-            },
-          },
-        },
       });
     }),
 

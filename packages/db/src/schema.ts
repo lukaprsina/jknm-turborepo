@@ -92,7 +92,7 @@ export interface ArticleContentType {
 export const Article = pgTable(
   "article",
   {
-    id: serial("id").primaryKey().notNull(),
+    id: serial("id").primaryKey(),
     old_id: integer("old_id"),
     title: varchar("title", { length: 255 }).notNull(),
     url: varchar("url", { length: 255 }).notNull(),
