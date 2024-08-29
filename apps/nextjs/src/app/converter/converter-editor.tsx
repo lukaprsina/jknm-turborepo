@@ -9,7 +9,6 @@ import { Input } from "@acme/ui/input";
 
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
-  add_authors,
   delete_articles,
   get_article_count,
   make_every_article_public,
@@ -18,7 +17,6 @@ import {
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
-import { get_google_admin_users } from "./google-admin";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -48,14 +46,14 @@ export function ArticleConverter() {
         >
           Sync with Algolia
         </Button>
-        <Button
+        {/* <Button
           onClick={async () => {
             const result = await get_google_admin_users();
             console.log(result);
           }}
         >
           Test Google admin
-        </Button>
+        </Button> */}
         <Button
           onClick={async () => {
             await make_every_article_public();
@@ -70,13 +68,13 @@ export function ArticleConverter() {
         >
           Delete articles
         </Button>
-        <Button
+        {/* <Button
           onClick={async () => {
             await add_authors();
           }}
         >
           Add authors
-        </Button>
+        </Button> */}
         <Button
           onClick={async () => {
             await upload_images();

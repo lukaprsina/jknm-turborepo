@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { get_google_admin_users } from "~/app/converter/google-admin";
+import { fetch_authors } from "~/components/authors";
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
@@ -26,7 +26,7 @@ interface EditorPageProps {
   };
 }
 
-export function ErrorCard({ title }: { title: string }) {
+function ErrorCard({ title }: { title: string }) {
   return (
     <Shell>
       <div className="prose dark:prose-invert container w-full pb-6 pt-8">
@@ -43,7 +43,7 @@ export function ErrorCard({ title }: { title: string }) {
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
-  const users = await get_google_admin_users();
+  const users = await fetch_authors();
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
   const novica_ime = novica_parts.slice(0, -1).join("-");

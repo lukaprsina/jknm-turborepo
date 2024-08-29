@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 
+import type { Article } from "@acme/db/schema";
 import type { ArticleHit } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { AspectRatio } from "@acme/ui/aspect-ratio";
@@ -14,8 +15,7 @@ import { Badge } from "@acme/ui/badge";
 import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
-import type { ArticleWithCreditedPeople } from "~/app/articles";
-import { Authors, useAuthors } from "~/components/authors";
+import { Authors } from "~/components/authors";
 import { content_to_text } from "~/lib/content-to-text";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
@@ -26,12 +26,10 @@ export const ArticleDrizzleCard = ({
   featured,
   ref,
 }: {
-  article: ArticleWithCreditedPeople;
+  article: typeof Article.$inferSelect;
   featured?: boolean;
   ref?: IntersectionObserverHookRefCallback;
 }) => {
-  const authors = useAuthors(article.credited_people);
-
   return (
     <ArticleCard
       featured={featured}
@@ -46,7 +44,7 @@ export const ArticleDrizzleCard = ({
         article.draft_content ?? article.content ?? undefined,
       )}
       created_at={article.created_at}
-      authors={authors}
+      author_ids={article.author_ids ?? undefined}
     />
   );
 };
@@ -60,7 +58,7 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
       preview_image={hit.image ?? undefined}
       content_preview={hit.content_preview}
       created_at={new Date(hit.created_at)}
-      authors={hit.authors}
+      author_ids={hit.author_ids}
     />
   );
 }
@@ -73,7 +71,7 @@ export function ArticleCard({
   preview_image,
   content_preview,
   created_at,
-  authors,
+  author_ids,
   ref,
 }: {
   featured?: boolean;
@@ -82,8 +80,8 @@ export function ArticleCard({
   published: boolean;
   preview_image?: string;
   content_preview?: string;
-  created_at: Date;
-  authors?: string[];
+  created_at?: Date;
+  author_ids?: string[];
   ref?: IntersectionObserverHookRefCallback;
 }) {
   const theme = useTheme();
@@ -133,16 +131,18 @@ export function ArticleCard({
               <div
                 className={cn(
                   "flex w-full items-center gap-3",
-                  authors?.length === 0 ? "justify-end" : "justify-between",
+                  author_ids?.length === 0 ? "justify-end" : "justify-between",
                 )}
               >
                 <Authors
-                  authors={authors}
+                  author_ids={author_ids}
                   className="line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap"
                 />
-                <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
-                  {format_date(created_at)}
-                </CardDescription>
+                {created_at && (
+                  <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
+                    {format_date(created_at)}
+                  </CardDescription>
+                )}
               </div>
               {!preview_image && !published && <DraftBadge />}
             </div>

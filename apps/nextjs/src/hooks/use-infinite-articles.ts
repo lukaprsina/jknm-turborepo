@@ -3,12 +3,13 @@
 import { useContext, useEffect, useMemo } from "react";
 import { useIntersectionObserver } from "react-intersection-observer-hook";
 
-import type { ArticleWithCreditedPeople } from "~/app/articles";
+import type { Article } from "@acme/db/schema";
+
 import { ShowDraftsContext } from "~/components/drafts-provider";
 import { api } from "~/trpc/react";
 
 export function useInfiniteArticles(
-  _initial_articles: ArticleWithCreditedPeople[],
+  _initial_articles: (typeof Article.$inferSelect)[],
 ) {
   const drafts = useContext(ShowDraftsContext);
   const show_drafts = drafts?.[0] ?? false;

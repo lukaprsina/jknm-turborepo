@@ -80,7 +80,7 @@ export function EditButton({
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
-        authors: [],
+        author_ids: returned_data.author_ids ?? undefined,
       });
 
       await trpc_utils.article.invalidate();

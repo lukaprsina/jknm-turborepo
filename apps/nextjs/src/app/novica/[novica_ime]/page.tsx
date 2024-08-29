@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
 import {
   Card,
@@ -10,7 +11,6 @@ import {
 } from "@acme/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
-import type { ArticleWithCreditedPeople } from "~/app/articles";
 import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
@@ -79,7 +79,7 @@ export default async function NovicaPage({
 function PublishedContent({
   article,
 }: {
-  article?: ArticleWithCreditedPeople;
+  article?: typeof Article.$inferSelect;
 }) {
   console.log("published", article);
 
@@ -100,7 +100,7 @@ function PublishedContent({
 async function TabbedContent({
   article,
 }: {
-  article?: ArticleWithCreditedPeople;
+  article?: typeof Article.$inferSelect;
 }) {
   const session = await auth();
 
@@ -134,7 +134,7 @@ async function TabbedContent({
   );
 }
 
-export function ArticleNotFound() {
+function ArticleNotFound() {
   return (
     <div className="prose dark:prose-invert container min-h-screen w-full pb-6 pt-8">
       <Card>

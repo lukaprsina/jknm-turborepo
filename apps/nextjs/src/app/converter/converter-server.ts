@@ -5,26 +5,21 @@ import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
-import { count, eq, sql } from "drizzle-orm";
+import { count, sql } from "drizzle-orm";
 import sharp from "sharp";
 
 import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
-import {
-  Article,
-  ArticlesToCreditedPeople,
-  CreditedPeople,
-} from "@acme/db/schema";
+import { Article } from "@acme/db/schema";
 
-import type { AuthorType } from "./authors";
 import type {
   ImageToSave,
   ProblematicArticleType,
 } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
+
 // import { buildConflictUpdateColumns } from "~/lib/drizzle";
-import { AUTHORS } from "./authors";
 
 export interface CSVType {
   id: string;
@@ -36,8 +31,6 @@ export interface CSVType {
 
 export async function delete_articles() {
   console.log("deleting articles");
-  await db.execute(sql`TRUNCATE TABLE ${CreditedPeople} CASCADE;`);
-  await db.execute(sql`TRUNCATE TABLE ${ArticlesToCreditedPeople} CASCADE;`);
   await db.execute(sql`TRUNCATE TABLE ${Article} CASCADE;`);
   console.log("done");
 }
@@ -118,7 +111,7 @@ export async function upload_articles(articles: TempArticleType[]) {
       }
     }
 
-    const authors: (typeof ArticlesToCreditedPeople.$inferInsert)[] = [];
+    /* const authors: (typeof Article.$inferInsert)[] = [];
 
     for (const article of articles) {
       for (const author_name of article.author_names) {
@@ -144,6 +137,7 @@ export async function upload_articles(articles: TempArticleType[]) {
     } catch (e) {
       console.error("Error inserting authors", e);
     }
+  }); */
   });
 
   console.log("done uploading articles");
@@ -219,9 +213,10 @@ export async function sync_with_algolia() {
         published: true,
         has_draft: false,
         year: article.created_at.getFullYear().toString(),
-        authors: article.credited_people.map(
+        author_ids: [],
+        /* authors: article.credited_people.map(
           (person) => person.credited_people.name,
-        ),
+        ), */
       } satisfies ArticleHit;
     })
     .filter((article) => typeof article !== "undefined");
@@ -339,7 +334,7 @@ export async function upload_images() {
   await Promise.all(promises);
   console.log("Done");
 }
-export async function add_authors() {
+/* export async function add_authors() {
   const all_authors = AUTHORS.reduce((acc: Set<string>, author: AuthorType) => {
     if (typeof author.change_to === "undefined") {
       acc.add(author.name);
@@ -355,7 +350,7 @@ export async function add_authors() {
     .insert(CreditedPeople)
     .values(Array.from(all_authors).map((name) => ({ name, email: "" })));
   console.log("done");
-}
+} */
 
 /* for (const image of json.images) {
         const old_path = `${JKNM_SERVED_DIR}/${decodeURIComponent(image)}`

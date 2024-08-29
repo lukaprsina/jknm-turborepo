@@ -2,7 +2,7 @@
 
 import { createContext } from "react";
 
-import type { GoogleAdminUser } from "~/app/converter/google-admin";
+import type { GoogleAdminUser } from "~/app/api/get_users/google-admin";
 
 type UsersContextValue = GoogleAdminUser[] | undefined;
 

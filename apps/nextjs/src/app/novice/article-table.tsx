@@ -32,6 +32,7 @@ import {
 } from "@acme/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
+import { useAuthors } from "~/components/authors";
 import { EditButton } from "~/components/editing-buttons";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
@@ -125,6 +126,8 @@ function ArticleTableRow({
   hit: SearchHit<ArticleHit>;
   session?: Session;
 }) {
+  const authors = useAuthors(hit.author_ids);
+
   return (
     <TableRow key={hit.objectID}>
       <TableCell>{hit.objectID}</TableCell>
@@ -141,10 +144,10 @@ function ArticleTableRow({
         </Button>
       </TableCell>
       <TableCell>
-        {hit.authors.map((author, index) => (
+        {authors?.map((author, index) => (
           <span key={index}>
-            {author}
-            {index !== hit.authors.length - 1 && ",\u00A0"}
+            {author.name}
+            {index !== authors.length - 1 && ",\u00A0"}
           </span>
         ))}
       </TableCell>

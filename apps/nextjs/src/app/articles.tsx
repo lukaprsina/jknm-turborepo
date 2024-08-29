@@ -2,11 +2,7 @@ import type { IntersectionObserverHookRefCallback } from "react-intersection-obs
 import React, { useCallback } from "react";
 import { cva } from "class-variance-authority";
 
-import type {
-  Article,
-  ArticlesToCreditedPeople,
-  CreditedPeople,
-} from "@acme/db/schema";
+import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardDescription, CardHeader, CardTitle } from "@acme/ui/card";
 
@@ -16,25 +12,12 @@ export const articles_variants = cva(
   "prose dark:prose-invert prose-img:m-0 prose-h3:my-0 prose-h3:py-0 prose-p:m-0",
 );
 
-type ArticleType = typeof Article.$inferSelect;
-type ArticlesToCreditedPeopleType =
-  typeof ArticlesToCreditedPeople.$inferSelect;
-type PartialCreditedPeopleType = typeof CreditedPeople.$inferSelect;
-
-export type FullCreditedPeopleType = ArticlesToCreditedPeopleType & {
-  credited_people: PartialCreditedPeopleType;
-};
-
-export type ArticleWithCreditedPeople = ArticleType & {
-  credited_people: FullCreditedPeopleType[];
-};
-
 export const Articles = ({
   articles,
   featured,
   ref,
 }: {
-  articles?: ArticleWithCreditedPeople[];
+  articles?: (typeof Article.$inferSelect)[];
   featured?: boolean;
   ref?: IntersectionObserverHookRefCallback;
 }) => {

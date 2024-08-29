@@ -25,7 +25,7 @@ import { Button } from "@acme/ui/button";
 import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import type { GoogleAdminUser } from "~/app/converter/google-admin";
+import type { GoogleAdminUser } from "~/app/api/get_users/google-admin";
 import { EditorProvider, useEditor } from "~/components/editor-context";
 import UsersContext from "~/components/users-context";
 import { editor_store } from "./editor-store";
@@ -66,7 +66,7 @@ function SettingsSummary() {
 }
 
 export interface SaveCallbackProps {
-  variables?: Partial<typeof Article.$inferInsert>;
+  variables?: Partial<typeof Article.$inferSelect>;
   update?: Partial<{ draft: boolean; content: boolean }> | false;
   redirect_to?: string | false;
 }
@@ -118,8 +118,8 @@ function MyToolbar() {
   if (!editor) return null;
   return (
     <div className="flex flex-col justify-between gap-4">
-      <div className="flex w-full items-baseline justify-between p-4">
-        <div className="flex gap-2">
+      <div className="flex w-full items-center justify-between p-4">
+        <div className="flex items-center gap-2">
           <MultiSelect
             onValueChange={(value) => {
               console.log("MultiSelect onValueChange", value);
@@ -133,7 +133,7 @@ function MyToolbar() {
           />
           {editor.savingText}
         </div>
-        <div className="flex">
+        <div className="flex items-center">
           <SaveButton />
           <UploadDialog />
           <SettingsDialog />

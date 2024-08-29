@@ -1,34 +1,61 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 
 import { cn } from "@acme/ui";
 import { CardDescription } from "@acme/ui/card";
 
-import type { FullCreditedPeopleType } from "~/app/articles";
+import type { GoogleAdminUser } from "~/app/api/get_users/google-admin";
 
-export function useAuthors(credited_people?: FullCreditedPeopleType[]) {
-  const authors = useMemo(() => {
-    return credited_people?.map(
-      (credited_person) => credited_person.credited_people.name,
-    );
-  }, [credited_people]);
+export async function fetch_authors() {
+  const users_response = await fetch("/api/get_users", {
+    cache: "force-cache",
+    next: {
+      tags: ["get_users"],
+    },
+  });
 
-  return authors;
+  const fetched_users = (await users_response.json()) as
+    | GoogleAdminUser[]
+    | undefined;
+  // if (!fetched_users) throw new Error("No users found");
+
+  return fetched_users;
+}
+
+// if author_ids is undefined, return none
+export function useAuthors(author_ids?: string[]) {
+  const [users, setUsers] = useState<GoogleAdminUser[] | undefined>(undefined);
+
+  useEffect(() => {
+    if (typeof author_ids === "undefined") return;
+
+    const fetchUsers = async () => {
+      const test = await fetch_authors();
+      setUsers(test);
+    };
+
+    void fetchUsers();
+  }, [author_ids]);
+
+  // if (!users) return [];
+
+  return users?.filter((user) => {
+    if (!author_ids || !user.id) return false;
+
+    return author_ids.includes(user.id);
+  });
 }
 
 export function Authors({
-  authors,
+  author_ids,
   className,
   ...props
 }: {
-  authors?: string[];
+  author_ids?: string[];
 } & React.HTMLAttributes<HTMLParagraphElement>) {
-  useEffect(() => {
-    console.log("authors", authors);
-  }, [authors]);
+  const authors = useAuthors(author_ids);
 
-  /* <DotIcon /> */
   return (
     <>
       {authors && authors.length !== 0 ? (
@@ -38,7 +65,7 @@ export function Authors({
         >
           {authors.map((author, index) => (
             <span className="flex items-center text-foreground" key={index}>
-              {author}
+              {author.name}
               {index !== authors.length - 1 && ",\u00A0"}
             </span>
           ))}

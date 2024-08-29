@@ -1,13 +1,14 @@
 "use client";
 
-import type { ArticleWithCreditedPeople } from "./articles";
+import type { Article } from "@acme/db/schema";
+
 import { useInfiniteArticles } from "~/hooks/use-infinite-articles";
 import { Articles } from "./articles";
 
 export function ArticlesClient({
   initial_articles,
 }: {
-  initial_articles: ArticleWithCreditedPeople[];
+  initial_articles: (typeof Article.$inferSelect)[];
 }) {
   const { articles, ref } = useInfiniteArticles(initial_articles);
 

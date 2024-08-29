@@ -92,7 +92,7 @@ export interface ArticleContentType {
 export const Article = pgTable(
   "article",
   {
-    id: serial("id").primaryKey(),
+    id: serial("id").primaryKey().notNull(),
     old_id: integer("old_id"),
     title: varchar("title", { length: 255 }).notNull(),
     url: varchar("url", { length: 255 }).notNull(),
@@ -106,6 +106,7 @@ export const Article = pgTable(
     draft_content: json("draft_content").$type<ArticleContentType>(),
     preview_image: varchar("preview_image", { length: 255 }),
     draft_preview_image: varchar("draft_preview_image", { length: 255 }),
+    author_ids: json("author_ids").$type<string[]>(),
   },
   (article) => ({
     created_at_index: index("created_at_index").on(article.created_at),
@@ -117,53 +118,14 @@ export const CreateArticleWithDateSchema = createInsertSchema(Article, {
   draft_content: content_validator,
   created_at: z.date(),
   updated_at: z.date(),
+  author_ids: z.array(z.string()),
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
   content: content_validator,
   draft_content: content_validator,
   updated_at: z.date(),
+  author_ids: z.array(z.string()),
 }).omit({
   created_at: true,
 });
-
-export const ArticleRelations = relations(Article, ({ many }) => ({
-  credited_people: many(ArticlesToCreditedPeople),
-}));
-
-export const CreditedPeople = pgTable("credited_people", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  // suspended: boolean("suspended").default(false),
-});
-
-export const CreditedPeopleRelations = relations(
-  CreditedPeople,
-  ({ many }) => ({
-    articles: many(ArticlesToCreditedPeople),
-  }),
-);
-
-export const ArticlesToCreditedPeople = pgTable("articles_to_credited_people", {
-  article_id: integer("article_id")
-    .notNull()
-    .references(() => Article.id),
-  credited_people_id: uuid("credited_people_id")
-    .notNull()
-    .references(() => CreditedPeople.id),
-});
-
-export const ArticlesToCreditedPeopleRelations = relations(
-  ArticlesToCreditedPeople,
-  ({ one }) => ({
-    article: one(Article, {
-      fields: [ArticlesToCreditedPeople.article_id],
-      references: [Article.id],
-    }),
-    credited_people: one(CreditedPeople, {
-      fields: [ArticlesToCreditedPeople.credited_people_id],
-      references: [CreditedPeople.id],
-    }),
-  }),
-);
