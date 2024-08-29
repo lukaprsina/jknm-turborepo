@@ -24,6 +24,7 @@ import {
   get_problematic_html,
   upload_articles,
 } from "./converter-server";
+import { get_authors } from "./get-authors";
 
 export interface ProblematicArticleType {
   csv: CSVType;
@@ -183,7 +184,7 @@ async function parse_csv_article(
     }
   }
 
-  const current_authors = get_authors(csv_article, blocks);
+  const current_authors = get_authors(csv_article, blocks, authors);
 
   const new_authors = new Set<string>();
   for (const current_author of current_authors) {
@@ -222,7 +223,7 @@ async function parse_csv_article(
     console.error("No images in article", csv_article.id, csv_article.title);
   }
 
-  console.log({ blocks, content });
+  // console.log({ blocks, content });
 
   return {
     serial_id: article_id,
@@ -365,6 +366,12 @@ async function parse_node(
               if (!(p_child_child instanceof ParserHTMLElement))
                 throw new Error("Not an HTMLElement");
 
+              if (p_child_child.tagName === "IMG") {
+                is_wrong = true;
+                console.error("Image in caption", csv_article.id);
+                break;
+              }
+
               if (!caption_allowed_tags.includes(p_child_child.tagName)) {
                 /* throw new Error(
                   "Unexpected tag in caption element: " + p_child_child.tagName,
@@ -416,11 +423,9 @@ async function parse_node(
       }
 
       if (!caption) {
-        throw new Error("No caption " + csv_article.id);
-        /* console.log("No image caption", csv_article.id, {
-          inner: node.innerHTML,
-        });
-        return false; */
+        // throw new Error("No caption " + csv_article.id);
+        console.error("No image caption", csv_article.id);
+        return false;
       }
 
       // console.log({ src, caption });
@@ -528,67 +533,3 @@ const PROBLEMATIC_CONSTANTS = [
   92, 114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
   538, 566, 571, 615,
 ];
-
-function get_authors(csv_article: CSVType, all_blocks: OutputBlockData[]) {
-  let number_of_paragraphs = 3;
-
-  const last_paragraphs: string[] = [];
-  // console.log("get_authors", all_blocks);
-
-  for (let i = all_blocks.length - 1; i >= 0; i--) {
-    const block = all_blocks.at(i);
-    if (!block) throw new Error("No block at index " + i);
-
-    if (block.type !== "paragraph") continue;
-
-    const paragraph_data = block.data as { text: string };
-    const trimmed = decode(paragraph_data.text).trim();
-    if (trimmed === "") continue;
-
-    last_paragraphs.push(trimmed);
-    number_of_paragraphs--;
-    if (number_of_paragraphs === 0) {
-      break;
-    }
-  }
-
-  last_paragraphs.reverse();
-
-  if (last_paragraphs.length === 0) {
-    console.error("get authors -> no paragraphs: " + csv_article.id);
-  }
-
-  const current_authors: string[] = [];
-
-  for (const paragraph of last_paragraphs) {
-    const root = html_parse(paragraph);
-    const strongs = root.querySelectorAll("strong");
-
-    for (const strong of strongs) {
-      const trimmed = strong.text
-        .trim()
-        .replace(/\s+/g, " ")
-        .replace(":", "")
-        .replace(".", "");
-
-      if (trimmed === "") continue;
-
-      const author = authors.find((a) => a.name === trimmed);
-      current_authors.push(trimmed);
-
-      if (author) {
-        author.ids.push(csv_article.id);
-      } else {
-        authors.push({ name: trimmed, ids: [csv_article.id] });
-      }
-    }
-  }
-  /* console.log("get_authors done", {
-    all_blocks,
-    last_paragraphs,
-    number_of_paragraphs,
-    authors,
-  }); */
-
-  return current_authors;
-}

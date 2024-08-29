@@ -32,7 +32,7 @@ export function ArticleConverter() {
   }, []);
 
   const [doSplice, setDoSplice] = useState(true);
-  const [firstArticle, setFirstArticle] = useState(32); // 20 - 60
+  const [firstArticle, setFirstArticle] = useState(0); // 32
   const [lastArticle, setLastArticle] = useState(33);
 
   return (
@@ -106,23 +106,23 @@ export function ArticleConverter() {
               Splice?
             </label>
           </div>
-        </div>
-        <Button
-          onClick={async () => {
-            console.clear();
-            const csv_articles = await read_articles();
+          <Button
+            onClick={async () => {
+              console.clear();
+              const csv_articles = await read_articles();
 
-            await iterate_over_articles(
-              csv_articles,
-              editorJS.current,
-              doSplice,
-              firstArticle,
-              lastArticle,
-            );
-          }}
-        >
-          Convert
-        </Button>
+              await iterate_over_articles(
+                csv_articles,
+                editorJS.current,
+                doSplice,
+                firstArticle,
+                lastArticle,
+              );
+            }}
+          >
+            Convert
+          </Button>
+        </div>
       </div>
       <TempEditor editorJS={editorJS} />
     </div>
