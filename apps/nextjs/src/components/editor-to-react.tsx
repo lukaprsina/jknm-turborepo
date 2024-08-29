@@ -8,7 +8,6 @@ import Image from "next/image";
 import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
-import _ from "lodash";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";

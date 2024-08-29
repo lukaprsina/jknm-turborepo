@@ -66,6 +66,7 @@
     "@types/react": "catalog:react-rc",
     "babel-plugin-react-compiler": "catalog:react-rc",
     "eslint": "catalog:",
+    "jest": "^29.7.0",
     "prettier": "catalog:",
     "react": "catalog:react-rc",
     "tailwindcss": "^3.4.4",

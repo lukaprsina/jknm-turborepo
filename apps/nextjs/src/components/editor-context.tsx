@@ -18,7 +18,6 @@ import EditorJS from "@editorjs/editorjs";
 import DragDrop from "editorjs-drag-drop";
 // @ts-expect-error no types
 import Undo from "editorjs-undo";
-import _ from "lodash";
 
 import type { Article } from "@acme/db/schema";
 import { Button } from "@acme/ui/button";
