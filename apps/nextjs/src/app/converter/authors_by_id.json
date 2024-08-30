@@ -5,7 +5,8 @@
   },
   {
     "id": "10",
-    "names": ["jamar pripravnik"]
+    "names": ["jamar pripravnik"],
+    "change_to": false
   },
   {
     "id": "11",

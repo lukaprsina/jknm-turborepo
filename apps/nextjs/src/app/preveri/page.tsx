@@ -1,6 +1,7 @@
 import { db } from "@acme/db/client";
 
 import { Shell } from "~/components/shell";
+// import { read_articles } from "../converter/converter-server";
 import { PreveriClient } from "./preveri-client";
 
 export default async function PreveriPage() {
@@ -11,9 +12,11 @@ export default async function PreveriPage() {
     },
   });
 
+  // const csv_articles = await read_articles();
+
   return (
     <Shell>
-      <PreveriClient articles={articles} />
+      <PreveriClient articles={articles} /* csv_articles={csv_articles} */ />
     </Shell>
   );
 }

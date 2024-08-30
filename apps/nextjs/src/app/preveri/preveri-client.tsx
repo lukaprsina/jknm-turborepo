@@ -6,13 +6,17 @@ import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
 import { useToast } from "@acme/ui/use-toast";
 
+// import type { CSVType } from "../converter/converter-server";
+
 export function PreveriClient({
   articles,
+  // csv_articles,
 }: {
   articles: {
     id: number;
     old_id: number | null;
   }[];
+  // csv_articles: CSVType[];
 }) {
   const toast = useToast();
   const [page, setPage] = useState(1);
@@ -35,6 +39,17 @@ export function PreveriClient({
       previous: articles[article_index - 1]?.old_id ?? NaN,
     };
   }, [articles, page]);
+
+  /* const current_page = useMemo(() => {
+    const csv_article = csv_articles[page];
+    if (!csv_article) {
+      return {
+        content: "Stran ne obstaja",
+      };
+    }
+
+    return csv_article;
+  }, [csv_articles, page]); */
 
   return (
     <div className="prose dark:prose-invert container w-full pb-6 pt-8">
@@ -62,20 +77,31 @@ export function PreveriClient({
             value={inputPage}
             onChange={(event) => {
               const number = parseInt(event.target.value);
-              if (isNaN(number)) {
+              setInputPage(number);
+            }}
+          />
+          <Button
+            onClick={() => {
+              const article_index = articles.findIndex(
+                (article) => article.old_id === inputPage,
+              );
+
+              if (article_index === -1) {
                 toast.toast({
-                  title: `ne obstaja`,
-                  // type: "",
+                  title: `Stran z ID ${inputPage} ne obstaja`,
                 });
 
                 return;
               }
-              setInputPage(number);
+
+              setPage(inputPage);
             }}
-          />
-          <Button onClick={() => setPage(inputPage)}>Pojdi</Button>
+          >
+            Pojdi
+          </Button>
         </div>
       </div>
+      {/* <div dangerouslySetInnerHTML={{ __html: current_page.content }} /> */}
       <iframe
         src={`https://www.jknm.si/si/?id=${page}`}
         className="h-screen w-full"
