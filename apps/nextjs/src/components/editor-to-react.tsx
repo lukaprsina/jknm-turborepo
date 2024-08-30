@@ -3,7 +3,7 @@
 import "./editorjs-attaches.css";
 
 import type { RenderFn } from "editorjs-blocks-react-renderer";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
@@ -55,6 +55,10 @@ export function EditorToReact({
       time: content.time ?? Date.now(),
     };
   }, [article?.content, article?.draft_content, draft, gallery_set_images]);
+
+  useEffect(() => {
+    console.log("editor-to-react", article?.author_ids);
+  }, [article?.author_ids]);
 
   if (!editor_data || !article) return;
 

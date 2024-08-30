@@ -12,10 +12,7 @@ import type { ArticleHit } from "@acme/validators";
 import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
-import type {
-  ImageToSave,
-  ProblematicArticleType,
-} from "./converter-spaghetti";
+import type { ImageToSave } from "./converter-spaghetti";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
 
@@ -219,7 +216,7 @@ export async function sync_with_algolia() {
   console.log("Done", objects.length);
 }
 
-export async function write_article_html_to_file(
+/* export async function write_article_html_to_file(
   problematic_articles: ProblematicArticleType[],
 ) {
   const some_time = Date.now();
@@ -231,7 +228,7 @@ export async function write_article_html_to_file(
   });
 
   await Promise.all(promises);
-}
+} */
 
 export async function get_problematic_html(
   id: string,

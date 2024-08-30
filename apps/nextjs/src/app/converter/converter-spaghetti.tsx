@@ -19,17 +19,8 @@ import {
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
 import { AUTHORS } from "./authors";
-import {
-  get_image_dimensions,
-  get_problematic_html,
-  upload_articles,
-} from "./converter-server";
+import { get_problematic_html, upload_articles } from "./converter-server";
 import { get_authors } from "./get-authors";
-
-export interface ProblematicArticleType {
-  csv: CSVType;
-  html: string;
-}
 
 export interface ImageToSave {
   objave_id: string;
@@ -38,13 +29,20 @@ export interface ImageToSave {
   images: string[];
 }
 
-let wrong_divs = 0;
-let videos = 0;
-const problematic_articles: ProblematicArticleType[] = [];
+const initial_problems: Record<string, [string, string][]> = {
+  single_in_div: [],
+  problematic_articles: [],
+  image_in_caption: [],
+  videos: [],
+  empty_captions: [],
+};
+
+let problems = initial_problems;
 
 const images_to_save: ImageToSave[] = [];
 const articles_without_authors = new Set<number>();
-const authors: { name: string; ids: string[] }[] = [];
+const authors_by_id: { id: string; names: string[] }[] = [];
+const authors_by_name: { name: string; ids: string[] }[] = [];
 
 export async function iterate_over_articles(
   csv_articles: CSVType[],
@@ -53,12 +51,12 @@ export async function iterate_over_articles(
   first_article: number,
   last_article: number,
 ) {
-  wrong_divs = 0;
-  videos = 0;
-  problematic_articles.length = 0;
+  problems = initial_problems;
+
   images_to_save.length = 0;
   articles_without_authors.clear();
-  authors.length = 0;
+  authors_by_id.length = 0;
+  authors_by_name.length = 0;
 
   /* const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
@@ -105,20 +103,14 @@ export async function iterate_over_articles(
     csv_articles.length,
     articles.length,
   );
-  console.log(
-    "Problematic:",
-    problematic_articles.map((a) => `${a.csv.id}-${a.csv.title}`),
-    problematic_articles.map((a) => a.csv.id),
-    { wrong_divs, videos },
-  );
+  console.log("Problems:", problems);
 
   console.log(
-    "Authors (all, articles without authors):",
-    authors.sort((a, b) => a.name.localeCompare(b.name)),
+    "Authors (articles without authors, by name, by id):",
     Array.from(articles_without_authors),
+    authors_by_name.sort((a, b) => a.name.localeCompare(b.name)),
+    authors_by_id,
   );
-
-  console.log();
 }
 
 const AWS_PREFIX =
@@ -135,6 +127,7 @@ async function parse_csv_article(
 
   let html = csv_article.content;
   if (PROBLEMATIC_CONSTANTS.includes(parseInt(csv_article.id))) {
+    console.log("Getting article", csv_article.id, "from file");
     html = await get_problematic_html(csv_article.id, problematic_dir);
   }
   const sanitized = fixHtml(html);
@@ -184,8 +177,8 @@ async function parse_csv_article(
     }
   }
 
-  const current_authors = get_authors(csv_article, blocks, authors);
-
+  const current_authors = get_authors(csv_article, blocks, authors_by_name);
+  authors_by_id.push({ id: csv_article.id, names: current_authors });
   const new_authors = new Set<string>();
   for (const current_author of current_authors) {
     const author = AUTHORS.find((a) => a.name === current_author);
@@ -197,11 +190,13 @@ async function parse_csv_article(
       continue;
     }
 
-    if (author.change_to) {
+    if (typeof author.change_to === "string") {
       console.log("Change author", current_author, author.change_to);
       new_authors.add(author.change_to);
-    } else {
+    } else if (typeof author.change_to === "undefined") {
       new_authors.add(author.name);
+    } else if (typeof author.change_to !== "boolean") {
+      throw new Error("Unexpected change_to type: " + author.name);
     }
   }
 
@@ -241,6 +236,7 @@ async function parse_csv_article(
 const p_allowed_tags = ["STRONG", "BR", "A", "IMG", "EM", "SUB", "SUP"];
 const caption_allowed_tags = ["STRONG", "EM", "A", "SUB", "SUP"];
 
+// eslint-disable-next-line @typescript-eslint/require-await
 async function parse_node(
   node: ParserNode,
   blocks: OutputBlockData[],
@@ -305,10 +301,59 @@ async function parse_node(
           },
         });
 
-        videos++;
-        console.log("Video", csv_article.id);
+        console.log("Video", csv_article.id, src ?? "NO SRC");
 
+        problems.videos?.push([csv_article.id, src ?? "NO SRC"]);
         return false;
+      }
+
+      const raw_children = node.childNodes;
+      const children = raw_children.filter((raw_child) => {
+        if (raw_child.nodeType === NodeType.TEXT_NODE) {
+          return raw_child.text.trim() !== "";
+        } else if (raw_child.nodeType === NodeType.ELEMENT_NODE) {
+          return true;
+        } else {
+          throw new Error("Unexpected comment: " + node.text);
+        }
+      });
+
+      if (children.length === 0) {
+        // throw new Error("Empty div " + csv_article.id);
+        console.error("Empty div", csv_article.id, node.outerHTML);
+        // problems.empty_divs?.push([csv_article.id, node.outerHTML]);
+        break;
+      } else if (children.length === 1) {
+        const child = children[0];
+        if (!child) throw new Error("Child is undefined?");
+
+        if (child.nodeType === NodeType.TEXT_NODE) {
+          console.error("Single text in div", csv_article.id);
+          problems.single_in_div?.push([csv_article.id, child.text]);
+          const text = decode(child.text).trim();
+          blocks.push({ type: "paragraph", data: { text } });
+          break;
+        } else if (child.nodeType === NodeType.ELEMENT_NODE) {
+          if (!(child instanceof ParserHTMLElement))
+            throw new Error("Not an HTMLElement");
+
+          if (child.tagName === "P" || child.tagName === "STRONG") {
+            console.error("Single tag in div", csv_article.id, child.outerHTML);
+            problems.single_in_div?.push([csv_article.id, child.outerHTML]);
+            const text = decode(child.innerHTML).trim();
+            blocks.push({ type: "paragraph", data: { text } });
+            break;
+          } else if (child.tagName !== "IMG") {
+            throw new Error(
+              "Unexpected element in div: " +
+                csv_article.id +
+                ", " +
+                child.outerHTML,
+            );
+          }
+        } else {
+          throw new Error("Unexpected comment: " + node.text);
+        }
       }
 
       let src: string | undefined;
@@ -368,20 +413,32 @@ async function parse_node(
 
               if (p_child_child.tagName === "IMG") {
                 is_wrong = true;
-                console.error("Image in caption", csv_article.id);
-                break;
+                console.error(
+                  "Image in caption",
+                  csv_article.id,
+                  p_child_child.outerHTML,
+                );
+                problems.image_in_caption?.push([
+                  csv_article.id,
+                  p_child_child.outerHTML,
+                ]);
+                continue;
               }
 
               if (!caption_allowed_tags.includes(p_child_child.tagName)) {
-                /* throw new Error(
+                throw new Error(
                   "Unexpected tag in caption element: " + p_child_child.tagName,
-                ); */
+                );
+                /* problems.tag_in_caption?.push([
+                  csv_article.id,
+                  p_child_child.outerHTML,
+                ]);
                 console.error(
                   "Unexpected tag in caption element",
                   csv_article.id,
-                  p_child_child.tagName,
+                  p_child_child.outerHTML,
                 );
-                is_wrong = true;
+                is_wrong = true; */
               }
             } else if (p_child_child.nodeType === NodeType.COMMENT_NODE) {
               throw new Error("Unexpected comment: " + node.text);
@@ -417,31 +474,37 @@ async function parse_node(
       // console.log("p children done");
 
       if (!src) {
-        throw new Error("No image src " + csv_article.id);
+        throw new Error(
+          "No image src " + csv_article.id + ", " + node.outerHTML,
+        );
         /* console.error("No image src", csv_article.id);
         return false; */
       }
 
       if (!caption) {
         // throw new Error("No caption " + csv_article.id);
-        console.error("No image caption", csv_article.id);
-        return false;
+        console.error("No image caption", csv_article.id, node.outerHTML);
+        problems.empty_captions?.push([csv_article.id, node.outerHTML]);
+        caption = "";
+        // return false;
       }
 
       // console.log({ src, caption });
-      const dimensions = await get_image_dimensions(src);
+      // TODO: get image dimensions
+      /* const dimensions = await get_image_dimensions(src);
       if (!dimensions) {
         console.error("No dimensions for image", csv_article.id, src);
         break;
-      }
+      } */
 
+      // console.log("Image", csv_article.id, { src, caption });
       blocks.push({
         type: "image",
         data: {
           file: {
             url: src,
-            width: dimensions.width,
-            height: dimensions.height,
+            /* width: dimensions.width,
+            height: dimensions.height, */
           },
           caption,
         },
@@ -528,8 +591,9 @@ function youtube_url_to_id(url?: string) {
 }
 
 // TODO: 33 isn't the only one. search for img in p.
+// 72, 578
 const PROBLEMATIC_CONSTANTS = [
-  33, 40, 43, 46, 47, 48, 49, 50, 51, 53, 54, 57, 59, 64, 66, 67, 68, 80, 90,
-  92, 114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492, 493,
-  538, 566, 571, 615,
+  33, 40, 43, 46, 47, 48, 49, 50, 51, 53, 54, 57, 59, 64, 66, 67, 68, 72, 80,
+  90, 92, 114, 164, 219, 225, 232, 235, 243, 280, 284, 333, 350, 355, 476, 492,
+  493, 538, 566, 571, 578, 615,
 ];

@@ -11,10 +11,6 @@ ko objaviš, zbriši druge slike
 preveri če preview image obstaja, ko shraniš
 ko odpreš settings, shrani stvari "settings-button"
 
-https://trpc.io/docs/client/react/useUtils#query-invalidation
-
-D:\dev\js\jknm-turborepo\apps\nextjs\pt-all\potop-v-termalni-izvir-1
-
 aws cors policy delete origins: *
 
 
@@ -22,26 +18,11 @@ Avtorji
 Davorin Kacin
 333: Janja in Zdravko posebej
 
-predzadnji odstavek poglej za avtorje
-
 gallery images, upload file, delete images, files
-
-
-slike dvakratnik
 
 RIP OFF:
 https://www.openstatus.dev/
 https://craft.mxkaske.dev/post/fancy-box
 
-http://localhost:3000/novica/jamarski-te%C4%8Daj-2023-596
-nbsp
-
-slike podnapisi, width, height
-
-
-
-
-USERS:
-1. shrani userje v db, updataj ko se info@jknm.si prijavi (ali na gumb click)
-2. hardcodej ime, mail, photo v novico. posodobi, ko info@jknm.si naredi publish
-3. hard
+IMPORTANT: ni slike
+https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/--#$-!%25&-pa-dolenjske-jame!-226/PA220010.JPG
