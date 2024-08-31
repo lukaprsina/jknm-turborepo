@@ -26,7 +26,7 @@ import { Button } from "@acme/ui/button";
 import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import { useAuthors } from "~/components/authors";
+import { useAllAuthors } from "~/components/authors";
 import { EditorProvider, useEditor } from "~/components/editor-context";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
@@ -75,21 +75,27 @@ interface AuthorMultiSelectType {
   icon?: ComponentType<{ className?: string | undefined }>;
 }
 
+export interface AuthorValueMultiSelectType {
+  source: "google" | "custom";
+  id?: string;
+  name?: string;
+}
+
 function MyToolbar() {
   const editor = useEditor();
-  const users = useAuthors();
+  const users = useAllAuthors();
 
   const authors = useMemo(() => {
     if (!users) return [];
 
-    const mapped_authors = users
+    const google_authors = users
       .filter((user) => {
         if (user.suspended) return false;
         return true;
       })
       .map((user) => ({
         label: user.name,
-        value: user.id,
+        value: JSON.stringify({ source: "google", id: user.id }),
         icon: ({ className }: { className: string | undefined }) => {
           if (!user.thumbnail || !user.name) return;
 
@@ -109,7 +115,7 @@ function MyToolbar() {
         return mapped_user.label && mapped_user.value;
       });
 
-    return mapped_authors as AuthorMultiSelectType[];
+    return google_authors as AuthorMultiSelectType[];
   }, [users]);
 
   if (!editor) return null;
@@ -119,7 +125,22 @@ function MyToolbar() {
         <div className="flex items-center gap-2">
           <MultiSelect
             onValueChange={(value) => {
-              editor_store.set.author_ids(value);
+              const google_ids: string[] = [];
+              const custom_author_names: string[] = [];
+
+              for (const author_string of value) {
+                const author_value = JSON.parse(
+                  author_string,
+                ) as AuthorValueMultiSelectType;
+                if (author_value.source === "google") {
+                  google_ids.push(author_value.id ?? "");
+                } else {
+                  custom_author_names.push(author_value.name ?? "");
+                }
+              }
+
+              editor_store.set.google_ids(google_ids);
+              editor_store.set.custom_author_names(custom_author_names);
             }}
             defaultValue={[]}
             options={authors}

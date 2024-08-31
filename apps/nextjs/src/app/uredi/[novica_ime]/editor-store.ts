@@ -7,8 +7,9 @@ interface EditorStoreType {
   title: string;
   url: string;
   preview_image: string | undefined;
-  author_ids: string[];
   image_data: EditorJSImageData[];
+  google_ids: string[];
+  custom_author_names: string[];
 }
 
 export const editor_store = createStore("editor")<EditorStoreType>({
@@ -16,6 +17,7 @@ export const editor_store = createStore("editor")<EditorStoreType>({
   title: "",
   url: "",
   preview_image: undefined,
-  author_ids: [],
   image_data: [],
+  google_ids: [],
+  custom_author_names: [],
 });

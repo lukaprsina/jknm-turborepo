@@ -126,7 +126,7 @@ function ArticleTableRow({
   hit: SearchHit<ArticleHit>;
   session?: Session;
 }) {
-  const authors = useAuthors(hit.author_ids);
+  const authors = useAuthors(hit.author_names ?? []);
 
   return (
     <TableRow key={hit.objectID}>

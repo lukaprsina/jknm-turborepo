@@ -42,6 +42,7 @@ import {
   rename_s3_directory,
 } from "~/server/s3-file";
 import { api } from "~/trpc/react";
+import { get_author_names, useAllAuthors } from "./authors";
 import { EDITOR_JS_PLUGINS } from "./plugins";
 
 export interface EditorContextType {
@@ -89,6 +90,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const editorJS = useRef<EditorJS | null>(null);
   const [dirty, setDirty] = useState(false);
   const trpc_utils = api.useUtils();
+  const all_authors = useAllAuthors();
 
   const content = useMemo(
     () => article?.draft_content ?? DEFAULT_VALUE,
@@ -255,7 +257,10 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         published: true,
         has_draft: !!returned_data.draft_content,
         image: returned_data.preview_image ?? undefined,
-        author_ids: returned_data.author_ids ?? undefined,
+        author_names: get_author_names(
+          returned_data,
+          all_authors,
+        ),
       });
 
       setSavingText(undefined);

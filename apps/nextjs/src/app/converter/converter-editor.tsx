@@ -8,7 +8,7 @@ import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
 import { ScrollArea } from "@acme/ui/scroll-area";
 
-import { useAuthors } from "~/components/authors";
+import { useAllAuthors, useAuthors } from "~/components/authors";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
   delete_articles,
@@ -37,7 +37,7 @@ export function ArticleConverter() {
   const [doSplice, setDoSplice] = useState(true);
   const [firstArticle, setFirstArticle] = useState(0); // 32
   const [lastArticle, setLastArticle] = useState(33);
-  const authors = useAuthors();
+  const authors = useAllAuthors();
 
   return (
     <div className="prose container mx-auto py-8">

@@ -2,28 +2,25 @@
 
 import React, { useEffect, useState } from "react";
 
-import type { GoogleAdminUser } from "~/app/api/get_users/route";
-import { revalidate_next_tag } from "~/server/revalidate-next-tag";
+import type { Article } from "@acme/db/schema";
 
-// if author_ids is undefined, return none
-export function useAuthors(author_ids?: string[]) {
+import type { GoogleAdminUser } from "~/app/api/get_users/route";
+
+export function useAllAuthors() {
   const [users, setUsers] = useState<GoogleAdminUser[] | undefined>(undefined);
 
   useEffect(() => {
-    // if (typeof author_ids === "undefined") return;
-
     const fetchUsers = async () => {
       const users_response = await fetch("/api/get_users", {
         cache: "force-cache",
         next: {
           tags: ["get_users"],
-          // expires: 2592000, // 30 days in seconds
+          // revalidate: 3600 * 24 * 7, // 1 week
         },
       });
 
       if (!users_response.ok) {
         console.error("Failed to fetch users", users_response);
-        void revalidate_next_tag("get_users");
         return;
       }
 
@@ -33,28 +30,32 @@ export function useAuthors(author_ids?: string[]) {
 
       if (fetched_users?.length === 0) {
         console.warn("Revalidating users");
-        void revalidate_next_tag("get_users");
       }
 
+      console.log("Fetched users", fetched_users);
       setUsers(fetched_users);
     };
 
     void fetchUsers();
-  }, [author_ids]);
+  }, []);
 
-  // if (!users) return [];
+  return users;
+}
 
-  return typeof author_ids === "undefined"
-    ? users
-    : users?.filter((user) => {
-        if (!user.id) return false;
+export function useAuthors(author_names: string[]) {
+  const all_authors = useAllAuthors();
 
-        return author_ids.includes(user.id);
+  return typeof author_names === "undefined"
+    ? all_authors
+    : all_authors?.filter((user) => {
+        if (!user.name) return false;
+
+        return author_names.includes(user.name);
       });
 }
 
-export function Authors({ author_ids }: { author_ids?: string[] }) {
-  const authors = useAuthors(author_ids);
+export function Authors({ author_names }: { author_names: string[] }) {
+  const authors = useAuthors(author_names);
 
   return (
     <>
@@ -67,4 +68,30 @@ export function Authors({ author_ids }: { author_ids?: string[] }) {
       ))}
     </>
   );
+}
+
+export function get_author_names(
+  article: typeof Article.$inferSelect,
+  all_authors: GoogleAdminUser[] | undefined,
+) {
+  if (!all_authors) return [];
+  const combined_authors = [...(article.author_ids ?? [])];
+
+  try {
+    const selected_authors =
+      article.author_ids?.map((author_id) => {
+        const author = all_authors.find((author) => author.id === author_id);
+        if (!author?.name)
+          throw new Error(
+            `Author with id ${author_id} not found: ${all_authors.length}`,
+          );
+        return author.name;
+      }) ?? [];
+
+    combined_authors.push(...selected_authors);
+  } catch (error) {
+    console.error("get_author_names error", error);
+  }
+
+  return combined_authors;
 }

@@ -1,11 +1,10 @@
-"use server";
-
 import type { JWTInput } from "google-auth-library";
-import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
 import { env } from "~/env";
+
+export const dynamic = "auto";
 
 export interface GoogleAdminUser {
   id?: string;
@@ -16,6 +15,7 @@ export interface GoogleAdminUser {
 }
 
 export async function GET() {
+  console.log("GETTING GOOGLE USERS");
   const credentials_text = atob(env.JKNM_SERVICE_ACCOUNT_CREDENTIALS);
   const credentials_json = JSON.parse(credentials_text) as Partial<JWTInput>;
   const google_client = await google.auth.getClient({
@@ -34,19 +34,22 @@ export async function GET() {
 
   if (!result.data.users) {
     console.error("No users found", result);
-    revalidateTag("get_users");
+    // revalidateTag("get_users");
     return NextResponse.error();
   }
 
-  const mapped_users = result.data.users.map((user) => ({
-    id: user.id ?? undefined,
-    email: user.primaryEmail ?? undefined,
-    name: user.name?.fullName ?? undefined,
-    suspended: user.suspended ?? undefined,
-    thumbnail: user.thumbnailPhotoUrl ?? undefined,
-  }));
+  const mapped_users = result.data.users.map(
+    (user) =>
+      ({
+        id: user.id ?? undefined,
+        email: user.primaryEmail ?? undefined,
+        name: user.name?.fullName ?? undefined,
+        suspended: user.suspended ?? undefined,
+        thumbnail: user.thumbnailPhotoUrl ?? undefined,
+      }) satisfies GoogleAdminUser,
+  );
 
-  mapped_users.push({
+  /* mapped_users.push({
     id: "Jamarji JKNM",
     email: "info@jknm.si",
     name: "Jamarji JKNM",
@@ -54,8 +57,8 @@ export async function GET() {
     // TODO
     thumbnail: "https://jknm-turborepo.vercel.app/android-chrome-512x512.png",
     // thumbnail: "https://jknm-turborepo.vercel.app/logo.svg",
-  });
+  }); */
 
-  console.log("GETTING NEW USERS", mapped_users);
+  console.log("GOT GOOGLE USERS", mapped_users.length);
   return NextResponse.json(mapped_users);
 }

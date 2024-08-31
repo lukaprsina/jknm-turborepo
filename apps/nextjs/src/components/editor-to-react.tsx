@@ -20,7 +20,7 @@ import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
-import { Authors } from "~/components/authors";
+import { Authors, get_author_names, useAllAuthors } from "~/components/authors";
 import { format_date } from "~/lib/format-date";
 import { human_file_size } from "./../lib/human-file-size";
 
@@ -28,11 +28,12 @@ export function EditorToReact({
   article,
   draft,
 }: {
-  article?: Partial<typeof Article.$inferSelect>;
+  article?: typeof Article.$inferSelect;
   draft?: boolean;
 }) {
   const [heading, setHeading] = useState<string | undefined>();
   const gallery_set_images = useGalleryStore((state) => state.set_images);
+  const all_authors = useAllAuthors();
 
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
@@ -69,12 +70,10 @@ export function EditorToReact({
         <h1>{heading}</h1>
         <CardDescription className="flex items-center text-base text-foreground">
           <span>
-            <Authors author_ids={article.author_ids ?? []} />
+            <Authors author_names={get_author_names(article, all_authors)} />
           </span>
-          {article.author_ids && article.created_at && <DotIcon size={20} />}
-          {article.created_at && (
-            <span> {format_date(article.created_at)}</span>
-          )}
+          {article.author_ids && <DotIcon size={20} />}
+          <span> {format_date(article.created_at)}</span>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -90,7 +89,7 @@ export function EditorToReact({
   );
 }
 
-const NextImageRenderer: RenderFn<EditorJSImageData> = ({
+export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
 }) => {
@@ -156,7 +155,7 @@ interface EditorJSAttachesData {
 
 const EXTENSION_MAX_LENGTH = 4;
 
-const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
+export const AttachesRenderer: RenderFn<EditorJSAttachesData> = ({
   data,
   className,
 }) => {

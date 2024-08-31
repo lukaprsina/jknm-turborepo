@@ -15,6 +15,7 @@ import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
+import { get_author_names, useAllAuthors } from "./authors";
 import NewArticleLoader from "./new-article-loader";
 
 export default function EditingButtons({
@@ -65,6 +66,7 @@ export function EditButton({
 }) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
+  const all_authors = useAllAuthors();
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: async (data) => {
@@ -80,7 +82,10 @@ export function EditButton({
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
-        author_ids: returned_data.author_ids ?? undefined,
+        author_names: get_author_names(
+          returned_data,
+          all_authors,
+        ),
       });
 
       await trpc_utils.article.invalidate();

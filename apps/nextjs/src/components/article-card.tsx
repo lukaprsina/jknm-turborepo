@@ -16,7 +16,7 @@ import { Badge } from "@acme/ui/badge";
 import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
-import { Authors } from "~/components/authors";
+import { Authors, get_author_names, useAllAuthors } from "~/components/authors";
 import { content_to_text } from "~/lib/content-to-text";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
@@ -31,6 +31,8 @@ export const ArticleDrizzleCard = ({
   featured?: boolean;
   ref?: IntersectionObserverHookRefCallback;
 }) => {
+  const all_authors = useAllAuthors();
+
   return (
     <ArticleCard
       featured={featured}
@@ -45,7 +47,7 @@ export const ArticleDrizzleCard = ({
         article.draft_content ?? article.content ?? undefined,
       )}
       created_at={article.created_at}
-      author_ids={article.author_ids ?? undefined}
+      author_names={get_author_names(article, all_authors)}
     />
   );
 };
@@ -59,7 +61,7 @@ export function ArticleAlgoliaCard({ hit }: { hit: SearchHit<ArticleHit> }) {
       preview_image={hit.image ?? undefined}
       content_preview={hit.content_preview}
       created_at={new Date(hit.created_at)}
-      author_ids={hit.author_ids}
+      author_names={hit.author_names}
     />
   );
 }
@@ -72,7 +74,7 @@ export function ArticleCard({
   preview_image,
   content_preview,
   created_at,
-  author_ids,
+  author_names,
   ref,
 }: {
   featured?: boolean;
@@ -81,13 +83,13 @@ export function ArticleCard({
   published: boolean;
   preview_image?: string;
   content_preview?: string;
-  created_at?: Date;
-  author_ids?: string[];
+  created_at: Date;
+  author_names: string[];
   ref?: IntersectionObserverHookRefCallback;
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
-
+  console.log({ featured, author_names, created_at });
   return (
     <Link
       href={`/novica/${url}`}
@@ -126,7 +128,7 @@ export function ArticleCard({
             )}
           </AspectRatio>
         ) : null}
-        <div className="prose-h3:font-semibold prose-h3:text-xl h-full">
+        <div className="h-full prose-h3:text-xl prose-h3:font-semibold">
           <CardHeader>
             {/* TODO, hardcodani dve vrstici */}
             <h3 className="line-clamp-2 h-[56px]">{title}</h3>
@@ -134,10 +136,9 @@ export function ArticleCard({
               <CardDescription
                 className={cn(
                   "flex w-full items-center gap-3 text-foreground",
-                  author_ids ? "justify-between" : "justify-end",
+                  author_names.length === 0 ? "justify-end" : "justify-between",
                   featured &&
-                    author_ids &&
-                    created_at &&
+                    author_names.length !== 0 &&
                     "justify-normal gap-0",
                 )}
               >
@@ -147,14 +148,12 @@ export function ArticleCard({
                   // className="flex flex-nowrap items-center justify-start overflow-x-scroll"
                   className="relative line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start text-ellipsis text-nowrap"
                 >
-                  <Authors author_ids={author_ids ?? []} />
+                  <Authors author_names={author_names} />
                 </span>
-                {featured && author_ids && created_at && <DotIcon size={20} />}
-                {created_at && (
-                  <span className="flex flex-nowrap text-nowrap">
-                    {format_date(created_at)}
-                  </span>
-                )}
+                {featured && author_names.length !== 0 && <DotIcon size={20} />}
+                <span className="flex flex-nowrap text-nowrap">
+                  {format_date(created_at)}
+                </span>
               </CardDescription>
               {!preview_image && !published && <DraftBadge />}
             </div>

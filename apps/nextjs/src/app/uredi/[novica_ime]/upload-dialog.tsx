@@ -65,6 +65,11 @@ export function UploadDialog() {
 
               const editor_content =
                 await editor.configure_article_before_publish();
+              console.log(
+                "ZZZZZZZZZZZZ",
+                editor_store.get.google_ids(),
+                editor_store.get.custom_author_names(),
+              );
               editor.mutations.publish({
                 id: editor.article.id,
                 created_at: editor.article.created_at,
@@ -72,7 +77,8 @@ export function UploadDialog() {
                 title: editor_store.get.title(),
                 url: editor_store.get.url(),
                 preview_image: editor_store.get.preview_image() ?? "",
-                author_ids: editor_store.get.author_ids(),
+                author_ids: editor_store.get.google_ids(),
+                custom_author_names: editor_store.get.custom_author_names(),
               });
             }}
           >

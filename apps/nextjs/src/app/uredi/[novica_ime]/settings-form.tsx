@@ -17,6 +17,7 @@ import {
 } from "@acme/ui/form";
 
 import { useEditor } from "~/components/editor-context";
+import { revalidate_next_tag } from "~/server/revalidate-next-tag";
 import { editor_store } from "./editor-store";
 import { ImageCarousel } from "./image-carousel";
 
@@ -95,6 +96,12 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                 const editor_content =
                   await editor.configure_article_before_publish();
 
+                console.log(
+                  "WWWWWWWWWWWWWWW",
+                  editor_store.get.google_ids(),
+                  editor_store.get.custom_author_names(),
+                );
+
                 editor.mutations.publish({
                   id: editor.article.id,
                   created_at: values.created_at,
@@ -102,7 +109,8 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                   url: editor_store.get.url(),
                   preview_image: editor_store.get.preview_image() ?? "",
                   content: editor_content,
-                  author_ids: editor_store.get.author_ids(),
+                  author_ids: editor_store.get.google_ids(),
+                  custom_author_names: editor_store.get.custom_author_names(),
                 });
 
                 closeDialog();
@@ -111,6 +119,12 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
             variant="secondary"
           >
             Objavi spremembe
+          </Button>
+          <Button
+            onClick={async () => await revalidate_next_tag("get_users")}
+            variant="secondary"
+          >
+            Osveži seznam avtorjev
           </Button>
           {editor.article?.published ? (
             <Button

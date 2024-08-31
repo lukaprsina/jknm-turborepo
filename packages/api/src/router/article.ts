@@ -137,13 +137,23 @@ export const articleRouter = {
         title: z.string(),
         url: z.string(),
         author_ids: z.array(z.string()),
+        custom_author_names: z.array(z.string()),
       }),
     )
     .mutation(({ ctx, input }) => {
       return ctx.db
         .update(Article)
         .set({
-          ...input,
+          id: input.id,
+          created_at: input.created_at,
+          content: input.content,
+          preview_image: input.preview_image,
+          title: input.title,
+          url: input.url,
+          author_ids: input.author_ids,
+          custom_author_names: input.custom_author_names,
+
+          // lol
           published: true,
           draft_content: null,
           draft_preview_image: null,
