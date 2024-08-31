@@ -2,9 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 
-import { cn } from "@acme/ui";
-import { CardDescription } from "@acme/ui/card";
-
 import type { GoogleAdminUser } from "~/app/api/get_users/route";
 import { revalidate_next_tag } from "~/server/revalidate-next-tag";
 
@@ -56,35 +53,17 @@ export function useAuthors(author_ids?: string[]) {
       });
 }
 
-export function Authors({
-  author_ids,
-  className,
-  ...props
-}: {
-  author_ids?: string[];
-} & React.HTMLAttributes<HTMLParagraphElement>) {
+export function Authors({ author_ids }: { author_ids?: string[] }) {
   const authors = useAuthors(author_ids);
 
   return (
     <>
-      {authors && authors.length !== 0 ? (
-        <CardDescription
-          className={cn(
-            "flex flex-nowrap items-center justify-start overflow-x-scroll",
-            className,
-          )}
-          {...props}
-        >
-          <div className="flex items-center">
-            {authors.map((author, index) => (
-              <span className="flex-shrink-0 text-foreground" key={index}>
-                {author.name}
-                {index !== authors.length - 1 && ",\u00A0"}
-              </span>
-            ))}
-          </div>
-        </CardDescription>
-      ) : undefined}
+      {authors?.map((author, index) => (
+        <span className="flex-shrink-0" key={index}>
+          {author.name}
+          {index !== authors.length - 1 && ",\u00A0"}
+        </span>
+      ))}
     </>
   );
 }

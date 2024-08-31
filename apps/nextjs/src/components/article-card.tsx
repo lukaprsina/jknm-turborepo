@@ -129,7 +129,7 @@ export function ArticleCard({
             {/* TODO, hardcodani dve vrstici */}
             <h3 className="line-clamp-2 h-[56px]">{title}</h3>
             <div className="flex w-full justify-between gap-2">
-              <div
+              <CardDescription
                 className={cn(
                   "flex w-full items-center gap-3",
                   author_ids && author_ids.length !== 0
@@ -137,16 +137,20 @@ export function ArticleCard({
                     : "justify-end",
                 )}
               >
-                <Authors
-                  author_ids={author_ids ?? []}
-                  className="line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap"
-                />
+                <span
+                  // flex items-center
+                  // line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap
+                  // className="flex flex-nowrap items-center justify-start overflow-x-scroll"
+                  className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden overflow-x-scroll text-ellipsis text-nowrap text-foreground"
+                >
+                  <Authors author_ids={author_ids ?? []} />
+                </span>
                 {created_at && (
-                  <CardDescription className="flex flex-nowrap text-nowrap text-foreground">
+                  <span className="flex flex-nowrap text-nowrap text-foreground">
                     {format_date(created_at)}
-                  </CardDescription>
+                  </span>
                 )}
-              </div>
+              </CardDescription>
               {!preview_image && !published && <DraftBadge />}
             </div>
           </CardHeader>

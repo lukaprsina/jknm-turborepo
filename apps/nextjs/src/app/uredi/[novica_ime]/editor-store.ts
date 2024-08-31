@@ -2,10 +2,20 @@ import { createStore } from "zustand-x";
 
 import type { EditorJSImageData } from "~/components/plugins";
 
-export const editor_store = createStore("editor")({
+interface EditorStoreType {
+  id: number;
+  title: string;
+  url: string;
+  preview_image: string | undefined;
+  author_ids: string[];
+  image_data: EditorJSImageData[];
+}
+
+export const editor_store = createStore("editor")<EditorStoreType>({
   id: -1,
   title: "",
   url: "",
-  preview_image: undefined as string | undefined,
-  image_data: [] as EditorJSImageData[],
+  preview_image: undefined,
+  author_ids: [],
+  image_data: [],
 });

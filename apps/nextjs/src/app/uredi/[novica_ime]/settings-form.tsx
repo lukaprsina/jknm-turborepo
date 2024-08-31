@@ -102,6 +102,7 @@ export function SettingsForm({ closeDialog }: { closeDialog: () => void }) {
                   url: editor_store.get.url(),
                   preview_image: editor_store.get.preview_image() ?? "",
                   content: editor_content,
+                  author_ids: editor_store.get.author_ids(),
                 });
 
                 closeDialog();

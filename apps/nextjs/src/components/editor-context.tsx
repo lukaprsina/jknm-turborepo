@@ -255,6 +255,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         published: true,
         has_draft: !!returned_data.draft_content,
         image: returned_data.preview_image ?? undefined,
+        author_ids: returned_data.author_ids ?? undefined,
       });
 
       setSavingText(undefined);

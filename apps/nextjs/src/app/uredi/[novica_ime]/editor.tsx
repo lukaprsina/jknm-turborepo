@@ -118,12 +118,11 @@ function MyToolbar() {
         <div className="flex items-center gap-2">
           <MultiSelect
             onValueChange={(value) => {
-              console.log("MultiSelect onValueChange", value);
+              editor_store.set.author_ids(value);
             }}
             defaultValue={[]}
             options={authors}
             placeholder="Avtorji"
-            // variant="inverted"
             animation={2}
             maxCount={3}
           />

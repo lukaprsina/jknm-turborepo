@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
+import { DotIcon } from "lucide-react";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
@@ -66,12 +67,13 @@ export function EditorToReact({
     <Card className="pt-8">
       <CardHeader>
         <h1>{heading}</h1>
-        {article.created_at && (
-          <>
+        <CardDescription className="flex items-center">
+          <span>
             <Authors author_ids={article.author_ids ?? []} />
-            <CardDescription>{format_date(article.created_at)}</CardDescription>
-          </>
-        )}
+          </span>
+          {article.author_ids && article.created_at && <DotIcon size={20} />}
+          <span>{article.created_at && format_date(article.created_at)}</span>
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Blocks

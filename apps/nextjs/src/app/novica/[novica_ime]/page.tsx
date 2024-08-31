@@ -115,7 +115,7 @@ async function TabbedContent({
       defaultValue={article.draft_content ? "draft" : "published"}
       /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
       // prose-figcaption:text-blue-800
-      className="prose dark:prose-invert prose-figcaption:text-sm container w-full pt-8"
+      className="prose dark:prose-invert prose-figcaption:text-sm prose-figcaption:text-foreground container w-full pt-8"
     >
       <TabsList>
         <TabsTrigger disabled={!article.draft_content} value="draft">

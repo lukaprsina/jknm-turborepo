@@ -136,6 +136,7 @@ export const articleRouter = {
         preview_image: z.string(),
         title: z.string(),
         url: z.string(),
+        author_ids: z.array(z.string()),
       }),
     )
     .mutation(({ ctx, input }) => {
