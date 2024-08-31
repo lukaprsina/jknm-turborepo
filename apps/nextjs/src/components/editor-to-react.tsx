@@ -67,12 +67,14 @@ export function EditorToReact({
     <Card className="pt-8">
       <CardHeader>
         <h1>{heading}</h1>
-        <CardDescription className="flex items-center">
+        <CardDescription className="flex items-center text-base text-foreground">
           <span>
             <Authors author_ids={article.author_ids ?? []} />
           </span>
           {article.author_ids && article.created_at && <DotIcon size={20} />}
-          <span>{article.created_at && format_date(article.created_at)}</span>
+          {article.created_at && (
+            <span> {format_date(article.created_at)}</span>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>

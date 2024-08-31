@@ -5,6 +5,7 @@ import type { IntersectionObserverHookRefCallback } from "react-intersection-obs
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { DotIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 
 import type { Article } from "@acme/db/schema";
@@ -131,22 +132,25 @@ export function ArticleCard({
             <div className="flex w-full justify-between gap-2">
               <CardDescription
                 className={cn(
-                  "flex w-full items-center gap-3",
-                  author_ids && author_ids.length !== 0
-                    ? "justify-between"
-                    : "justify-end",
+                  "flex w-full items-center gap-3 text-foreground",
+                  author_ids ? "justify-between" : "justify-end",
+                  featured &&
+                    author_ids &&
+                    created_at &&
+                    "justify-normal gap-0",
                 )}
               >
                 <span
                   // flex items-center
                   // line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap
                   // className="flex flex-nowrap items-center justify-start overflow-x-scroll"
-                  className="line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start overflow-hidden overflow-x-scroll text-ellipsis text-nowrap text-foreground"
+                  className="relative line-clamp-1 flex flex-grow-0 flex-nowrap items-center justify-start text-ellipsis text-nowrap"
                 >
                   <Authors author_ids={author_ids ?? []} />
                 </span>
+                {featured && author_ids && created_at && <DotIcon size={20} />}
                 {created_at && (
-                  <span className="flex flex-nowrap text-nowrap text-foreground">
+                  <span className="flex flex-nowrap text-nowrap">
                     {format_date(created_at)}
                   </span>
                 )}
