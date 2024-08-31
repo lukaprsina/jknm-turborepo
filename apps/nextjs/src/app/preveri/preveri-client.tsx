@@ -1,10 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 import { useToast } from "@acme/ui/use-toast";
+
+import { EditorToReact } from "~/components/editor-to-react";
+import { api } from "~/trpc/react";
 
 // import type { CSVType } from "../converter/converter-server";
 
@@ -21,6 +26,7 @@ export function PreveriClient({
   const toast = useToast();
   const [page, setPage] = useState(1);
   const [inputPage, setInputPage] = useState(1);
+  const router = useRouter();
 
   const page_info = useMemo(() => {
     const article_index = articles.findIndex(
@@ -31,14 +37,38 @@ export function PreveriClient({
       return {
         next: NaN,
         previous: NaN,
+        current_id: NaN,
+      };
+    }
+
+    if (!articles[article_index]?.id) {
+      return {
+        next: NaN,
+        previous: NaN,
+        current_id: NaN,
       };
     }
 
     return {
       next: articles[article_index + 1]?.old_id ?? NaN,
       previous: articles[article_index - 1]?.old_id ?? NaN,
+      current_id: articles[article_index]?.id,
     };
   }, [articles, page]);
+
+  const article = api.article.by_id.useQuery({
+    id: page_info.current_id,
+  });
+
+  const iframe_src = useCallback(
+    (id: number) => `https://www.jknm.si/si/?id=${id}`,
+    [],
+  );
+
+  useEffect(() => {
+    router.prefetch(iframe_src(page_info.next));
+    router.prefetch(iframe_src(page_info.previous));
+  }, [iframe_src, page_info.next, page_info.previous, router]);
 
   /* const current_page = useMemo(() => {
     const csv_article = csv_articles[page];
@@ -102,10 +132,28 @@ export function PreveriClient({
         </div>
       </div>
       {/* <div dangerouslySetInnerHTML={{ __html: current_page.content }} /> */}
-      <iframe
-        src={`https://www.jknm.si/si/?id=${page}`}
-        className="h-screen w-full"
-      />
+      <Tabs defaultValue="old" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="old">Stara stran</TabsTrigger>
+          <TabsTrigger value="new">Nova stran</TabsTrigger>
+        </TabsList>
+        <TabsContent value="old">
+          <iframe
+            className="h-[50vh] w-full"
+            src={iframe_src(page)}
+            /* onLoad={(event) => {
+              console.log("event", event);
+              const iframe = event.target as HTMLIFrameElement;
+              // iframe.style.height = "500px";
+              const height = `${iframe.contentWindow?.document.documentElement.scrollHeight}px`;
+              console.log("height", height);
+            }} */
+          />
+        </TabsContent>
+        <TabsContent value="new">
+          <EditorToReact article={article.data} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
