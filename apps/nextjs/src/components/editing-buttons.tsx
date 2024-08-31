@@ -82,10 +82,7 @@ export function EditButton({
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
-        author_names: get_author_names(
-          returned_data,
-          all_authors,
-        ),
+        author_names: get_author_names(returned_data, all_authors),
       });
 
       await trpc_utils.article.invalidate();
@@ -103,7 +100,7 @@ export function EditButton({
           variant={variant}
           size="icon"
           onClick={() => {
-            console.log({ has_draft });
+            // console.log({ has_draft });
             if (has_draft) {
               router.push(
                 `/uredi/${generate_encoded_url({

@@ -89,7 +89,7 @@ export function ArticleCard({
 }) {
   const theme = useTheme();
   const [hover, setHover] = useState(false);
-  console.log({ featured, author_names, created_at });
+  // console.log({ featured, author_names, created_at });
   return (
     <Link
       href={`/novica/${url}`}
@@ -128,7 +128,7 @@ export function ArticleCard({
             )}
           </AspectRatio>
         ) : null}
-        <div className="h-full prose-h3:text-xl prose-h3:font-semibold">
+        <div className="prose-h3:text-xl prose-h3:font-semibold h-full">
           <CardHeader>
             {/* TODO, hardcodani dve vrstici */}
             <h3 className="line-clamp-2 h-[56px]">{title}</h3>

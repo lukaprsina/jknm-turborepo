@@ -92,6 +92,16 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const trpc_utils = api.useUtils();
   const all_authors = useAllAuthors();
 
+  useEffect(() => {
+    if (dirty) {
+      console.log("dirty");
+      window.onbeforeunload = () => true;
+    } else {
+      console.log("clean");
+      window.onbeforeunload = null;
+    }
+  }, [dirty]);
+
   const content = useMemo(
     () => article?.draft_content ?? DEFAULT_VALUE,
     [article],
@@ -198,6 +208,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       update_settings_from_editor(editor_content);
 
       setSavingText(undefined);
+      setDirty(false);
     },
   });
 
@@ -257,13 +268,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         published: true,
         has_draft: !!returned_data.draft_content,
         image: returned_data.preview_image ?? undefined,
-        author_names: get_author_names(
-          returned_data,
-          all_authors,
-        ),
+        author_names: get_author_names(returned_data, all_authors),
       });
-
-      setSavingText(undefined);
 
       const old_article_url = `${get_clean_url(article.url)}-${article.id}`;
       const new_article_url = `${get_clean_url(returned_data.url)}-${returned_data.id}`;
@@ -304,6 +310,9 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       });
 
       await clean_s3_directory(new_article_url, spliced_urls);
+
+      setSavingText(undefined);
+      setDirty(false);
 
       router.replace(`/novica/${generate_encoded_url(returned_data)}`);
     },
