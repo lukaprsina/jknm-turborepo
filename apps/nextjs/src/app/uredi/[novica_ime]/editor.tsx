@@ -98,11 +98,6 @@ function MyToolbar() {
               alt={user.name}
               width={16}
               height={16}
-              onError={(event) => {
-                console.error("Failed to load image", event);
-                const target = event.target as HTMLImageElement;
-                target.src = "/android-chrome-512x512.png";
-              }}
               loader={({ src }) => src}
               className={cn("rounded-full", className)}
             />

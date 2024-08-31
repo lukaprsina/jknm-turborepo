@@ -117,6 +117,7 @@ export function ArticleCard({
               alt={title}
               fill
               className="rounded-md object-cover"
+              loader={({ src }) => src}
             />
             {!published && (
               <DraftBadge className="absolute bottom-0 right-0 mx-4 my-6" />
@@ -131,11 +132,13 @@ export function ArticleCard({
               <div
                 className={cn(
                   "flex w-full items-center gap-3",
-                  author_ids?.length === 0 ? "justify-end" : "justify-between",
+                  author_ids && author_ids.length !== 0
+                    ? "justify-between"
+                    : "justify-end",
                 )}
               >
                 <Authors
-                  author_ids={author_ids}
+                  author_ids={author_ids ?? []}
                   className="line-clamp-1 flex-grow-0 flex-nowrap overflow-hidden text-ellipsis text-nowrap"
                 />
                 {created_at && (

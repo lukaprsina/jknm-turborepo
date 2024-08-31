@@ -69,15 +69,20 @@ export function Authors({
     <>
       {authors && authors.length !== 0 ? (
         <CardDescription
-          className={cn("flex items-center justify-start", className)}
+          className={cn(
+            "flex flex-nowrap items-center justify-start overflow-x-scroll",
+            className,
+          )}
           {...props}
         >
-          {authors.map((author, index) => (
-            <span className="flex items-center text-foreground" key={index}>
-              {author.name}
-              {index !== authors.length - 1 && ",\u00A0"}
-            </span>
-          ))}
+          <div className="flex items-center">
+            {authors.map((author, index) => (
+              <span className="flex-shrink-0 text-foreground" key={index}>
+                {author.name}
+                {index !== authors.length - 1 && ",\u00A0"}
+              </span>
+            ))}
+          </div>
         </CardDescription>
       ) : undefined}
     </>

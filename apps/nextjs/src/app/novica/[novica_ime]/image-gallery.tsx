@@ -194,6 +194,7 @@ function GalleryImage({ image }: { image: EditorJSImageData }) {
         sizes="(max-width: 1500px) 100vw, 1500px"
         width={image.file.width ?? 1500}
         height={image.file.height ?? 1000}
+        loader={({ src }) => src}
       />
       {image.caption && (
         <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4">

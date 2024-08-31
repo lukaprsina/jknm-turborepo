@@ -68,7 +68,7 @@ export function EditorToReact({
         <h1>{heading}</h1>
         {article.created_at && (
           <>
-            <Authors author_ids={article.author_ids ?? undefined} />
+            <Authors author_ids={article.author_ids ?? []} />
             <CardDescription>{format_date(article.created_at)}</CardDescription>
           </>
         )}
@@ -111,6 +111,7 @@ const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   return (
     <figure className="max-h-[1500] max-w-[1500]">
       <Image
+        loader={({ src }) => src}
         onClick={() => {
           // router.push(`?image=${data.file.url}`);
           // gallery_store.set.default_image(data);
