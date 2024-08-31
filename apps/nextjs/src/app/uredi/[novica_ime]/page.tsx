@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@acme/ui/card";
 
-import { fetch_authors } from "~/components/authors";
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
 import { api } from "~/trpc/server";
@@ -43,14 +42,13 @@ function ErrorCard({ title }: { title: string }) {
 export default async function EditorPage({
   params: { novica_ime: novica_ime_raw },
 }: EditorPageProps) {
-  const users = await fetch_authors();
   const novica_parts = decodeURIComponent(novica_ime_raw).split("-");
   const novica_id_string = novica_parts[novica_parts.length - 1];
   const novica_ime = novica_parts.slice(0, -1).join("-");
 
-  if (!users) {
+  /* if (!users) {
     return <ErrorCard title="Napaka pri pridobivanju uporabnikov" />;
-  }
+  } */
 
   if (!novica_id_string) {
     return <ErrorCard title="Napaka pri pridobivanju ID-ja novičke" />;
@@ -66,7 +64,7 @@ export default async function EditorPage({
     <Shell>
       <div className="container mb-4 mt-8 h-full min-h-screen">
         {article_by_url ? (
-          <Editor users={users} article={article_by_url} />
+          <Editor article={article_by_url} />
         ) : (
           <CreateNewArticle novica_ime={novica_ime} />
         )}

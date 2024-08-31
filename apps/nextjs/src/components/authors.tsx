@@ -5,34 +5,41 @@ import React, { useEffect, useState } from "react";
 import { cn } from "@acme/ui";
 import { CardDescription } from "@acme/ui/card";
 
-import type { GoogleAdminUser } from "~/app/api/get_users/google-admin";
-
-export async function fetch_authors() {
-  const users_response = await fetch("/api/get_users", {
-    cache: "force-cache",
-    next: {
-      tags: ["get_users"],
-    },
-  });
-
-  const fetched_users = (await users_response.json()) as
-    | GoogleAdminUser[]
-    | undefined;
-  // if (!fetched_users) throw new Error("No users found");
-
-  return fetched_users;
-}
+import type { GoogleAdminUser } from "~/app/api/get_users/route";
+import { revalidate_next_tag } from "~/server/revalidate-next-tag";
 
 // if author_ids is undefined, return none
 export function useAuthors(author_ids?: string[]) {
   const [users, setUsers] = useState<GoogleAdminUser[] | undefined>(undefined);
 
   useEffect(() => {
-    if (typeof author_ids === "undefined") return;
+    // if (typeof author_ids === "undefined") return;
 
     const fetchUsers = async () => {
-      const test = await fetch_authors();
-      setUsers(test);
+      const users_response = await fetch("/api/get_users", {
+        cache: "force-cache",
+        next: {
+          tags: ["get_users"],
+          // expires: 2592000, // 30 days in seconds
+        },
+      });
+
+      if (!users_response.ok) {
+        console.error("Failed to fetch users", users_response);
+        void revalidate_next_tag("get_users");
+        return;
+      }
+
+      const fetched_users = (await users_response.json()) as
+        | GoogleAdminUser[]
+        | undefined;
+
+      if (fetched_users?.length === 0) {
+        console.warn("Revalidating users");
+        void revalidate_next_tag("get_users");
+      }
+
+      setUsers(fetched_users);
     };
 
     void fetchUsers();
@@ -40,11 +47,13 @@ export function useAuthors(author_ids?: string[]) {
 
   // if (!users) return [];
 
-  return users?.filter((user) => {
-    if (!author_ids || !user.id) return false;
+  return typeof author_ids === "undefined"
+    ? users
+    : users?.filter((user) => {
+        if (!user.id) return false;
 
-    return author_ids.includes(user.id);
-  });
+        return author_ids.includes(user.id);
+      });
 }
 
 export function Authors({

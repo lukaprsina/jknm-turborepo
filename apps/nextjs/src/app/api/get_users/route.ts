@@ -1,6 +1,7 @@
 "use server";
 
 import type { JWTInput } from "google-auth-library";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
@@ -31,7 +32,11 @@ export async function GET() {
     customer: "C049fks0l",
   });
 
-  if (!result.data.users) return NextResponse.error();
+  if (!result.data.users) {
+    console.error("No users found", result);
+    revalidateTag("get_users");
+    return NextResponse.error();
+  }
 
   const mapped_users = result.data.users.map((user) => ({
     id: user.id ?? undefined,
@@ -51,5 +56,6 @@ export async function GET() {
     // thumbnail: "https://jknm-turborepo.vercel.app/logo.svg",
   });
 
+  console.log("GETTING NEW USERS", mapped_users);
   return NextResponse.json(mapped_users);
 }

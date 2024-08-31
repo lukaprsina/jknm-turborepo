@@ -5,7 +5,7 @@ import { SaveIcon, XIcon } from "lucide-react";
 import "./editor.css";
 
 import type { ComponentType } from "react";
-import { useCallback, useContext, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Image from "next/image";
 
 import type { Article } from "@acme/db/schema";
@@ -25,34 +25,29 @@ import { Button } from "@acme/ui/button";
 import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import type { GoogleAdminUser } from "~/app/api/get_users/google-admin";
+import { useAuthors } from "~/components/authors";
 import { EditorProvider, useEditor } from "~/components/editor-context";
-import UsersContext from "~/components/users-context";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
 
 export default function MyEditor({
   article,
-  users,
 }: {
   article?: typeof Article.$inferSelect;
-  users?: GoogleAdminUser[];
 }) {
   return (
-    <UsersContext.Provider value={users}>
-      <EditorProvider article={article}>
-        <div className="mx-auto w-full outline outline-1">
-          <MyToolbar />
-          <div
-            id="editorjs"
-            /* lg:prose-xl  */
-            className="prose dark:prose-invert container"
-          />
-        </div>
-        <SettingsSummary />
-      </EditorProvider>
-    </UsersContext.Provider>
+    <EditorProvider article={article}>
+      <div className="mx-auto w-full outline outline-1">
+        <MyToolbar />
+        <div
+          id="editorjs"
+          /* lg:prose-xl  */
+          className="prose dark:prose-invert container"
+        />
+      </div>
+      <SettingsSummary />
+    </EditorProvider>
   );
 }
 
@@ -80,13 +75,13 @@ interface AuthorMultiSelectType {
 }
 
 function MyToolbar() {
-  const users_context = useContext(UsersContext);
   const editor = useEditor();
+  const users = useAuthors();
 
   const authors = useMemo(() => {
-    if (!users_context) return [];
+    if (!users) return [];
 
-    const mapped_authors = users_context
+    const mapped_authors = users
       .filter((user) => {
         if (user.suspended) return false;
         return true;
@@ -103,6 +98,12 @@ function MyToolbar() {
               alt={user.name}
               width={16}
               height={16}
+              onError={(event) => {
+                console.error("Failed to load image", event);
+                const target = event.target as HTMLImageElement;
+                target.src = "/android-chrome-512x512.png";
+              }}
+              loader={({ src }) => src}
               className={cn("rounded-full", className)}
             />
           );
@@ -113,7 +114,7 @@ function MyToolbar() {
       });
 
     return mapped_authors as AuthorMultiSelectType[];
-  }, [users_context]);
+  }, [users]);
 
   if (!editor) return null;
   return (
