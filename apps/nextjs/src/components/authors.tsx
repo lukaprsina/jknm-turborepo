@@ -59,10 +59,11 @@ export function Authors({ author_ids }: { author_ids?: string[] }) {
   return (
     <>
       {authors?.map((author, index) => (
-        <span className="flex-shrink-0" key={index}>
+        // span className="flex-shrink-0"
+        <React.Fragment key={index}>
           {author.name}
           {index !== authors.length - 1 && ",\u00A0"}
-        </span>
+        </React.Fragment>
       ))}
     </>
   );

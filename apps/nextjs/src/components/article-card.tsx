@@ -117,6 +117,7 @@ export function ArticleCard({
               src={preview_image}
               alt={title}
               fill
+              priority={featured}
               className="rounded-md object-cover"
               loader={({ src }) => src}
             />

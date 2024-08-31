@@ -1,11 +1,12 @@
 "use client";
 
-import { SaveIcon, XIcon } from "lucide-react";
+import { DownloadIcon, SaveIcon, UploadIcon, XIcon } from "lucide-react";
 
 import "./editor.css";
 
+import type { OutputData } from "@editorjs/editorjs";
 import type { ComponentType } from "react";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 
 import type { Article } from "@acme/db/schema";
@@ -126,9 +127,11 @@ function MyToolbar() {
             animation={2}
             maxCount={3}
           />
-          {editor.savingText}
+          <span className="flex flex-shrink-0">{editor.savingText}</span>
         </div>
         <div className="flex items-center">
+          <ExportButton />
+          <ImportButton />
           <SaveButton />
           <UploadDialog />
           <SettingsDialog />
@@ -136,6 +139,102 @@ function MyToolbar() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ExportButton() {
+  const editor = useEditor();
+
+  if (!editor) return null;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={async () => {
+            const editor_content = await editor.editor?.save();
+            const blob = new Blob([JSON.stringify(editor_content, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${editor.article?.title ?? "novica"}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          }}
+        >
+          <DownloadIcon />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>Izvozi</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function ImportButton() {
+  const editor = useEditor();
+  const input_ref = useRef<HTMLInputElement>(null);
+  const form_ref = useRef<HTMLFormElement>(null);
+
+  if (!editor) return null;
+
+  return (
+    <>
+      <form ref={form_ref}>
+        <input
+          type="file"
+          className="hidden"
+          accept="application/json"
+          ref={input_ref}
+          onChange={async (event) => {
+            const files = event.target.files;
+            const file = files?.item(0);
+            console.log("input onChange event", file);
+            if (!file) return;
+
+            const file_content = await file.text();
+            const parsed_file = JSON.parse(file_content) as OutputData;
+            console.log("file", file, parsed_file);
+            await editor.editor?.render(parsed_file);
+          }}
+        />
+      </form>
+      <AlertDialog>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <UploadIcon />
+              </Button>
+            </AlertDialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Uvozi</TooltipContent>
+        </Tooltip>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Uvozi novico</AlertDialogTitle>
+            <AlertDialogDescription>
+              Ste prepričani, da želite uvoziti novico iz računalnika?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ne uvozi</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                form_ref.current?.reset();
+                input_ref.current?.click();
+                console.log("input_ref", input_ref);
+              }}
+            >
+              Uvozi novico
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -212,14 +311,14 @@ function ClearButton() {
             </Button>
           </AlertDialogTrigger>
         </TooltipTrigger>
-        <TooltipContent>Ponastavi osnutek</TooltipContent>
+        <TooltipContent>Izbriši osnutek</TooltipContent>
       </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Ponastavi osnutek</AlertDialogTitle>
+          <AlertDialogTitle>Izbriši osnutek</AlertDialogTitle>
         </AlertDialogHeader>
         <AlertDialogDescription>
-          Ste prepričani, da želite ponastaviti osnutek na objavljeno različico
+          Ste prepričani, da želite izbrisati osnutek na objavljeno različico
           novičke?
         </AlertDialogDescription>
         <AlertDialogFooter>
@@ -233,7 +332,7 @@ function ClearButton() {
               editor.mutations.delete_draft({ id: editor.article.id });
             }}
           >
-            Ponastavi osnutek
+            Izbriši osnutek
           </AlertDialogAction>
           <AlertDialogCancel>Prekliči</AlertDialogCancel>
         </AlertDialogFooter>
