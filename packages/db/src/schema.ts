@@ -107,6 +107,7 @@ export const Article = pgTable(
     preview_image: varchar("preview_image", { length: 255 }),
     draft_preview_image: varchar("draft_preview_image", { length: 255 }),
     author_ids: json("author_ids").$type<string[]>(),
+    custom_author_names: json("custom_author_names").$type<string[]>(),
   },
   (article) => ({
     created_at_index: index("created_at_index").on(article.created_at),
@@ -119,6 +120,7 @@ export const CreateArticleWithDateSchema = createInsertSchema(Article, {
   created_at: z.date(),
   updated_at: z.date(),
   author_ids: z.array(z.string()),
+  custom_author_names: z.array(z.string()),
 });
 
 export const CreateArticleSchema = createInsertSchema(Article, {
@@ -126,6 +128,7 @@ export const CreateArticleSchema = createInsertSchema(Article, {
   draft_content: content_validator,
   updated_at: z.date(),
   author_ids: z.array(z.string()),
+  custom_author_names: z.array(z.string()),
 }).omit({
   created_at: true,
 });

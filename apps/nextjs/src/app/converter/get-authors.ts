@@ -4,6 +4,12 @@ import { parse as html_parse } from "node-html-parser";
 
 import type { CSVType } from "./converter-server";
 
+export interface AuthorType {
+  name: string;
+  ids: string[];
+  change?: false | string;
+}
+
 export function get_authors(
   csv_article: CSVType,
   all_blocks: OutputBlockData[],

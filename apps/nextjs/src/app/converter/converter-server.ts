@@ -13,6 +13,7 @@ import { db } from "@acme/db/client";
 import { Article } from "@acme/db/schema";
 
 import type { ImageToSave } from "./converter-spaghetti";
+import type { AuthorType } from "./get-authors";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
 
@@ -203,7 +204,7 @@ export async function sync_with_algolia() {
         published: true,
         has_draft: false,
         year: article.created_at.getFullYear().toString(),
-        author_ids: [],
+        author_names: [],
         /* authors: article.credited_people.map(
           (person) => person.credited_people.name,
         ), */
@@ -290,7 +291,6 @@ export async function upload_images() {
           throw new Error("Old file name doesn't exist: " + old_path);
         }
 
-        // TODO: server to server fetch
         // return upload_from_path(old_path, s3_dir);
         try {
           await fs_promises.stat(old_path);
@@ -408,3 +408,12 @@ const JKNM_SERVED_DIR = "D:/JKNM/served";
 
   await upload_image_by_file(file, article_url);
 } */
+
+export async function get_authors_by_name() {
+  const authors_by_name = await fs_promises.readFile(
+    "pt-testing/authors_by_name.json",
+    "utf-8",
+  );
+  const authors = JSON.parse(authors_by_name) as AuthorType[];
+  return authors;
+}

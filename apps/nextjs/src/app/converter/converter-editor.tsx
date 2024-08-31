@@ -6,11 +6,14 @@ import EditorJS from "@editorjs/editorjs";
 import { Button } from "@acme/ui/button";
 import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
+import { ScrollArea } from "@acme/ui/scroll-area";
 
+import { useAuthors } from "~/components/authors";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
   delete_articles,
   get_article_count,
+  get_authors_by_name,
   make_every_article_public,
   read_articles,
   sync_with_algolia,
@@ -34,6 +37,7 @@ export function ArticleConverter() {
   const [doSplice, setDoSplice] = useState(true);
   const [firstArticle, setFirstArticle] = useState(0); // 32
   const [lastArticle, setLastArticle] = useState(33);
+  const authors = useAuthors();
 
   return (
     <div className="prose container mx-auto py-8">
@@ -68,13 +72,45 @@ export function ArticleConverter() {
         >
           Delete articles
         </Button>
-        {/* <Button
+        <Button
           onClick={async () => {
-            await add_authors();
+            if (!authors) {
+              throw new Error("Authors not loaded");
+            }
+
+            const not_found_authors = new Set<string>();
+            const authors_by_name = await get_authors_by_name();
+
+            for (const author_by_name of authors_by_name) {
+              let author = author_by_name.name;
+
+              if (typeof author_by_name.change === "boolean") {
+                continue;
+              } else if (typeof author_by_name.change === "string") {
+                author = author_by_name.change;
+              }
+
+              author = author.trim();
+              author.split(", ").forEach((split_author) => {
+                const author_obj = authors.find((a) => a.name === split_author);
+
+                if (!author_obj) {
+                  console.log(split_author);
+                  not_found_authors.add(split_author);
+                }
+              });
+            }
+
+            const all_authors = authors.map((a) => a.name);
+            console.log(
+              "not_found_authors",
+              all_authors,
+              Array.from(not_found_authors),
+            );
           }}
         >
-          Add authors
-        </Button> */}
+          Check authors
+        </Button>
         <Button
           onClick={async () => {
             await upload_images();
@@ -124,6 +160,9 @@ export function ArticleConverter() {
           </Button>
         </div>
       </div>
+      <ScrollArea className="my-4 h-72 rounded-md">
+        <pre>{JSON.stringify(authors, null, 2)}</pre>
+      </ScrollArea>
       <TempEditor editorJS={editorJS} />
     </div>
   );

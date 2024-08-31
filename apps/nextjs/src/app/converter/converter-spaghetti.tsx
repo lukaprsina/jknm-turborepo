@@ -18,9 +18,7 @@ import {
   get_clean_url,
   get_image_data_from_editor,
 } from "../uredi/[novica_ime]/editor-utils";
-import { AUTHORS } from "./authors";
 import { get_problematic_html, upload_articles } from "./converter-server";
-import { get_authors } from "./get-authors";
 
 export interface ImageToSave {
   objave_id: string;
@@ -177,9 +175,9 @@ async function parse_csv_article(
     }
   }
 
-  const current_authors = get_authors(csv_article, blocks, authors_by_name);
-  authors_by_id.push({ id: csv_article.id, names: current_authors });
+  // const current_authors = get_authors(csv_article, blocks, authors_by_name);
   const new_authors = new Set<string>();
+  /* authors_by_id.push({ id: csv_article.id, names: current_authors });
   for (const current_author of current_authors) {
     const author = AUTHORS.find((a) => a.name === current_author);
     // add authors first
@@ -190,15 +188,15 @@ async function parse_csv_article(
       continue;
     }
 
-    if (typeof author.change_to === "string") {
-      console.log("Change author", current_author, author.change_to);
-      new_authors.add(author.change_to);
-    } else if (typeof author.change_to === "undefined") {
+    if (typeof author.change === "string") {
+      console.log("Change author", current_author, author.change);
+      new_authors.add(author.change);
+    } else if (typeof author.change === "undefined") {
       new_authors.add(author.name);
-    } else if (typeof author.change_to !== "boolean") {
+    } else if (typeof author.change !== "boolean") {
       throw new Error("Unexpected change_to type: " + author.name);
     }
-  }
+  } */
 
   await editorJS?.render({
     blocks,
