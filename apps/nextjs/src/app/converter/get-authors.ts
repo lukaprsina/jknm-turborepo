@@ -2,6 +2,8 @@ import type { OutputBlockData } from "@editorjs/editorjs";
 import { decode } from "html-entities";
 import { parse as html_parse } from "node-html-parser";
 
+import type { RouterOutputs } from "@acme/api";
+
 import type { CSVType } from "./converter-server";
 
 export interface AuthorType {
@@ -13,8 +15,13 @@ export interface AuthorType {
 export function get_authors(
   csv_article: CSVType,
   all_blocks: OutputBlockData[],
-  authors: { name: string; ids: string[] }[],
+  authors_by_name: AuthorType[],
+  all_authors: RouterOutputs["article"]["google_users"],
 ) {
+  if (!all_authors) {
+    throw new Error("No authors");
+  }
+
   let number_of_paragraphs = 3;
 
   const last_paragraphs: string[] = [];
@@ -44,7 +51,8 @@ export function get_authors(
     console.error("get authors -> no paragraphs: " + csv_article.id);
   }
 
-  const current_authors: string[] = [];
+  const current_authors = new Set<string>();
+  const not_found_authors = new Set<string>();
 
   for (const paragraph of last_paragraphs) {
     const root = html_parse(paragraph);
@@ -59,14 +67,28 @@ export function get_authors(
 
       if (trimmed === "") continue;
 
-      const author = authors.find((a) => a.name === trimmed);
-      current_authors.push(trimmed);
-
-      if (author) {
-        author.ids.push(csv_article.id);
-      } else {
-        authors.push({ name: trimmed, ids: [csv_article.id] });
+      const author_by_name = authors_by_name.find((a) => a.name === trimmed);
+      if (!author_by_name) {
+        console.error("Author not found", trimmed);
+        continue;
       }
+
+      let author = author_by_name.name;
+      if (typeof author_by_name.change === "boolean") {
+        continue;
+      } else if (typeof author_by_name.change === "string") {
+        author = author_by_name.change;
+      }
+
+      author = author.trim();
+      author.split(", ").forEach((split_author) => {
+        const author_obj = all_authors.find((a) => a.name === split_author);
+
+        if (!author_obj) {
+          // console.log(split_author);
+          not_found_authors.add(split_author);
+        }
+      });
     }
   }
   /* console.log("get_authors done", {
@@ -76,5 +98,5 @@ export function get_authors(
     authors,
   }); */
 
-  return current_authors;
+  return { current_authors, not_found_authors };
 }

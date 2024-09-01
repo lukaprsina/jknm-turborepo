@@ -64,7 +64,7 @@ export interface TempArticleType {
   csv_url: string;
   created_at: Date;
   updated_at: Date;
-  author_names: string[];
+  author_ids: string[];
 }
 
 export async function upload_articles(articles: TempArticleType[]) {
@@ -86,6 +86,7 @@ export async function upload_articles(articles: TempArticleType[]) {
             preview_image: article.preview_image,
             url: article.csv_url,
             published: true,
+            author_ids: article.author_ids,
           })),
         )
         /* .onConflictDoUpdate({

@@ -8,6 +8,7 @@ import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
 import { ScrollArea } from "@acme/ui/scroll-area";
 
+import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
   delete_articles,
@@ -19,7 +20,6 @@ import {
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
-import { api } from "~/trpc/react";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -37,7 +37,7 @@ export function ArticleConverter() {
   const [doSplice, setDoSplice] = useState(true);
   const [firstArticle, setFirstArticle] = useState(0); // 32
   const [lastArticle, setLastArticle] = useState(33);
-  const all_authors = api.article.google_users.useQuery()
+  const all_authors = api.article.google_users.useQuery();
 
   return (
     <div className="prose container mx-auto py-8">
@@ -93,7 +93,9 @@ export function ArticleConverter() {
 
               author = author.trim();
               author.split(", ").forEach((split_author) => {
-                const author_obj = all_authors.data?.find((a) => a.name === split_author);
+                const author_obj = all_authors.data?.find(
+                  (a) => a.name === split_author,
+                );
 
                 if (!author_obj) {
                   console.log(split_author);
@@ -154,6 +156,7 @@ export function ArticleConverter() {
                 doSplice,
                 firstArticle,
                 lastArticle,
+                all_authors.data,
               );
             }}
           >
@@ -178,7 +181,6 @@ export function TempEditor({
     const temp_editor = new EditorJS({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS(),
-      // data: content,
       autofocus: true,
     });
 
