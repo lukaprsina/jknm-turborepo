@@ -6,6 +6,7 @@ import EditorJS from "@editorjs/editorjs";
 import { Button } from "@acme/ui/button";
 import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
+import { Label } from "@acme/ui/label";
 import { ScrollArea } from "@acme/ui/scroll-area";
 
 import { api } from "~/trpc/react";
@@ -35,8 +36,10 @@ export function ArticleConverter() {
   }, []);
 
   const [doSplice, setDoSplice] = useState(true);
-  const [firstArticle, setFirstArticle] = useState(0); // 32
-  const [lastArticle, setLastArticle] = useState(33);
+  const [doDryRun, setDoDryRun] = useState(true);
+  const [doUpdate, setDoUpdate] = useState(true);
+  const [firstArticle, setFirstArticle] = useState("0"); // 32
+  const [lastArticle, setLastArticle] = useState("33");
   const all_authors = api.article.google_users.useQuery();
 
   return (
@@ -123,14 +126,12 @@ export function ArticleConverter() {
         </Button>
         <div className="flex flex-shrink gap-2">
           <Input
-            type="number"
             value={firstArticle}
-            onChange={(event) => setFirstArticle(parseInt(event.target.value))}
+            onChange={(event) => setFirstArticle(event.target.value)}
           />
           <Input
-            type="number"
             value={lastArticle}
-            onChange={(event) => setLastArticle(parseInt(event.target.value))}
+            onChange={(event) => setLastArticle(event.target.value)}
           />
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -145,6 +146,32 @@ export function ArticleConverter() {
               Splice?
             </label>
           </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={doDryRun}
+              onCheckedChange={(checked) => setDoDryRun(checked === true)}
+              id="do_dry"
+            />
+            <label
+              htmlFor="do_dry"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Dry run?
+            </label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={doUpdate}
+              onCheckedChange={(checked) => setDoUpdate(checked === true)}
+              id="do_update"
+            />
+            <label
+              htmlFor="do_update"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Update?
+            </label>
+          </div>
           <Button
             onClick={async () => {
               console.clear();
@@ -154,8 +181,10 @@ export function ArticleConverter() {
                 csv_articles,
                 editorJS.current,
                 doSplice,
-                firstArticle,
-                lastArticle,
+                doDryRun,
+                doUpdate,
+                parseInt(firstArticle),
+                parseInt(lastArticle),
                 all_authors.data,
               );
             }}

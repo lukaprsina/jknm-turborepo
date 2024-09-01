@@ -81,8 +81,6 @@ function PublishedContent({
 }: {
   article?: typeof Article.$inferSelect;
 }) {
-  console.log("published", article);
-
   if (!article?.content) {
     return <ArticleNotFound />;
   }
@@ -126,10 +124,10 @@ async function TabbedContent({
         </TabsTrigger>
       </TabsList>
       <TabsContent value="draft" className="py-6">
-        <EditorToReact draft article={article} />
+        <EditorToReact draft article={article} session={session ?? undefined} />
       </TabsContent>
       <TabsContent value="published" className="py-6">
-        <EditorToReact article={article} />
+        <EditorToReact article={article} session={session ?? undefined} />
       </TabsContent>
     </Tabs>
   );

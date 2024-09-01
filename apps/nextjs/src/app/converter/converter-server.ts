@@ -16,8 +16,7 @@ import type { ImageToSave } from "./converter-spaghetti";
 import type { AuthorType } from "./get-authors";
 import { algolia_protected } from "~/lib/algolia-protected";
 import { content_to_text } from "~/lib/content-to-text";
-
-// import { buildConflictUpdateColumns } from "~/lib/drizzle";
+import { buildConflictUpdateColumns } from "~/lib/drizzle";
 
 export interface CSVType {
   id: string;
@@ -71,6 +70,8 @@ export async function upload_articles(articles: TempArticleType[]) {
   console.log("uploading articles", articles.length);
   if (articles.length === 0) return;
 
+  db.update(Article).set({});
+
   await db.transaction(async (tx) => {
     try {
       await tx
@@ -89,9 +90,10 @@ export async function upload_articles(articles: TempArticleType[]) {
             author_ids: article.author_ids,
           })),
         )
-        /* .onConflictDoUpdate({
+        .onConflictDoUpdate({
           target: Article.id,
-          set: buildConflictUpdateColumns(Article, [
+          set: buildConflictUpdateColumns(Article, ["content"]),
+          /* set: buildConflictUpdateColumns(Article, [
             "title",
             "content",
             "created_at",
@@ -99,9 +101,10 @@ export async function upload_articles(articles: TempArticleType[]) {
             "updated_at",
             "url",
             "published",
-          ]),
-        }) */
-        .returning();
+            "author_ids",            
+          ]), */
+        });
+      // .returning();
     } catch (e: unknown) {
       if (e instanceof Error) {
         console.error("Error uploading articles", e.message);

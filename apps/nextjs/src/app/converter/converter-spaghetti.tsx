@@ -47,6 +47,8 @@ export async function iterate_over_articles(
   csv_articles: CSVType[],
   editorJS: EditorJS | null,
   do_splice: boolean,
+  do_dry_run: boolean,
+  do_update: boolean,
   first_article: number,
   last_article: number,
   all_authors: RouterOutputs["article"]["google_users"],
@@ -61,15 +63,20 @@ export async function iterate_over_articles(
   /* const spliced_csv_articles = do_splice
     ? csv_articles.slice(first_article, last_article)
     : csv_articles; */
-  let first_index = csv_articles.findIndex(
+  const first_index = csv_articles.findIndex(
     (a) => a.id === first_article.toString(),
   );
-  let last_index = csv_articles.findIndex(
-    (a) => a.id === last_article.toString(),
-  );
+  const last_index =
+    last_article === -1
+      ? undefined
+      : csv_articles.findIndex((a) => a.id === last_article.toString());
 
-  if (first_index === -1) first_index = 0;
-  if (last_index === -1) last_index = csv_articles.length - 1;
+  /* if (first_index === -1) first_index = 0;
+  if (last_index === -1) last_index = csv_articles.length - 1; */
+  if (first_index === -1 || last_index === -1) {
+    console.error("Invalid index", csv_articles.length);
+    return;
+  }
 
   const sliced_csv_articles = do_splice
     ? csv_articles.slice(first_index, last_index)
@@ -83,6 +90,12 @@ export async function iterate_over_articles(
     do_splice,
     csv_articles,
   });
+
+  console.log(
+    csv_articles[first_index]?.title,
+    csv_articles.at(last_index ?? -1)?.title,
+    csv_articles.length - 1,
+  );
 
   const articles: TempArticleType[] = [];
   let article_id = do_splice && first_index !== -1 ? first_index + 1 : 1;
@@ -106,7 +119,9 @@ export async function iterate_over_articles(
   }
 
   console.log("done", articles);
-  await upload_articles(articles);
+  if (!do_dry_run) {
+    await upload_articles(articles);
+  }
 
   // await save_images(images_to_save);
   // await write_article_html_to_file(problematic_articles);

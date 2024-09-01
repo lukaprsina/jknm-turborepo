@@ -10,6 +10,7 @@ import Blocks from "editorjs-blocks-react-renderer";
 import HTMLReactParser from "html-react-parser";
 import { DotIcon } from "lucide-react";
 
+import type { Session } from "@acme/auth";
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardContent, CardDescription, CardHeader } from "@acme/ui/card";
@@ -28,9 +29,11 @@ import { human_file_size } from "./../lib/human-file-size";
 export function EditorToReact({
   article,
   draft,
+  session,
 }: {
   article?: typeof Article.$inferSelect;
   draft?: boolean;
+  session?: Session;
 }) {
   const [heading, setHeading] = useState<string | undefined>();
   const gallery_set_images = useGalleryStore((state) => state.set_images);
@@ -75,8 +78,14 @@ export function EditorToReact({
               author_names={get_author_names(article, all_authors.data)}
             />
           </span>
-          {article.author_ids && <DotIcon size={20} />}
+          {article.author_ids?.length !== 0 && <DotIcon size={20} />}
           <span> {format_date(article.created_at)}</span>
+          {session && (
+            <>
+              <DotIcon size={20} />
+              {article.old_id}
+            </>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
