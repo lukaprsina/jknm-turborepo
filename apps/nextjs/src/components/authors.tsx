@@ -12,7 +12,7 @@ export function useAllAuthors() {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      /* const users_response = await fetch("/api/get_users", {
+      /*const users_response = await fetch("/api/get_users", {
         cache: "default",
         next: {
           tags: ["get_users"],
@@ -27,16 +27,15 @@ export function useAllAuthors() {
       
       const fetched_users = (await users_response.json()) as
       | GoogleAdminUser[]
-      | undefined; */
+      | undefined;
 
-      const fetched_users = await get_google_users();
+      // const fetched_users = await get_google_users();
 
       /* if (fetched_users?.length === 0) {
         console.warn("Revalidating users");
       } */
-
       // console.log("Fetched users", fetched_users);
-      setUsers(fetched_users);
+      // setUsers(fetched_users);
     };
 
     void fetchUsers();

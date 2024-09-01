@@ -8,9 +8,8 @@ import type { Article } from "@acme/db/schema";
 import { ShowDraftsContext } from "~/components/drafts-provider";
 import { api } from "~/trpc/react";
 
-export function useInfiniteArticles(
-  _initial_articles: (typeof Article.$inferSelect)[],
-) {
+export function useInfiniteArticles() {
+  // _initial_articles?: (typeof Article.$inferSelect)[],
   const drafts = useContext(ShowDraftsContext);
   const show_drafts = drafts?.[0] ?? false;
 
