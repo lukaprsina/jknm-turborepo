@@ -24,5 +24,12 @@ RIP OFF:
 https://www.openstatus.dev/
 https://craft.mxkaske.dev/post/fancy-box
 
-IMPORTANT: ni slike
+
+obisk-mihovške-jame-510 manjka slika 5
+
+works
+https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/--%23%24-%21%25%26-pa-dolenjske-jame%21-226/PA220010.JPG
+https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/--%23%24-%21%25%26-pa-dolenjske-jame%21-226/PA220010.JPG
+
+doesn't work
 https://jamarski-klub-novo-mesto.s3.eu-central-1.amazonaws.com/--#$-!%25&-pa-dolenjske-jame!-226/PA220010.JPG

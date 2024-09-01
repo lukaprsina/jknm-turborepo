@@ -6,11 +6,11 @@ import { decode } from "html-entities";
 import { NodeType, HTMLElement as ParserHTMLElement } from "node-html-parser";
 
 import type { CSVType } from "./converter-server";
+import { get_image_dimensions } from "./converter-server";
 
 const p_allowed_tags = ["STRONG", "BR", "A", "IMG", "EM", "SUB", "SUP"];
 const caption_allowed_tags = ["STRONG", "EM", "A", "SUB", "SUP"];
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function parse_node(
   node: ParserNode,
   blocks: OutputBlockData[],
@@ -266,11 +266,11 @@ export async function parse_node(
 
       // console.log({ src, caption });
       // TODO: get image dimensions
-      /* const dimensions = await get_image_dimensions(src);
+      const dimensions = await get_image_dimensions(src);
       if (!dimensions) {
         console.error("No dimensions for image", csv_article.id, src);
         break;
-      } */
+      }
 
       // console.log("Image", csv_article.id, { src, caption });
       blocks.push({
@@ -278,8 +278,8 @@ export async function parse_node(
         data: {
           file: {
             url: src,
-            /* width: dimensions.width,
-            height: dimensions.height, */
+            width: dimensions.width,
+            height: dimensions.height,
           },
           caption,
         },
