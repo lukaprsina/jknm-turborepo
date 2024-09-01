@@ -83,10 +83,12 @@ export function get_authors(
       author = author.trim();
       author.split(", ").forEach((split_author) => {
         const author_obj = all_authors.find((a) => a.name === split_author);
+        console.log("split article", csv_article.id, split_author, author_obj);
 
-        if (!author_obj) {
-          // console.log(split_author);
+        if (!author_obj?.id) {
           not_found_authors.add(split_author);
+        } else {
+          current_authors.add(author_obj.id);
         }
       });
     }

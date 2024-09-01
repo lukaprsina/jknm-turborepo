@@ -225,8 +225,6 @@ async function parse_csv_article(
     console.error("No images in article", csv_article.id, csv_article.title);
   }
 
-  // console.log({ blocks, content });
-
   return {
     serial_id: article_id,
     objave_id: csv_article.id,
