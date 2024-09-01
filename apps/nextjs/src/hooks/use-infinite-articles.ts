@@ -13,7 +13,7 @@ export function useInfiniteArticles() {
   const drafts = useContext(ShowDraftsContext);
   const show_drafts = drafts?.[0] ?? false;
 
-  const article_api = api.article.infinite.useInfiniteQuery(
+  const [article_api, test] = api.article.infinite.useSuspenseInfiniteQuery(
     {
       show_drafts: show_drafts,
       limit: 6 * 5,
@@ -37,14 +37,13 @@ export function useInfiniteArticles() {
 
   const articles = useMemo(() => {
     // console.log(article_api.data?.pages);
-    const pages = article_api.data?.pages;
-    if (!pages) return;
+    const pages = article_api.pages;
     const last_page = pages[pages.length - 1]?.data;
     if (!last_page) return;
     // console.log("use memo", pages, last_page);
 
-    return article_api.data?.pages.flatMap((page) => page.data);
-  }, [article_api.data?.pages]);
+    return article_api.pages.flatMap((page) => page.data);
+  }, [article_api.pages]);
 
   const [ref, { entry }] = useIntersectionObserver({
     threshold: 1,
@@ -52,9 +51,9 @@ export function useInfiniteArticles() {
 
   useEffect(() => {
     if (entry?.isIntersecting) {
-      void article_api.fetchNextPage();
+      void test.fetchNextPage();
     }
-  }, [article_api, entry]);
+  }, [test, entry]);
 
   return { articles, ref, article_api };
 }
