@@ -22,8 +22,8 @@ import {
 } from "~/app/uredi/[novica_ime]/editor-utils";
 import { Authors, get_author_names } from "~/components/authors";
 import { format_date } from "~/lib/format-date";
-import { human_file_size } from "./../lib/human-file-size";
 import { api } from "~/trpc/react";
+import { human_file_size } from "./../lib/human-file-size";
 
 export function EditorToReact({
   article,
@@ -34,7 +34,7 @@ export function EditorToReact({
 }) {
   const [heading, setHeading] = useState<string | undefined>();
   const gallery_set_images = useGalleryStore((state) => state.set_images);
-  const all_authors = api.article.google_users.useQuery()
+  const all_authors = api.article.google_users.useQuery();
 
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
@@ -71,7 +71,9 @@ export function EditorToReact({
         <h1>{heading}</h1>
         <CardDescription className="flex items-center text-base text-foreground">
           <span>
-            <Authors author_names={get_author_names(article, all_authors.data)} />
+            <Authors
+              author_names={get_author_names(article, all_authors.data)}
+            />
           </span>
           {article.author_ids && <DotIcon size={20} />}
           <span> {format_date(article.created_at)}</span>
@@ -90,6 +92,8 @@ export function EditorToReact({
   );
 }
 
+const DOUBLE_IMAGES = false as boolean;
+
 export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
   data,
   className,
@@ -100,12 +104,19 @@ export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
     if (!data.file.width || !data.file.height)
       return { width: 1500, height: 1000, dimensions_exist: false };
 
-    if (data.file.width < 500 && data.file.height < 500)
+    if (DOUBLE_IMAGES && data.file.width < 500 && data.file.height < 500) {
       return {
         width: data.file.width * 2,
         height: data.file.height * 2,
         dimensions_exist: true,
       };
+    } else {
+      return {
+        width: data.file.width,
+        height: data.file.height,
+        dimensions_exist: true,
+      };
+    }
   }, [data.file.height, data.file.width]);
 
   /* useEffect(() => {
@@ -130,12 +141,12 @@ export const NextImageRenderer: RenderFn<EditorJSImageData> = ({
         className={cn(
           "cursor-pointer",
           className,
-          !image_props?.dimensions_exist && "object-contain",
+          !image_props.dimensions_exist && "object-contain",
         )}
         src={data.file.url}
         alt={data.caption}
-        width={image_props?.width ?? 1500}
-        height={image_props?.height ?? 1000}
+        width={image_props.width}
+        height={image_props.height}
         priority={true}
         // fill={!image_props?.dimensions_exist}
       />
