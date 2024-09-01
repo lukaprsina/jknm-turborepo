@@ -20,9 +20,10 @@ import {
   get_heading_from_editor,
   get_image_data_from_editor,
 } from "~/app/uredi/[novica_ime]/editor-utils";
-import { Authors, get_author_names, useAllAuthors } from "~/components/authors";
+import { Authors, get_author_names } from "~/components/authors";
 import { format_date } from "~/lib/format-date";
 import { human_file_size } from "./../lib/human-file-size";
+import { api } from "~/trpc/react";
 
 export function EditorToReact({
   article,
@@ -33,7 +34,7 @@ export function EditorToReact({
 }) {
   const [heading, setHeading] = useState<string | undefined>();
   const gallery_set_images = useGalleryStore((state) => state.set_images);
-  const all_authors = useAllAuthors();
+  const all_authors = api.article.google_users.useQuery()
 
   const editor_data = useMemo(() => {
     const content = draft ? article?.draft_content : article?.content;
@@ -70,7 +71,7 @@ export function EditorToReact({
         <h1>{heading}</h1>
         <CardDescription className="flex items-center text-base text-foreground">
           <span>
-            <Authors author_names={get_author_names(article, all_authors)} />
+            <Authors author_names={get_author_names(article, all_authors.data)} />
           </span>
           {article.author_ids && <DotIcon size={20} />}
           <span> {format_date(article.created_at)}</span>

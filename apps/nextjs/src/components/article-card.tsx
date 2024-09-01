@@ -16,10 +16,11 @@ import { Badge } from "@acme/ui/badge";
 import { CardContent, CardDescription, CardHeader } from "@acme/ui/card";
 import { MagicCard } from "@acme/ui/magic-card";
 
-import { Authors, get_author_names, useAllAuthors } from "~/components/authors";
+import { Authors, get_author_names } from "~/components/authors";
 import { content_to_text } from "~/lib/content-to-text";
 import { format_date } from "~/lib/format-date";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
+import { api } from "~/trpc/react";
 
 // React.RefObject<HTMLAnchorElement>;
 export const ArticleDrizzleCard = ({
@@ -31,7 +32,7 @@ export const ArticleDrizzleCard = ({
   featured?: boolean;
   ref?: IntersectionObserverHookRefCallback;
 }) => {
-  const all_authors = useAllAuthors();
+  const all_authors = api.article.google_users.useQuery()
 
   return (
     <ArticleCard
@@ -47,7 +48,7 @@ export const ArticleDrizzleCard = ({
         article.draft_content ?? article.content ?? undefined,
       )}
       created_at={article.created_at}
-      author_names={get_author_names(article, all_authors)}
+      author_names={get_author_names(article, all_authors.data)}
     />
   );
 };

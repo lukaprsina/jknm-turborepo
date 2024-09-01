@@ -26,11 +26,11 @@ import { Button } from "@acme/ui/button";
 import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
-import { useAllAuthors } from "~/components/authors";
 import { EditorProvider, useEditor } from "~/components/editor-context";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
+import { api } from "~/trpc/react";
 
 export default function MyEditor({
   article,
@@ -83,12 +83,12 @@ export interface AuthorValueMultiSelectType {
 
 function MyToolbar() {
   const editor = useEditor();
-  const users = useAllAuthors();
+  const all_authors = api.article.google_users.useQuery()
 
   const authors = useMemo(() => {
-    if (!users) return [];
+    if (!all_authors.data) return [];
 
-    const google_authors = users
+    const google_authors = all_authors.data
       .filter((user) => {
         if (user.suspended) return false;
         return true;
@@ -116,7 +116,7 @@ function MyToolbar() {
       });
 
     return google_authors as AuthorMultiSelectType[];
-  }, [users]);
+  }, [all_authors.data]);
 
   if (!editor) return null;
   return (

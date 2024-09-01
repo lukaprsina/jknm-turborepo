@@ -16,7 +16,7 @@ import { content_to_text } from "~/lib/content-to-text";
 import { generate_encoded_url } from "~/lib/generate-encoded-url";
 import { create_algolia_article } from "~/server/algolia";
 import { api } from "~/trpc/react";
-import { get_author_names, useAllAuthors } from "./authors";
+import { get_author_names } from "./authors";
 
 export default function NewArticleLoader({
   title,
@@ -25,7 +25,7 @@ export default function NewArticleLoader({
 }: ButtonProps & { title?: string; url?: string }) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
-  const all_authors = useAllAuthors();
+  const all_authors = api.article.google_users.useQuery()
 
   const article_create = api.article.create_article.useMutation({
     onSuccess: async (data) => {
@@ -46,7 +46,7 @@ export default function NewArticleLoader({
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
         year: returned_data.created_at.getFullYear().toString(),
-        author_names: get_author_names(returned_data, all_authors),
+        author_names: get_author_names(returned_data, all_authors.data),
       });
 
       await trpc_utils.article.invalidate();

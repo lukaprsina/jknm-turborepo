@@ -1,55 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 import type { Article } from "@acme/db/schema";
-
-import type { GoogleAdminUser } from "~/app/api/get_users/route";
-import { get_google_users } from "~/server/get_google_users";
-
-export function useAllAuthors() {
-  const [users, setUsers] = useState<GoogleAdminUser[] | undefined>(undefined);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      /*const users_response = await fetch("/api/get_users", {
-        cache: "default",
-        next: {
-          tags: ["get_users"],
-          // revalidate: 3600 * 24 * 7, // 1 week
-        },
-      });
-      
-      if (!users_response.ok) {
-        console.error("Failed to fetch users", users_response);
-        return;
-      }
-      
-      const fetched_users = (await users_response.json()) as
-      | GoogleAdminUser[]
-      | undefined;
-
-      // const fetched_users = await get_google_users();
-
-      /* if (fetched_users?.length === 0) {
-        console.warn("Revalidating users");
-      } */
-      // console.log("Fetched users", fetched_users);
-      // setUsers(fetched_users);
-    };
-
-    void fetchUsers();
-  }, []);
-
-  return users;
-}
+import type { GoogleAdminUser } from '@acme/api';
+import { api } from "~/trpc/react";
 
 export function useAuthors(author_names: string[]) {
-  const all_authors = useAllAuthors();
-
+  const all_authors = api.article.google_users.useQuery()
+  
   return typeof author_names === "undefined"
-    ? all_authors
-    : all_authors?.filter((user) => {
+    ? all_authors.data
+    : all_authors.data?.filter((user) => {
         if (!user.name) return false;
 
         return author_names.includes(user.name);

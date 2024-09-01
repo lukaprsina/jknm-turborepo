@@ -29,5 +29,13 @@ type RouterInputs = inferRouterInputs<AppRouter>;
  **/
 type RouterOutputs = inferRouterOutputs<AppRouter>;
 
+interface GoogleAdminUser {
+  id?: string;
+  email?: string;
+  name?: string;
+  suspended?: boolean;
+  thumbnail?: string;
+}
+
 export { createTRPCContext, appRouter, createCaller };
-export type { AppRouter, RouterInputs, RouterOutputs };
+export type { AppRouter, RouterInputs, RouterOutputs, GoogleAdminUser };

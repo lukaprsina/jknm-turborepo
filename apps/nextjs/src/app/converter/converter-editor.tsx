@@ -8,7 +8,6 @@ import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
 import { ScrollArea } from "@acme/ui/scroll-area";
 
-import { useAllAuthors, useAuthors } from "~/components/authors";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
   delete_articles,
@@ -20,6 +19,7 @@ import {
   upload_images,
 } from "./converter-server";
 import { iterate_over_articles } from "./converter-spaghetti";
+import { api } from "~/trpc/react";
 
 export function ArticleConverter() {
   const editorJS = useRef<EditorJS | null>(null);
@@ -37,7 +37,7 @@ export function ArticleConverter() {
   const [doSplice, setDoSplice] = useState(true);
   const [firstArticle, setFirstArticle] = useState(0); // 32
   const [lastArticle, setLastArticle] = useState(33);
-  const authors = useAllAuthors();
+  const all_authors = api.article.google_users.useQuery()
 
   return (
     <div className="prose container mx-auto py-8">
@@ -74,8 +74,9 @@ export function ArticleConverter() {
         </Button>
         <Button
           onClick={async () => {
-            if (!authors) {
-              throw new Error("Authors not loaded");
+            if (!all_authors.data) {
+              console.warn("Authors not loaded");
+              return;
             }
 
             const not_found_authors = new Set<string>();
@@ -92,7 +93,7 @@ export function ArticleConverter() {
 
               author = author.trim();
               author.split(", ").forEach((split_author) => {
-                const author_obj = authors.find((a) => a.name === split_author);
+                const author_obj = all_authors.data?.find((a) => a.name === split_author);
 
                 if (!author_obj) {
                   console.log(split_author);
@@ -101,10 +102,10 @@ export function ArticleConverter() {
               });
             }
 
-            const all_authors = authors.map((a) => a.name);
+            const mapped_authors = all_authors.data.map((a) => a.name);
             console.log(
               "not_found_authors",
-              all_authors,
+              mapped_authors,
               Array.from(not_found_authors),
             );
           }}
@@ -161,7 +162,7 @@ export function ArticleConverter() {
         </div>
       </div>
       <ScrollArea className="my-4 h-72 rounded-md">
-        <pre>{JSON.stringify(authors, null, 2)}</pre>
+        <pre>{JSON.stringify(all_authors.data, null, 2)}</pre>
       </ScrollArea>
       <TempEditor editorJS={editorJS} />
     </div>
@@ -171,7 +172,7 @@ export function ArticleConverter() {
 export function TempEditor({
   editorJS,
 }: {
-  editorJS: React.MutableRefObject<EditorJS | null>;
+  editorJS: React.RefObject<EditorJS | null>;
 }) {
   const editor_factory = useCallback(() => {
     const temp_editor = new EditorJS({

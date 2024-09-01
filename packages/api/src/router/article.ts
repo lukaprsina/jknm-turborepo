@@ -1,8 +1,10 @@
 import type { TRPCRouterRecord } from "@trpc/server";
+import type { JWTInput } from "google-auth-library";
 import { withCursorPagination } from "drizzle-pagination";
+import { google } from "googleapis";
 import { z } from "zod";
 
-import { and, desc, eq } from "@acme/db";
+import { and, eq } from "@acme/db";
 import {
   Article,
   CreateArticleSchema,
@@ -10,17 +12,10 @@ import {
 } from "@acme/db/schema";
 import { content_validator } from "@acme/validators";
 
+import type { GoogleAdminUser } from "..";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
 export const articleRouter = {
-  last_n: publicProcedure.input(z.number()).query(({ ctx, input }) => {
-    return ctx.db.query.Article.findMany({
-      limit: input,
-      orderBy: desc(Article.created_at),
-      where: !ctx.session ? eq(Article.published, true) : undefined,
-    });
-  }),
-
   infinite: publicProcedure
     .input(
       z.object({
@@ -207,5 +202,50 @@ export const articleRouter = {
       .delete(Article)
       .where(eq(Article.id, input))
       .returning({ id: Article.id, url: Article.url });
+  }),
+
+  google_users: protectedProcedure.query(async () => {
+    console.log("GETTING GOOGLE USERS");
+    const credentials = process.env.JKNM_SERVICE_ACCOUNT_CREDENTIALS;
+    if (!credentials) {
+      console.error("No credentials found");
+      return;
+    }
+
+    const credentials_text = atob(credentials);
+    const credentials_json = JSON.parse(credentials_text) as Partial<JWTInput>;
+    const google_client = await google.auth.getClient({
+      credentials: credentials_json,
+      scopes: ["https://www.googleapis.com/auth/admin.directory.user.readonly"],
+    });
+
+    const service = google.admin({
+      version: "directory_v1",
+      auth: google_client,
+    });
+
+    const result = await service.users.list({
+      customer: "C049fks0l",
+    });
+
+    if (!result.data.users) {
+      console.error("No users found", result);
+      // revalidateTag("get_users");
+      return;
+    }
+
+    const mapped_users = result.data.users.map(
+      (user) =>
+        ({
+          id: user.id ?? undefined,
+          email: user.primaryEmail ?? undefined,
+          name: user.name?.fullName ?? undefined,
+          suspended: user.suspended ?? undefined,
+          thumbnail: user.thumbnailPhotoUrl ?? undefined,
+        }) satisfies GoogleAdminUser,
+    );
+
+    console.log("GOT GOOGLE USERS", mapped_users.length);
+    return mapped_users;
   }),
 } satisfies TRPCRouterRecord;

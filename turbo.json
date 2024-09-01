@@ -6,6 +6,7 @@
       "dependsOn": ["^topo"]
     },
     "build": {
+      "cache": false,
       "dependsOn": ["^build"],
       "outputs": ["node_modules/.cache/tsbuildinfo.json", "dist/**"]
     },
@@ -52,7 +53,8 @@
     "AUTH_SECRET",
     "PORT",
     "NEXT_PUBLIC_ALGOLIA_ID",
-    "NEXT_PUBLIC_ALGOLIA_SEARCH_KEY"
+    "NEXT_PUBLIC_ALGOLIA_SEARCH_KEY",
+    "JKNM_SERVICE_ACCOUNT_CREDENTIALS"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
