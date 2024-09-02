@@ -18,7 +18,7 @@ export default async function PreveriPage() {
   // const csv_articles = await read_articles();
 
   return (
-    <Shell>
+    <Shell without_footer>
       <PreveriClient articles={articles} /* csv_articles={csv_articles} */ />
     </Shell>
   );

@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Input } from "@acme/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 import { useToast } from "@acme/ui/use-toast";
 
+import { EditButton } from "~/components/editing-buttons";
 import { EditorToReact } from "~/components/editor-to-react";
 import { api } from "~/trpc/react";
 
@@ -70,21 +71,15 @@ export function PreveriClient({
     router.prefetch(iframe_src(page_info.previous));
   }, [iframe_src, page_info.next, page_info.previous, router]);
 
-  /* const current_page = useMemo(() => {
-    const csv_article = csv_articles[page];
-    if (!csv_article) {
-      return {
-        content: "Stran ne obstaja",
-      };
-    }
-
-    return csv_article;
-  }, [csv_articles, page]); */
-
   return (
-    <div className="prose dark:prose-invert container w-full pb-6 pt-8">
-      <h1>Preveri</h1>
-      <h2>Stran {page}</h2>
+    <div
+      className={cn(
+        "prose h-full w-full max-w-none px-6 pb-6 pt-8",
+        // "h-full max-h-screen overflow-scroll",
+      )}
+    >
+      <h2>Preveri</h2>
+      <p>Stran {page}</p>
       <div className="my-8 flex items-center gap-4">
         <div className="flex gap-2">
           <Button
@@ -129,31 +124,18 @@ export function PreveriClient({
           >
             Pojdi
           </Button>
+          {article.data && (
+            <EditButton id={article.data.id} url={article.data.url} new_tab />
+          )}
         </div>
       </div>
-      {/* <div dangerouslySetInnerHTML={{ __html: current_page.content }} /> */}
-      <Tabs defaultValue="old" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="old">Stara stran</TabsTrigger>
-          <TabsTrigger value="new">Nova stran</TabsTrigger>
-        </TabsList>
-        <TabsContent value="old">
-          <iframe
-            className="h-[50vh] w-full"
-            src={iframe_src(page)}
-            /* onLoad={(event) => {
-              console.log("event", event);
-              const iframe = event.target as HTMLIFrameElement;
-              // iframe.style.height = "500px";
-              const height = `${iframe.contentWindow?.document.documentElement.scrollHeight}px`;
-              console.log("height", height);
-            }} */
-          />
-        </TabsContent>
-        <TabsContent value="new">
-          <EditorToReact article={article.data} />
-        </TabsContent>
-      </Tabs>
+      <div className="prose-slate grid h-full w-full grid-cols-2 gap-2 marker:text-neutral-500">
+        <iframe
+          className="h-full w-full overflow-y-hidden rounded-xl"
+          src={iframe_src(page)}
+        />
+        <EditorToReact article={article.data} />
+      </div>
     </div>
   );
 }

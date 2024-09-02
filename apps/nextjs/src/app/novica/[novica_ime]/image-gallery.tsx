@@ -48,12 +48,12 @@ export function ImageGallery() {
     const scroll_callback = (event: WheelEvent | TouchEvent) => {
       if (event instanceof WheelEvent) {
         gallery.clear_default_image();
-        event.preventDefault();
+        // event.preventDefault();
       } else if (event instanceof TouchEvent) {
         const touch = event.touches[0];
         if (typeof touch?.clientY !== "undefined") {
           gallery.clear_default_image();
-          event.preventDefault();
+          // event.preventDefault();
         }
       }
     };
@@ -88,7 +88,7 @@ export function ImageGallery() {
 
     return createPortal(
       <div
-        className="fixed inset-0 z-50 h-screen w-screen bg-black/40 backdrop-blur-sm"
+        className="fixed inset-0 z-50 h-screen w-screen bg-black/90 backdrop-blur-sm"
         onClick={() => {
           gallery_store.set.default_image(undefined);
         }}
@@ -148,6 +148,7 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
       setApi={setApi}
       opts={{
         align: "center",
+        duration: 0,
       }}
       // max-h-[90vh] max-w-[90vw]  p-10
       className="flex h-full w-full max-w-[80%] items-center justify-center"
@@ -186,18 +187,26 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
 function GalleryImage({ image }: { image: EditorJSImageData }) {
   return (
     <figure>
-      <Image
-        /* max-h-[1500px] max-w-[1500px] */
-        className="max-h-[90vh] rounded-xl"
-        src={image.file.url}
-        alt={image.caption}
-        sizes="(max-width: 1500px) 100vw, 1500px"
-        width={image.file.width ?? 1500}
-        height={image.file.height ?? 1000}
-        loader={({ src }) => src}
-      />
+      <div className="flex h-full w-full items-center justify-center">
+        <Image
+          /* max-h-[1500px] max-w-[1500px] */
+          className="max-h-[90vh] rounded-xl object-contain"
+          src={image.file.url}
+          alt={image.caption}
+          sizes="(max-width: 1500px) 100vw, 1500px"
+          width={image.file.width ?? 1500}
+          height={image.file.height ?? 1000}
+          loader={({ src }) => src}
+        />
+      </div>
       {image.caption && (
-        <figcaption className="mt-2 w-full rounded-xl border bg-background/90 p-4">
+        <figcaption
+          className="mt-2 w-full rounded-xl text-white"
+          style={{
+            width: `${image.file.width}px`,
+            // height: `${image.file.height}px`,
+          }}
+        >
           {image.caption}
         </figcaption>
       )}

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Separator } from "@acme/ui/separator";
 
@@ -14,13 +15,19 @@ interface ShellProps {
   children: React.ReactNode;
   article?: typeof Article.$inferSelect;
   without_footer?: boolean;
+  className?: string;
 }
 
-export function Shell({ children, article, without_footer }: ShellProps) {
+export function Shell({
+  children,
+  article,
+  without_footer,
+  className,
+}: ShellProps) {
   return (
     <HydrateClient>
       {/* <Background /> */}
-      <div className="w-full">
+      <div className={cn("w-full", className)}>
         {/* py-4 md:py-6 backdrop-blur-sm*/}
         <header /* className="z-50" */>
           <Header article={article} />

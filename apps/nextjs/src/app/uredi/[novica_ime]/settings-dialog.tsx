@@ -45,11 +45,11 @@ export function SettingsDialog() {
             </Button>
           </DialogTrigger>
         </TooltipTrigger>
-        <TooltipContent>Nastvitve novičke</TooltipContent>
+        <TooltipContent>Nastavitve</TooltipContent>
       </Tooltip>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nastvitve novičke</DialogTitle>
+          <DialogTitle>Nastavitve</DialogTitle>
           <DialogDescription>
             Spremeni naslov, določi naslovno slike, objavi ali shrani kot
             osnutek.

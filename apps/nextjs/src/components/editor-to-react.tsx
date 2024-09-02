@@ -69,7 +69,7 @@ export function EditorToReact({
   if (!editor_data || !article) return;
 
   return (
-    <Card className="pt-8">
+    <Card className="prose dark:prose-invert prose-figcaption:text-base prose-figcaption:text-blue-800 pt-8">
       <CardHeader>
         <h1>{heading}</h1>
         <CardDescription className="flex items-center text-base text-foreground">

@@ -90,7 +90,7 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
   const editorJS = useRef<EditorJS | null>(null);
   const [dirty, setDirty] = useState(false);
   const trpc_utils = api.useUtils();
-  const all_authors = api.article.google_users.useQuery()
+  const all_authors = api.article.google_users.useQuery();
 
   useEffect(() => {
     if (dirty) {
@@ -209,6 +209,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       setSavingText(undefined);
       setDirty(false);
+
+      await trpc_utils.article.invalidate();
     },
   });
 
@@ -221,11 +223,13 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
 
       setSavingText("Brišem osnutek ...");
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       const returned_data = data?.at(0);
       if (!editorJS.current || !returned_data || !article) return;
 
       setSavingText(undefined);
+
+      await trpc_utils.article.invalidate();
 
       router.push(
         `/novica/${generate_encoded_url({
@@ -314,6 +318,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       setSavingText(undefined);
       setDirty(false);
 
+      await trpc_utils.article.invalidate();
+
       router.replace(`/novica/${generate_encoded_url(returned_data)}`);
     },
   });
@@ -333,6 +339,8 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
         published: false,
         has_draft: true,
       });
+
+      await trpc_utils.article.invalidate();
     },
   });
 

@@ -57,25 +57,37 @@ export default {
         DEFAULT: {
           css: {
             maxWidth: "1280px",
+            lineHeight: "1.5",
+            color: "#404040", // theme("colors.neutral.700"),
             p: {
-              fontWeight: "400",
+              // fontWeight: "400",
               fontSize: "16px",
-              lineHeight: "1.5",
             },
             h1: {
               fontWeight: "500", // 500
               color: theme("colors.blue.800"),
-              fontSize: "36px",
+              // fontSize: "36px",
             },
             h2: {
               fontWeight: "400",
               color: theme("colors.blue.800"),
-              fontSize: "24px",
+              // fontSize: "24px",
             },
             h3: {
               fontWeight: "400",
               color: theme("colors.blue.800"),
               fontSize: "18px",
+            },
+            li: {
+              marginTop: "0em",
+              marginBottom: "0em",
+            },
+            figure: {
+              marginTop: "1em",
+              marginBottom: "1em",
+            },
+            figcaption: {
+              marginTop: "4px",
             },
           },
         },

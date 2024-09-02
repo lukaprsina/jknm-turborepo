@@ -35,7 +35,6 @@ export default function EditingButtons({
         <EditButton
           id={article.id}
           url={article.url}
-          preview_image={article.preview_image ?? undefined}
           content_preview={content_to_text(article.content ?? undefined)}
           has_draft={!!article.draft_content}
         />
@@ -55,18 +54,19 @@ export function EditButton({
   url,
   content_preview,
   has_draft,
+  new_tab,
   variant = "ghost",
 }: {
   id: number;
   url: string;
-  preview_image?: string;
   content_preview?: string;
   has_draft?: boolean;
+  new_tab?: boolean;
   variant?: ButtonProps["variant"];
 }) {
   const router = useRouter();
   const trpc_utils = api.useUtils();
-  const all_authors = api.article.google_users.useQuery()
+  const all_authors = api.article.google_users.useQuery();
 
   const article_create_draft = api.article.create_draft.useMutation({
     onSuccess: async (data) => {
@@ -78,6 +78,7 @@ export function EditButton({
         title: returned_data.title,
         url: returned_data.url,
         content_preview: content_preview ?? "",
+        image: returned_data.preview_image ?? "",
         created_at: returned_data.created_at.getTime(),
         published: !!returned_data.published,
         has_draft: !!returned_data.draft_content,
@@ -88,7 +89,12 @@ export function EditButton({
       await trpc_utils.article.invalidate();
 
       // console.log("/uredi", generate_encoded_url(returned_data));
-      router.push(`/uredi/${generate_encoded_url(returned_data)}`);
+      const new_url = `/uredi/${generate_encoded_url(returned_data)}`;
+      if (new_tab) {
+        window.open(new_url, "_blank");
+      } else {
+        router.push(new_url);
+      }
     },
   });
 
@@ -96,18 +102,22 @@ export function EditButton({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          className="dark:bg-primary/80 dark:text-primary-foreground"
+          className="flex flex-shrink-0 dark:bg-primary/80 dark:text-primary-foreground"
           variant={variant}
           size="icon"
           onClick={() => {
             // console.log({ has_draft });
+            const new_url = `/uredi/${generate_encoded_url({
+              id,
+              url,
+            })}`;
+
             if (has_draft) {
-              router.push(
-                `/uredi/${generate_encoded_url({
-                  id,
-                  url,
-                })}`,
-              );
+              if (new_tab) {
+                window.open(new_url, "_blank");
+              } else {
+                router.push(new_url);
+              }
             } else {
               article_create_draft.mutate({
                 id,
