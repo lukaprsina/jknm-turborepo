@@ -5,7 +5,7 @@ import fs_promises from "node:fs/promises";
 import { finished } from "node:stream/promises";
 import type { OutputData } from "@editorjs/editorjs";
 import { parse as csv_parse } from "csv-parse";
-import { count, sql } from "drizzle-orm";
+import { count, eq, sql } from "drizzle-orm";
 import sharp from "sharp";
 
 import type { ArticleHit } from "@acme/validators";
@@ -66,30 +66,44 @@ export interface TempArticleType {
   author_ids: string[];
 }
 
-export async function upload_articles(articles: TempArticleType[]) {
+function convert_article(
+  article: TempArticleType,
+): typeof Article.$inferInsert {
+  return {
+    id: article.serial_id,
+    old_id: parseInt(article.objave_id),
+    title: article.title,
+    content: article.content,
+    created_at: article.created_at,
+    updated_at: article.updated_at,
+    preview_image: article.preview_image,
+    url: article.csv_url,
+    published: true,
+    author_ids: article.author_ids,
+  };
+}
+
+export async function upload_articles(
+  articles: TempArticleType[],
+  do_update: boolean,
+) {
   console.log("uploading articles", articles.length);
   if (articles.length === 0) return;
+  if (do_update) {
+    for (const article of articles) {
+      const test = await db
+        .update(Article)
+        .set(convert_article(article))
+        .where(eq(Article.id, article.serial_id))
+        .returning();
 
-  db.update(Article).set({});
-
-  await db.transaction(async (tx) => {
+      console.log("UPDATING", test);
+    }
+  } else {
     try {
-      await tx
+      await db
         .insert(Article)
-        .values(
-          articles.map((article) => ({
-            id: article.serial_id,
-            old_id: parseInt(article.objave_id),
-            title: article.title,
-            content: article.content,
-            created_at: article.created_at,
-            updated_at: article.updated_at,
-            preview_image: article.preview_image,
-            url: article.csv_url,
-            published: true,
-            author_ids: article.author_ids,
-          })),
-        )
+        .values(articles.map(convert_article))
         .onConflictDoUpdate({
           target: Article.id,
           set: buildConflictUpdateColumns(Article, ["content"]),
@@ -112,35 +126,7 @@ export async function upload_articles(articles: TempArticleType[]) {
         console.error("Unknown", e);
       }
     }
-
-    /* const authors: (typeof Article.$inferInsert)[] = [];
-
-    for (const article of articles) {
-      for (const author_name of article.author_names) {
-        const author = await db.query.CreditedPeople.findFirst({
-          where: eq(CreditedPeople.name, author_name),
-        });
-
-        if (!author) {
-          console.error("Author not found", author_name, article.serial_id);
-          continue;
-        }
-
-        authors.push({
-          article_id: article.serial_id,
-          credited_people_id: author.id,
-        });
-      }
-    }
-
-    if (authors.length === 0) return;
-    try {
-      await tx.insert(ArticlesToCreditedPeople).values(authors);
-    } catch (e) {
-      console.error("Error inserting authors", e);
-    }
-  }); */
-  });
+  }
 
   console.log("done uploading articles");
 }

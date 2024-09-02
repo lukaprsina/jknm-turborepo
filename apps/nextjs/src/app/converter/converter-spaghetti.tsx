@@ -120,7 +120,7 @@ export async function iterate_over_articles(
 
   console.log("done", articles);
   if (!do_dry_run) {
-    await upload_articles(articles);
+    await upload_articles(articles, do_update);
   }
 
   // await save_images(images_to_save);

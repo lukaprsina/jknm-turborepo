@@ -78,11 +78,11 @@ export function EditorToReact({
               author_names={get_author_names(article, all_authors.data)}
             />
           </span>
-          {article.author_ids?.length !== 0 && <DotIcon size={20} />}
+          {article.author_ids?.length !== 0 && <DotIcon />}
           <span> {format_date(article.created_at)}</span>
           {session && (
             <>
-              <DotIcon size={20} />
+              <DotIcon />
               {article.old_id}
             </>
           )}
