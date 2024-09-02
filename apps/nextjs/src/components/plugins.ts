@@ -24,11 +24,7 @@ import Quote from "@editorjs/quote";
 import Table from "@editorjs/table";
 // @ts-expect-error no types
 import Warning from "@editorjs/warning";
-import {
-  ItalicInlineTool,
-  StrongInlineTool,
-  UnderlineInlineTool,
-} from "editorjs-inline-tool";
+import { UnderlineInlineTool } from "editorjs-inline-tool";
 
 // import type { useToast } from "@acme/ui/use-toast";
 
@@ -86,9 +82,6 @@ export function EDITOR_JS_PLUGINS(): Record<
       inlineToolbar: true,
     },
     embed: Embed,
-    italic: ItalicInlineTool,
-    strong: StrongInlineTool,
-    underline: UnderlineInlineTool,
     table: {
       class: Table,
       // inlineToolbar: true,
@@ -120,5 +113,42 @@ export function EDITOR_JS_PLUGINS(): Record<
     checklist: CheckList,
     delimiter: Delimiter,
     inlineCode: InlineCode,
+
+    // toolbar
+    /* bold: {
+      class: createGenericInlineTool({
+        sanitize: {
+          strong: {},
+        },
+        shortcut: "CMD+B",
+        tagName: "STRONG",
+        toolboxIcon: BOLD_ICON,
+      }),
+    },
+    italic: {
+      class: createGenericInlineTool({
+        sanitize: {
+          em: {},
+        },
+        shortcut: "CMD+I",
+        tagName: "EM",
+        toolboxIcon: ITALIC_ICON,
+      }),
+    },
+    underline: {
+      class: createGenericInlineTool({
+        sanitize: {
+          u: {},
+        },
+        shortcut: "CMD+U",
+        tagName: "U",
+        toolboxIcon: UNDERLINE_ICON,
+      }),
+    }, */
+    underline: UnderlineInlineTool,
   };
 }
+
+/* const BOLD_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bold"><path d="M6 12h9a4 4 0 0 1 0 8H7a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h7a4 4 0 0 1 0 8"/></svg>`;
+const ITALIC_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-italic"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>`;
+const UNDERLINE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-underline"><path d="M6 4v6a6 6 0 0 0 12 0V4"/><line x1="4" x2="20" y1="20" y2="20"/></svg>`; */

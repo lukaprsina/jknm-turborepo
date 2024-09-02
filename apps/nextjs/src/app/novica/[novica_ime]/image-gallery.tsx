@@ -185,17 +185,24 @@ export function MyCarousel({ first_image }: { first_image?: string }) {
 }
 
 function GalleryImage({ image }: { image: EditorJSImageData }) {
+  const { width, height } = useMemo(
+    () => ({
+      width: image.file.width ?? 1500,
+      height: image.file.height ?? 1000,
+    }),
+    [image.file.width, image.file.height],
+  );
   return (
     <figure>
       <div className="flex h-full w-full items-center justify-center">
         <Image
           /* max-h-[1500px] max-w-[1500px] */
-          className="max-h-[90vh] rounded-xl object-contain"
+          className="max-h-[90vh] rounded-xl object-scale-down"
           src={image.file.url}
           alt={image.caption}
           sizes="(max-width: 1500px) 100vw, 1500px"
-          width={image.file.width ?? 1500}
-          height={image.file.height ?? 1000}
+          width={width}
+          height={height}
           loader={({ src }) => src}
         />
       </div>

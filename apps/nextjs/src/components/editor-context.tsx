@@ -148,7 +148,19 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       holder: "editorjs",
       tools: EDITOR_JS_PLUGINS(),
       data: content,
-      // inlineToolbar: ["italic", "strong", "underline"], //true, //["link", "marker", "bold", "italic"],
+      inlineToolbar: true,
+      /* inlineToolbar: [
+        // "convert-to",
+        // "separator",
+        "bold",
+        "italic",
+        "underline",
+        // "separator",
+        "link",
+        "inline-code",
+        "marker",
+      ], */
+      // inlineToolbar: ["convert-to", "bold", "italic", "underline"],
       autofocus: true,
       onReady: () => {
         setTimeout(() => {
