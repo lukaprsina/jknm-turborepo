@@ -1,19 +1,14 @@
 "use client";
 
-import { useContext, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useIntersectionObserver } from "react-intersection-observer-hook";
 
-import { ShowDraftsContext } from "~/components/drafts-provider";
 import { api } from "~/trpc/react";
 import { Articles } from "./articles";
 
 export function useInfiniteArticles() {
-  const drafts = useContext(ShowDraftsContext);
-  const show_drafts = drafts?.[0] ?? false;
-
   const [article_api, test] = api.article.infinite.useSuspenseInfiniteQuery(
     {
-      show_drafts: show_drafts,
       limit: 6 * 5,
     },
     {

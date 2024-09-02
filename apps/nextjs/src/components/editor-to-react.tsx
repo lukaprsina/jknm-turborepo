@@ -3,7 +3,7 @@
 import "./editorjs-attaches.css";
 
 import type { RenderFn } from "editorjs-blocks-react-renderer";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Blocks from "editorjs-blocks-react-renderer";
@@ -62,9 +62,13 @@ export function EditorToReact({
     };
   }, [article?.content, article?.draft_content, draft, gallery_set_images]);
 
-  /* useEffect(() => {
-    console.log("editor-to-react", article?.author_ids);
-  }, [article?.author_ids]); */
+  useEffect(() => {
+    console.log(
+      "editor-to-react author ids",
+      article?.author_ids,
+      article?.author_ids && article.author_ids.length !== 0,
+    );
+  }, [article?.author_ids]);
 
   if (!editor_data || !article) return;
 
@@ -78,9 +82,9 @@ export function EditorToReact({
               author_names={get_author_names(article, all_authors.data)}
             />
           </span>
-          {article.author_ids?.length !== 0 && <DotIcon />}
+          {article.author_ids && article.author_ids.length !== 0 && <DotIcon />}
           <span> {format_date(article.created_at)}</span>
-          {session && (
+          {session && article.old_id && (
             <>
               <DotIcon />
               {article.old_id}

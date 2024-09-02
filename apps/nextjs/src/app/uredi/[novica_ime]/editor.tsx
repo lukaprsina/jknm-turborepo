@@ -27,10 +27,10 @@ import { MultiSelect } from "@acme/ui/multi-select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { EditorProvider, useEditor } from "~/components/editor-context";
+import { api } from "~/trpc/react";
 import { editor_store } from "./editor-store";
 import { SettingsDialog } from "./settings-dialog";
 import { UploadDialog } from "./upload-dialog";
-import { api } from "~/trpc/react";
 
 export default function MyEditor({
   article,
@@ -83,7 +83,7 @@ export interface AuthorValueMultiSelectType {
 
 function MyToolbar() {
   const editor = useEditor();
-  const all_authors = api.article.google_users.useQuery()
+  const all_authors = api.article.google_users.useQuery();
 
   const authors = useMemo(() => {
     if (!all_authors.data) return [];

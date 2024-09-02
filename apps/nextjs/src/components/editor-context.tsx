@@ -112,24 +112,28 @@ export const EditorProvider: React.FC<EditorProviderProps> = ({
       if (!editorJS.current || !article) return;
 
       const image_data = get_image_data_from_editor(editor_content);
-      editor_store.set.image_data(image_data);
-
       const preview_image = editor_store.get.preview_image();
 
-      if (!preview_image) {
-        if (article.draft_preview_image) {
-          editor_store.set.preview_image(article.draft_preview_image);
-        } else if (article.preview_image) {
-          editor_store.set.preview_image(article.preview_image);
-        } else {
-          editor_store.set.preview_image(image_data.at(0)?.file.url);
+      editor_store.set.state((draft) => {
+        if (!preview_image) {
+          if (article.draft_preview_image) {
+            draft.preview_image = article.draft_preview_image;
+          } else if (article.preview_image) {
+            draft.preview_image = article.preview_image;
+          } else {
+            draft.preview_image = image_data.at(0)?.file.url;
+          }
         }
-      }
 
-      editor_store.set.id(article.id);
+        draft.image_data = image_data;
+        draft.id = article.id;
+        draft.image_data = image_data;
+        if (typeof title !== "undefined") draft.title = title;
+        if (typeof url !== "undefined") draft.url = url;
 
-      if (typeof title !== "undefined") editor_store.set.title(title);
-      if (typeof url !== "undefined") editor_store.set.url(url);
+        draft.google_ids = article.author_ids ?? [];
+        draft.custom_author_names = article.custom_author_names ?? [];
+      });
     },
     [article],
   );

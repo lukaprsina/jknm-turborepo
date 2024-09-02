@@ -19,7 +19,6 @@ import { Separator } from "@acme/ui/separator";
 import { ThemeToggle } from "@acme/ui/theme";
 
 import { NoviceAutocomplete } from "./autocomplete";
-import { ShowDraftsSwitch } from "./drafts-provider";
 import EditingButtons from "./editing-buttons";
 import { Logo } from "./logo";
 import { MobileSheet } from "./mobile-sheet";
@@ -81,7 +80,6 @@ export function DesktopHeader({
         </Link>
         <div className="flex h-full flex-shrink-0 flex-col justify-between">
           <div className="flex justify-end">
-            <ShowDraftsSwitch />
             <EditingButtons article={article} session={session} />
           </div>
           <div className="flex items-center justify-between gap-2">

@@ -22,25 +22,26 @@ export const articleRouter = {
         limit: z.number().min(1).max(1000).default(50),
         cursor: z.date().optional(),
         direction: z.enum(["forward", "backward"]).optional(),
-        show_drafts: z.boolean().optional().default(false),
       }),
     )
     .query(async ({ ctx, input }) => {
-      console.warn("input", input);
-      const direction = input.direction == "forward" ? "desc" : "asc";
+      const direction = input.direction === "backward" ? "asc" : "desc";
 
       const data = await ctx.db.query.Article.findMany({
         ...withCursorPagination({
           limit: input.limit,
           cursors: [[Article.created_at, direction, input.cursor]],
-          where:
-            ctx.session && input.show_drafts
-              ? undefined
-              : eq(Article.published, true),
+          where: ctx.session ? undefined : eq(Article.published, true),
         }),
       });
 
-      console.log("data", data.length);
+      console.log(
+        "data",
+        data.length,
+        data.at(0)?.title,
+        data.at(data.length - 1)?.title,
+        input,
+      );
 
       const last = data[data.length - 1];
 
