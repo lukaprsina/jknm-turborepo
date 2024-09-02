@@ -77,7 +77,9 @@ export function PreveriClient({
       <h2>Preveri</h2>
       <p>Stran {page}</p>
       <form
-        onSubmit={() => {
+        onSubmit={(event) => {
+          event.preventDefault();
+          console.log("form onsubmit");
           const article_index = articles.findIndex(
             (article) => article.old_id === inputPage,
           );
