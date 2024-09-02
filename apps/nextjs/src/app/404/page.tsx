@@ -1,9 +1,12 @@
+import { cn } from "@acme/ui";
+
 import { Shell } from "~/components/shell";
+import { article_variants, page_variants } from "~/lib/page-variants";
 
 export default function FourOFour() {
   return (
     <Shell>
-      <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+      <div className={cn(article_variants(), page_variants())}>
         <h1>404</h1>
         <p>Page not found</p>
       </div>

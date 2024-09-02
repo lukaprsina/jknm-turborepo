@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Checkbox } from "@acme/ui/checkbox";
 import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
 import { ScrollArea } from "@acme/ui/scroll-area";
 
+import { article_variants, page_variants } from "~/lib/page-variants";
 import { api } from "~/trpc/react";
 import { EDITOR_JS_PLUGINS } from "../../components/plugins";
 import {
@@ -43,7 +44,7 @@ export function ArticleConverter() {
   const all_authors = api.article.google_users.useQuery();
 
   return (
-    <div className="prose container mx-auto py-8">
+    <div className={cn(article_variants(), page_variants())}>
       <h1>Article Converter: {article_count} novičk</h1>
       <div className="flex w-full flex-wrap gap-4">
         <Button

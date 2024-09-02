@@ -1,16 +1,12 @@
 import type { IntersectionObserverHookRefCallback } from "react-intersection-observer-hook";
 import React, { useCallback } from "react";
-import { cva } from "class-variance-authority";
 
 import type { Article } from "@acme/db/schema";
 import { cn } from "@acme/ui";
 import { Card, CardDescription, CardHeader, CardTitle } from "@acme/ui/card";
 
 import { ArticleDrizzleCard } from "~/components/article-card";
-
-export const articles_variants = cva(
-  "prose dark:prose-invert prose-img:m-0 prose-h3:my-0 prose-h3:py-0 prose-p:m-0",
-);
+import { article_variants } from "~/lib/page-variants";
 
 export const Articles = ({
   articles,
@@ -40,7 +36,7 @@ export const Articles = ({
         /* prose-h3:my-0 prose-p:mt-0 lg:prose-xl prose-p:text-lg mx-auto   */
         <div
           className={cn(
-            articles_variants(),
+            article_variants({ variant: "card" }),
             "container grid w-full grid-cols-1 gap-6 px-4 py-8 md:grid-cols-2 md:px-6 lg:grid-cols-3 lg:px-8",
           )}
         >

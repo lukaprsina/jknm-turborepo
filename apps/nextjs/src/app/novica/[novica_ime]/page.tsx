@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { Article } from "@acme/db/schema";
 import { auth } from "@acme/auth";
+import { cn } from "@acme/ui";
 import {
   Card,
   CardContent,
@@ -14,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 import { EditableProvider } from "~/components/editable-context";
 import { EditorToReact } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
+import { article_variants, page_variants } from "~/lib/page-variants";
 import { api } from "~/trpc/server";
 import { ImageGallery } from "./image-gallery";
 
@@ -88,7 +90,7 @@ function PublishedContent({
   return (
     // <div className="container h-full min-h-screen pt-8">
     // {/* lg:prose-xl  */}
-    <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+    <div className={cn(article_variants(), page_variants())}>
       <EditorToReact article={article} />
     </div>
     // </div>
@@ -113,9 +115,9 @@ async function TabbedContent({
       defaultValue={article.draft_content ? "draft" : "published"}
       /* lg:prose-xl prose-p:text-lg prose-h1:font-normal prose-h1:text-blue-800 prose-h1:text-[40px]  */
       // prose-figcaption:text-foreground
-      className="container w-full pt-8"
+      className={cn(article_variants(), page_variants())}
     >
-      <TabsList>
+      <TabsList className="not-prose">
         <TabsTrigger disabled={!article.draft_content} value="draft">
           Osnutek
         </TabsTrigger>
@@ -123,10 +125,10 @@ async function TabbedContent({
           Objavljeno
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="draft" className="py-6">
+      <TabsContent value="draft">
         <EditorToReact draft article={article} session={session ?? undefined} />
       </TabsContent>
-      <TabsContent value="published" className="py-6">
+      <TabsContent value="published">
         <EditorToReact article={article} session={session ?? undefined} />
       </TabsContent>
     </Tabs>
@@ -135,7 +137,7 @@ async function TabbedContent({
 
 function ArticleNotFound() {
   return (
-    <div className="prose dark:prose-invert container min-h-screen w-full pb-6 pt-8">
+    <div className={cn(article_variants(), page_variants(), "min-h-screen")}>
       <Card>
         <CardHeader>
           <CardTitle>Novica ne obstaja</CardTitle>

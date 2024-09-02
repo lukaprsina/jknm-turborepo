@@ -59,6 +59,8 @@ export default {
             maxWidth: "1280px",
             lineHeight: "1.5",
             color: "#404040", // theme("colors.neutral.700"),
+            "--card-foreground": theme("colors.neutral.700"),
+            "--tw-prose-bullets": theme("colors.neutral[500]"),
             p: {
               // fontWeight: "400",
               fontSize: "16px",

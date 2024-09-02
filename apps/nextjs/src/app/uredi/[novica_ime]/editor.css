@@ -7,6 +7,11 @@
 .ce-toolbar__content {
   max-width: calc(100% - 180px) !important;
 }
+
 .cdx-block {
   max-width: 100% !important;
+}
+
+.ce-block__content {
+  @apply prose;
 }

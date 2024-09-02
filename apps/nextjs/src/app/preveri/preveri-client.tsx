@@ -10,6 +10,7 @@ import { useToast } from "@acme/ui/use-toast";
 
 import { EditButton } from "~/components/editing-buttons";
 import { EditorToReact } from "~/components/editor-to-react";
+import { article_variants, page_variants } from "~/lib/page-variants";
 import { api } from "~/trpc/react";
 
 // import type { CSVType } from "../converter/converter-server";
@@ -72,15 +73,27 @@ export function PreveriClient({
   }, [iframe_src, page_info.next, page_info.previous, router]);
 
   return (
-    <div
-      className={cn(
-        "prose h-full w-full max-w-none px-6 pb-6 pt-8",
-        // "h-full max-h-screen overflow-scroll",
-      )}
-    >
+    <div className={cn(article_variants(), page_variants(), "max-w-none px-6")}>
       <h2>Preveri</h2>
       <p>Stran {page}</p>
-      <div className="my-8 flex items-center gap-4">
+      <form
+        onSubmit={() => {
+          const article_index = articles.findIndex(
+            (article) => article.old_id === inputPage,
+          );
+
+          if (article_index === -1) {
+            toast.toast({
+              title: `Stran z ID ${inputPage} ne obstaja`,
+            });
+
+            return;
+          }
+
+          setPage(inputPage);
+        }}
+        className="my-8 flex items-center gap-4"
+      >
         <div className="flex gap-2">
           <Button
             disabled={isNaN(page_info.previous)}
@@ -105,31 +118,13 @@ export function PreveriClient({
               setInputPage(number);
             }}
           />
-          <Button
-            onClick={() => {
-              const article_index = articles.findIndex(
-                (article) => article.old_id === inputPage,
-              );
-
-              if (article_index === -1) {
-                toast.toast({
-                  title: `Stran z ID ${inputPage} ne obstaja`,
-                });
-
-                return;
-              }
-
-              setPage(inputPage);
-            }}
-          >
-            Pojdi
-          </Button>
+          <Button type="submit">Pojdi</Button>
           {article.data && (
             <EditButton id={article.data.id} url={article.data.url} new_tab />
           )}
         </div>
-      </div>
-      <div className="prose-slate grid h-full w-full grid-cols-2 gap-2 marker:text-neutral-500">
+      </form>
+      <div className="grid h-full w-full grid-cols-2 gap-2">
         <iframe
           className="h-full w-full overflow-y-hidden rounded-xl"
           src={iframe_src(page)}

@@ -41,11 +41,7 @@ export default function MyEditor({
     <EditorProvider article={article}>
       <div className="mx-auto w-full outline outline-1">
         <MyToolbar />
-        <div
-          id="editorjs"
-          /* lg:prose-xl  */
-          className="prose dark:prose-invert container"
-        />
+        <div id="editorjs" />
       </div>
       <SettingsSummary />
     </EditorProvider>

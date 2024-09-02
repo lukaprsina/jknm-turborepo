@@ -2,11 +2,14 @@ import type { OutputBlockData } from "@editorjs/editorjs";
 import { redirect } from "next/navigation";
 import Blocks from "editorjs-blocks-react-renderer";
 
+import { cn } from "@acme/ui";
+
 import {
   AttachesRenderer,
   NextImageRenderer,
 } from "~/components/editor-to-react";
 import { Shell } from "~/components/shell";
+import { article_variants, page_variants } from "~/lib/page-variants";
 import { zgodovina } from "./zgodovina";
 
 interface PageProps {
@@ -25,7 +28,7 @@ export default function Page({ params: { page_name } }: PageProps) {
 
   return (
     <Shell>
-      <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+      <div className={cn(article_variants(), page_variants())}>
         <Blocks
           data={{ time: Date.now(), version: "UNKNOWN", blocks: page }}
           renderers={{

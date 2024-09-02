@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Open_Sans } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistMono } from "geist/font/mono";
 import { GeistSans } from "geist/font/sans";
 import { SessionProvider } from "next-auth/react";
@@ -67,6 +68,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
             <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
               <TRPCReactProvider>{props.children}</TRPCReactProvider>
               <Toaster />
+              <SpeedInsights />
             </ThemeProvider>
           </TooltipProvider>
         </SessionProvider>

@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import {
   Card,
@@ -12,6 +13,7 @@ import {
 
 import NewArticleLoader from "~/components/new-article-loader";
 import { Shell } from "~/components/shell";
+import { article_variants, page_variants } from "~/lib/page-variants";
 import { api } from "~/trpc/server";
 import { get_clean_url } from "./editor-utils";
 
@@ -28,7 +30,7 @@ interface EditorPageProps {
 function ErrorCard({ title }: { title: string }) {
   return (
     <Shell>
-      <div className="prose dark:prose-invert container w-full pb-6 pt-8">
+      <div className={cn(article_variants(), page_variants())}>
         <Card>
           <CardHeader>
             <CardTitle>{title}</CardTitle>
@@ -62,7 +64,7 @@ export default async function EditorPage({
 
   return (
     <Shell>
-      <div className="container mb-4 mt-8 h-full min-h-screen">
+      <div className={cn(article_variants(), page_variants(), "min-h-screen")}>
         {article_by_url ? (
           <Editor article={article_by_url} />
         ) : (

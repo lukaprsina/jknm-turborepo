@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@acme/ui/tabs";
 
 import { ArticleAlgoliaCard } from "~/components/article-card";
 import { algolia } from "~/lib/algolia";
-import { articles_variants } from "../articles";
+import { article_card_variants } from "../articles";
 import { ArticleTable } from "./article-table";
 import { MyPagination } from "./pagination";
 import {
@@ -60,7 +60,7 @@ export function Search({ session }: { session?: Session }) {
             hitComponent={ArticleAlgoliaCard}
             classNames={{
               list: "container grid w-full grid-cols-1 gap-6 px-0 py-8 md:grid-cols-2 lg:grid-cols-3",
-              item: articles_variants(),
+              item: article_card_variants(),
               // list: "grid grid-cols-1 gap-4 sm:grid-cols-2",
             }}
           />
